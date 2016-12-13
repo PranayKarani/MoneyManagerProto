@@ -10,7 +10,7 @@ class TCategories : AbstractTable() {
         val TYPE = "cat_type" // 0- income, 1- expense
         val EXCLUDE = "cat_ex"
 
-        val createTableQuery =
+        val q_CREATE_TABLE =
                 "CREATE TABLE $TABLE_NAME ( " +
                         "$ID INTEGER PRIMARY KEY AUTOINCREMENT," +
                         "$NAME TEXT," +

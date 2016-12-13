@@ -14,7 +14,7 @@ class TTransactions : AbstractTable(){
         val EXCLUDE = "trans_ex"
 
 
-        val createTableQuery = "" +
+        val q_CREATE_TABLE = "" +
                 "CREATE TABLE $TABLE_NAME (" +
                 "$ID INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "$AMOUNT DOUBLE," +

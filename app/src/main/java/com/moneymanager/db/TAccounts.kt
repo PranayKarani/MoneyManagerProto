@@ -1,8 +1,9 @@
 package com.moneymanager.db
 
-import com.moneymanager.entities.Account
 import android.content.ContentValues
 import android.content.Context
+import com.moneymanager.entities.Account
+import com.moneymanager.exceptions.NoAccountsException
 
 // Created by PranayKarani on 10-12-2016.
 class TAccounts(context: Context) : AbstractTable() {
@@ -14,7 +15,7 @@ class TAccounts(context: Context) : AbstractTable() {
         val BALANCE = "acc_bal"
         val EXCLUDE = "acc_ex"
 
-        val createTableQuery =
+        val q_CREATE_TABLE =
                 "CREATE TABLE $TABLE_NAME ( " +
                         "$ID INTEGER PRIMARY KEY AUTOINCREMENT," +
                         "$NAME TEXT," +
@@ -22,7 +23,9 @@ class TAccounts(context: Context) : AbstractTable() {
                         "$EXCLUDE INTEGER" +
                         ");"
 
-        val selectAllAccounts = "SELECT * FROM $TABLE_NAME ORDER BY $NAME ASC;"
+        fun q_SELECT_ALL_ACCOUNTS(column: String?, order: String?): String {
+            return "SELECT * FROM $TABLE_NAME ORDER BY ${column ?: NAME} ${order ?: "ASC"};"
+        }
 
     }
 
@@ -39,34 +42,33 @@ class TAccounts(context: Context) : AbstractTable() {
 
     }
 
-    fun getAllAccounts(): Array<Account?> {
+    fun getAllAccounts(column: String?, order: String?): Array<Account?> {
 
+        val c = dbHelper.select(q_SELECT_ALL_ACCOUNTS(column, order), null)
 
-        val c = dbHelper.select(selectAllAccounts, null)
+        if (c.count == 0) throw NoAccountsException()
 
-        if (c.moveToFirst()) {
+        val accounts = kotlin.arrayOfNulls<Account>(c.count)
 
-            val accounts = kotlin.arrayOfNulls<Account>(c.count)
+        while (c.moveToNext()) {
 
-            while (c.moveToNext()) {
+            val id = c.getInt(c.getColumnIndex(ID))
+            val name = c.getString(c.getColumnIndex(NAME))
+            val balance = c.getDouble(c.getColumnIndex(BALANCE))
+            val exclude = c.getInt(c.getColumnIndex(NAME)) == 1
 
-                val name = c.getString(c.getColumnIndex(NAME))
-                val balance = c.getDouble(c.getColumnIndex(BALANCE))
-                val exclude = c.getInt(c.getColumnIndex(NAME)) == 1
+            val account = Account(id, name, balance, exclude)
 
-                val account = Account(name, balance, exclude)
+            accounts[c.position] = account
 
-                accounts[c.position] = account
-
-            }
-
-            return accounts
-
-        } else {
-            throw Exception("account table should not be empty")
         }
 
+        return accounts
 
+    }
+
+    fun removeAccount(id: Int) {
+        dbHelper.delete(TABLE_NAME, "$ID = ?", arrayOf(id.toString()))
     }
 
 }
