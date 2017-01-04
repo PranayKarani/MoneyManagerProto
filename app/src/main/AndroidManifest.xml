@@ -21,7 +21,7 @@
                 android:name=".activities.ASearch"
                 android:parentActivityName=".activities.AMain">
         </activity>
-        <activity android:name=".activities.ATransaction">
+        <activity android:name=".activities.transaction.AAddTransaction">
         </activity>
         <activity android:name=".activities.accounts.AAddAccount">
         </activity>

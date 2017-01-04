@@ -9,8 +9,8 @@ import android.widget.EditText
 import android.widget.Switch
 import android.widget.Toast
 import com.moneymanager.R
-import com.moneymanager.db.TAccounts
 import com.moneymanager.entities.Account
+import com.moneymanager.repo.TAccounts
 import com.moneymanager.setUpToolbar
 
 class AAddAccount : AppCompatActivity() {
@@ -52,7 +52,7 @@ class AAddAccount : AppCompatActivity() {
         } else if (new_acc_bal.isEmpty()) {
             acc_bal.error = "Enter starting balance"
         } else {
-            if (accountTable.insertNewAccount(Account(-1, new_acc_name, new_acc_bal.toDouble(), new_acc_ex)) > 1) {
+			if (accountTable.insertNewAccount(Account(-1, new_acc_name, new_acc_bal.toDouble(), new_acc_ex)) >= 1) {
                 Toast.makeText(this, "New Account $new_acc_name created!", Toast.LENGTH_LONG).show()
                 AAccounts.noAccounts = false
             } else {

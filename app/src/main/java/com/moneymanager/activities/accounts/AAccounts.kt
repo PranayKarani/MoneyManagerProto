@@ -10,9 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.moneymanager.R
-import com.moneymanager.db.TAccounts
 import com.moneymanager.entities.Account
 import com.moneymanager.exceptions.NoAccountsException
+import com.moneymanager.repo.TAccounts
 
 class AAccounts : AppCompatActivity() {
 

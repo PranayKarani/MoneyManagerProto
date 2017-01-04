@@ -9,8 +9,9 @@ import android.view.Menu
 import android.view.MenuItem
 import com.moneymanager.R
 import com.moneymanager.activities.accounts.AAccounts
-import com.moneymanager.db.TAccounts
+import com.moneymanager.activities.transaction.AAddTransaction
 import com.moneymanager.exceptions.NoAccountsException
+import com.moneymanager.repo.TAccounts
 
 class AMain : AppCompatActivity() {
 
@@ -25,8 +26,13 @@ class AMain : AppCompatActivity() {
         // check if accounts exists else redirect to accounts page
         val accTable = TAccounts(this)
         try {
-            val accounts = accTable.getAllAccounts(null, null)
 
+			// commented because of layout changes in AAddTransaction
+            val accounts = accTable.getAllAccounts(null, null)
+//            val bal = accTable.getAllAcountsOverView()
+//            val overviewCard = findViewById(R.id.main_overview_card) as CardView
+//            val overviewIncome = overviewCard.findViewById(R.id.main_overview_card_income_text) as TextView
+//            val overviewExpense = overviewCard.findViewById(R.id.main_overview_card_expense_text) as TextView
 
         } catch(e: NoAccountsException) {
             startActivity(Intent(this, AAccounts::class.java))
@@ -36,7 +42,7 @@ class AMain : AppCompatActivity() {
         // set up fab button to add new transaction
         val fab = findViewById(R.id.fab_add_transaction) as FloatingActionButton
         fab.setOnClickListener {
-            startActivity(Intent(this, ATransaction::class.java))
+			startActivity(Intent(this, AAddTransaction::class.java))
         }
 
 

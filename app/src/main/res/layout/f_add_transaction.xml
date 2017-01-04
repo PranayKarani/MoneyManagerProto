@@ -1,0 +1,65 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="com.moneymanager.fragments.FAddTransaction">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+
+        <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:ems="10"
+                android:id="@+id/add_trans_amt" android:hint="amount"/>
+        <ToggleButton
+                android:text="ToggleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/add_trans_type"
+                android:textOff="income"
+                android:textOn="expense"/>
+        <AutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textAutoComplete"
+                android:ems="10"
+                android:id="@+id/add_trans_cat"
+                android:hint="Category">
+        </AutoCompleteTextView>
+        <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textAutoComplete"
+                android:ems="10"
+                android:id="@+id/add_trans_acc" android:hint="account"/>
+
+        <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textAutoComplete"
+                android:ems="10"
+                android:id="@+id/add_trans_info" android:hint="info"/>
+        <TextView
+                android:text="set date"
+                android:textSize="32sp"
+                android:padding="8sp"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/cardview_shadow_start_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/add_trans_date"
+                android:onClick="OnSetDateClick"/>
+        <Switch
+                android:text="Exclude from Overview and Reports"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/add_trans_ex"/>
+
+
+    </LinearLayout>
+
+</FrameLayout>

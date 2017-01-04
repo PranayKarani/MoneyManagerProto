@@ -5,28 +5,31 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.moneymanager.repo.TAccounts
+import com.moneymanager.repo.TCategories
+import com.moneymanager.repo.TTransactions
 
 /**
  * All queries to executed on the database should be lauched through this class only.
  * Any operation on database should be COMPULSORLY done through this class
  */
-
 class DBHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
 
-    companion object{
+	companion object {
         val DB_VERSION = 1
         val DB_NAME = "moneymanager.db"
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
 
-        val createTableQueries =
-                TAccounts.q_CREATE_TABLE +
-                        TCategories.q_CREATE_TABLE +
-                        TTransactions.q_CREATE_TABLE
+		val newTables = arrayOf(
+				TAccounts.q_CREATE_TABLE,
+				TCategories.q_CREATE_TABLE,
+				TTransactions.q_CREATE_TABLE
+		)
 
-
-        db?.execSQL(createTableQueries)
+		for (i in newTables)
+			db?.execSQL(i)
 
     }
 
@@ -61,10 +64,8 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_V
      * update("Student", {roll->'1'}, "WHERE name = ?", {"Pranay"})
      *
      */
-
     fun update(tableName: String, cv: ContentValues, where: String?, clauses: Array<String>?) =
             writableDatabase.update(tableName, cv, where, clauses)
-
 
     /**
      * Do not use this to INSERT, UPDATE, DELETE rows
@@ -74,7 +75,6 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_V
         writableDatabase.execSQL(query)
     }
 
-    // TODO add delete method
     fun delete(table: String, where: String, clauses: Array<String>) {
         writableDatabase.delete(table, where, clauses)
     }
