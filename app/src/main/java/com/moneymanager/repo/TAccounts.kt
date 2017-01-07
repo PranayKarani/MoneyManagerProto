@@ -78,7 +78,7 @@ class TAccounts(context: Context) : IAccount {
 			return getAccountInstance(c)
 
 		} else {
-			throw Exception("No Account found retrieved")
+			throw Exception("No Account found")
 		}
 
 	}
