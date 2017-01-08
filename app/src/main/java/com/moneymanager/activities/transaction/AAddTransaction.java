@@ -130,6 +130,8 @@ public class AAddTransaction extends AppCompatActivity implements
 				if (newTransaction != null) {
 					trans_table.insertNewTransaction(newTransaction);
 					Log.i(mylog, newTransaction.toString());
+					finish();
+					Toast.makeText(this, "New Transaction added successfully in " + newTransaction.getAccount().getName(), Toast.LENGTH_SHORT).show();
 				}
 				break;
 			}

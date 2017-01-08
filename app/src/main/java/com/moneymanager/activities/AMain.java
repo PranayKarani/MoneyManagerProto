@@ -133,10 +133,11 @@ public class AMain extends AppCompatActivity {
 	}
 
 	private void refreshToolbar() {
-		final TextView toolbar_text = (TextView) findViewById(R.id.home_toolbar_textview);
+		final LinearLayout layout = (LinearLayout) findViewById(R.id.home_toobar_layout);
+
+		final TextView toolbar_text = (TextView) layout.findViewById(R.id.home_toolbar_textview);
 		toolbar_text.setText(CURRENT_ACCOUNT_NAME);
 
-		final LinearLayout layout = (LinearLayout) findViewById(R.id.home_toobar_layout);
 		layout.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
