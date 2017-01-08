@@ -11,8 +11,10 @@ import android.widget.Toast;
 import com.moneymanager.R;
 import com.moneymanager.entities.Account;
 import com.moneymanager.repo.TAccounts;
+import com.moneymanager.utilities.ShrPref;
 
 import static com.moneymanager.Common.setupToolbar;
+import static com.moneymanager.Common.spCURRENT_ACCOUNT_ID;
 
 class AAddAccount extends AppCompatActivity {
 
@@ -54,9 +56,11 @@ class AAddAccount extends AppCompatActivity {
 			acc_bal.setError("Enter starting balance");
 
 		} else {
-			if (accountTable.insertNewAccount(new Account(-1, new_acc_name, Double.valueOf(new_acc_bal), new_acc_ex)) >= 1) {
+			long new_account_id = accountTable.insertNewAccount(new Account(-1, new_acc_name, Double.valueOf(new_acc_bal), new_acc_ex));
+			if (new_account_id >= 1) {
 				Toast.makeText(this, "New Account " + new_acc_name + " created!", Toast.LENGTH_LONG).show();
 				AAccounts.noAccounts = false;
+				ShrPref.writeData(this, spCURRENT_ACCOUNT_ID, (int) new_account_id);
 			} else {
 				Toast.makeText(this, "Something went wrong :(", Toast.LENGTH_LONG).show();
 			}

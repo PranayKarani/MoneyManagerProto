@@ -57,8 +57,7 @@ public class TCategories implements ICategory {
 			return extractCategoryFromCursor(c);
 
 		} else {
-			whenNoCategoryFound();
-			return getCategory(id);
+			return null;
 		}
 	}
 

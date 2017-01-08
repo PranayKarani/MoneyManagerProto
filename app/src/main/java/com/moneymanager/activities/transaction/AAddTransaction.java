@@ -3,9 +3,12 @@ package com.moneymanager.activities.transaction;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.moneymanager.R;
@@ -20,13 +23,19 @@ import com.moneymanager.repo.TTransactions;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
 
+import static com.moneymanager.Common.mylog;
 import static com.moneymanager.Common.setupToolbar;
 
-public class AAddTransaction extends AppCompatActivity {
+public class AAddTransaction extends AppCompatActivity implements
+		FAddTransaction.OnCategorySelectListener,
+		FAddTransaction.OnAccountSelectListener,
+		FAddTransaction.OnDateSelectListener {
 
 	private ViewPager viewPager;
+	private int selectedCategoryId = -1;
+	private int selectedAccountId = -1;
+	private Date selectedDate = null;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,24 +62,50 @@ public class AAddTransaction extends AppCompatActivity {
 		final TCategories cat_table = new TCategories(this);
 		final TAccounts acc_table = new TAccounts(this);
 
+		String errorMessage;
+
 		// amount
-		final String amt = ((TextView) findViewById(R.id.add_trans_amt)).getText().toString();
+		final EditText add_trans_amt = (EditText) findViewById(R.id.add_trans_amt);
+		final String amt = add_trans_amt.getText().toString();
+		if (amt.equals("")) {
+			errorMessage = "Amount cannot be empty";
+			Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+			return null;
+		}
+
 		// category
-		final Category cat = cat_table.getCategory(1);// for testing purpose, all get Category with id = 1
+		Category cat;
+		if (selectedCategoryId <= 0) {
+			errorMessage = "Select a Category";
+			Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+			return null;
+		} else {
+			cat = cat_table.getCategory(selectedCategoryId);
+		}
+
 		// Account
-		final Account acc = acc_table.getAccount(new Random().nextInt(3) + 1);// for testing purpose, select random account between IDs 1 and 2
+		Account acc;
+		if (selectedAccountId <= 0) {
+			errorMessage = "Select an Account first";// this should not happen since the account is set to current by default, but still...
+			Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+			return null;
+		} else {
+			acc = acc_table.getAccount(selectedAccountId);
+		}
 
 		// info
 		final String info = ((TextView) findViewById(R.id.add_trans_info)).getText().toString();
 
 		// date
-		final Calendar cal = java.util.Calendar.getInstance();
-		final Date date = new Date(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+		if (selectedDate == null) {
+			final Calendar cal = java.util.Calendar.getInstance();
+			selectedDate = new Date(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+		}
 
 		// exclude
-		final boolean ex = findViewById(R.id.add_trans_ex).isActivated();
+		final boolean ex = ((Switch) findViewById(R.id.add_trans_ex)).isChecked();
 
-		return new Transaction(-1, Double.valueOf(amt), cat, acc, info, date, ex);
+		return new Transaction(-1, Double.valueOf(amt), cat, acc, info, selectedDate, ex);
 
 	}
 
@@ -91,7 +126,11 @@ public class AAddTransaction extends AppCompatActivity {
 			case 0: {
 				// insert new transaction data into database
 				final TTransactions trans_table = new TTransactions(this);
-				trans_table.insertNewTransaction(getNewTransaction());
+				final Transaction newTransaction = getNewTransaction();
+				if (newTransaction != null) {
+					trans_table.insertNewTransaction(newTransaction);
+					Log.i(mylog, newTransaction.toString());
+				}
 				break;
 			}
 
@@ -106,4 +145,18 @@ public class AAddTransaction extends AppCompatActivity {
 		return true;
 	}
 
+	@Override
+	public void updateCategoryId(int categoryID) {
+		this.selectedCategoryId = categoryID;
+	}
+
+	@Override
+	public void updateAccountId(int accountId) {
+		this.selectedAccountId = accountId;
+	}
+
+	@Override
+	public void updateDate(Date date) {
+		selectedDate = date;
+	}
 }

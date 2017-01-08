@@ -3,11 +3,12 @@
           package="com.moneymanager">
 
     <application
-            android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:supportsRtl="true"
-            android:theme="@style/NoActionBarAppTheme">
+        android:allowBackup="true"
+        android:debuggable="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/NoActionBarAppTheme">
         <activity android:name=".activities.AMain">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

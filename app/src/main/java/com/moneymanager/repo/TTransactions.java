@@ -2,6 +2,7 @@
 
 package com.moneymanager.repo;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import com.moneymanager.db.DBHelper;
@@ -11,7 +12,9 @@ import com.moneymanager.entities.Transaction;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.interfaces.ITransaction;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class TTransactions implements ITransaction {
 
@@ -81,6 +84,15 @@ public class TTransactions implements ITransaction {
 
 	@Override
 	public void insertNewTransaction(Transaction transaction) {
+
+		final ContentValues cv = new ContentValues();
+		cv.put(AMOUNT, transaction.getAmount());
+		cv.put(CATEGORY, transaction.getCategory().getId());
+		cv.put(ACCOUNT, transaction.getAccount().getId());
+		cv.put(INFO, transaction.getInfo());
+		cv.put(DATETIME, new SimpleDateFormat("yy-MM-dd", Locale.getDefault()).format(transaction.getDateTime()));
+		cv.put(EXCLUDE, transaction.isExclude());
+		dbHelper.insert(TABLE_NAME, cv);
 
 	}
 

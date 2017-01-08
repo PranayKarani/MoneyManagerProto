@@ -16,43 +16,52 @@
             android:background="@color/transparent"
     />
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingTop="8dp"
-            android:paddingRight="14sp"
-            android:paddingLeft="14sp">
-        <EditText
-                android:id="@+id/new_account_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:hint="Name"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingLeft="14sp"
+        android:paddingRight="14sp"
+        android:paddingTop="8dp">
 
-                android:layout_marginBottom="4sp"/>
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <EditText
-                android:id="@+id/new_account_bal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:hint="Starting Balance"
-                android:layout_marginBottom="6sp"/>
+            android:id="@+id/new_account_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4sp"
+            android:hint="Name"
+            android:inputType="textPersonName"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/new_account_bal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6sp"
+            android:hint="Starting Balance"
+            android:inputType="numberDecimal"/>
+        </android.support.design.widget.TextInputLayout>
         <Switch
-                android:id="@+id/new_account_exclude"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:text="Exclude from reports and stats"
-                android:textSize="16sp"
-                android:layout_marginBottom="12sp"
+            android:id="@+id/new_account_exclude"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="12sp"
+            android:text="Exclude from reports and stats"
+            android:textSize="16sp"
         />
         <Button
-                android:id="@+id/insert_new_account_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/colorAccent"
-                android:textColor="@color/colorPrimarySuperDark"
-                android:text="add new account"
-                android:onClick="onInsertAccountClick"
+            android:id="@+id/insert_new_account_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
+            android:onClick="onInsertAccountClick"
+            android:text="add new account"
+            android:textColor="@color/colorPrimarySuperDark"
         />
     </LinearLayout>
 

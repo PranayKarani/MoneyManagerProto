@@ -14,7 +14,7 @@ class ASearch extends AppCompatActivity {
 
         setupToolbar(this, R.id.search_toolbar, "Search");
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
     }
+
+
 }

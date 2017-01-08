@@ -116,7 +116,7 @@ public class AAccounts extends AppCompatActivity {
 
 			// fill up the layout elements
 			final TextView nametv = (TextView) rowView.findViewById(R.id.account_view_name);
-			nametv.setText(name);
+			nametv.setText(name + " (" + id + ")");
 			final TextView baltv = (TextView) rowView.findViewById(R.id.account_view_bal);
 			baltv.setText(String.valueOf(bal));
 

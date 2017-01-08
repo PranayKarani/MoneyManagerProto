@@ -79,4 +79,15 @@ public class Transaction {
 	public void setExclude(boolean exclude) {
 		this.exclude = exclude;
 	}
+
+	@Override
+	public String toString() {
+		return "id: " + id + "\n" +
+				"amount: " + amount + "\n" +
+				"category: " + category.getName() + " (" + category.getId() + ")\n" +
+				"account: " + account.getName() + " (" + account.getId() + ")\n" +
+				"info: " + info + "\n" +
+				"datetime: " + dateTime.toString() + "\n" +
+				"exclude? " + exclude;
+	}
 }
