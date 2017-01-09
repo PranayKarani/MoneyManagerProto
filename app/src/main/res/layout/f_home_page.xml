@@ -9,5 +9,12 @@
     <!--add budget card if set-->
 
     <!--list view to display today's transactions-->
+    <TextView
+        android:id="@+id/crap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="256sp"
+        />
 
 </FrameLayout>

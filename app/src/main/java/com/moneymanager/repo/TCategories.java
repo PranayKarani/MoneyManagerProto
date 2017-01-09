@@ -109,13 +109,13 @@ public class TCategories implements ICategory {
 		// insert some categories before hand
 		final ContentValues cv = new ContentValues();
 		cv.put(NAME, "Movies");
-		cv.put(TYPE, 1);
+		cv.put(TYPE, EXPENSE);
 		cv.put(EXCLUDE, 0);
 		dbHelper.insert(TABLE_NAME, cv);
 
 		final ContentValues cv1 = new ContentValues();
 		cv1.put(NAME, "Salary");
-		cv1.put(TYPE, 0);
+		cv1.put(TYPE, INCOME);
 		cv1.put(EXCLUDE, 0);
 		dbHelper.insert(TABLE_NAME, cv1);
 	}

@@ -6,7 +6,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import com.moneymanager.fragments.FHomePage;
 
-class HomePagerAdapter extends FragmentPagerAdapter {
+import java.util.Calendar;
+import java.util.Date;
+
+public class HomePagerAdapter extends FragmentPagerAdapter {
 
 	public HomePagerAdapter(FragmentManager fm) {
 		super(fm);
@@ -24,7 +27,26 @@ class HomePagerAdapter extends FragmentPagerAdapter {
 
 	}
 
+	@Override
+	public CharSequence getPageTitle(int position) {
+
+		Calendar cal = Calendar.getInstance();
+		Date date = new Date();
+		int today = date.getDate();
+
+		if (position == 6) {
+			return "Today";
+		} else if (position == 5) {
+			return "Yesterday";
+		} else {
+
+			return (today - (6 - position)) + "th";
+
+		}
+
+	}
+
 	public int getCount() {
-		return -1;
+		return 7; // because week
 	}
 }

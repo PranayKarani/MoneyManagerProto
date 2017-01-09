@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import com.moneymanager.R;
 import com.moneymanager.activities.accounts.AAccounts;
 import com.moneymanager.activities.transaction.AAddTransaction;
+import com.moneymanager.adapters.HomePagerAdapter;
 import com.moneymanager.entities.Account;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.TAccounts;
@@ -28,6 +30,8 @@ public class AMain extends AppCompatActivity {
 	private Account[] accounts;
 	private String[] acc_names;
 	private int[] acc_ids;
+
+	private ViewPager viewPager;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -48,6 +52,12 @@ public class AMain extends AppCompatActivity {
 				startActivity(new Intent(AMain.this, AAddTransaction.class));
 			}
 		});
+
+		final HomePagerAdapter hmp = new HomePagerAdapter(getSupportFragmentManager());
+
+		viewPager = (ViewPager) findViewById(R.id.home_viewpager);
+		viewPager.setAdapter(hmp);
+		viewPager.setCurrentItem(6);
 
 
 	}
