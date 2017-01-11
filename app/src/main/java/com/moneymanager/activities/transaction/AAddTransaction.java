@@ -24,8 +24,7 @@ import com.moneymanager.repo.TTransactions;
 import java.util.Calendar;
 import java.util.Date;
 
-import static com.moneymanager.Common.mylog;
-import static com.moneymanager.Common.setupToolbar;
+import static com.moneymanager.Common.*;
 
 public class AAddTransaction extends AppCompatActivity implements
 		FAddTransaction.OnCategorySelectListener,
@@ -36,6 +35,7 @@ public class AAddTransaction extends AppCompatActivity implements
 	private int selectedCategoryId = -1;
 	private int selectedAccountId = -1;
 	private Date selectedDate = null;
+	private double selectedAccountBalance;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -64,15 +64,6 @@ public class AAddTransaction extends AppCompatActivity implements
 
 		String errorMessage;
 
-		// amount
-		final EditText add_trans_amt = (EditText) findViewById(R.id.add_trans_amt);
-		final String amt = add_trans_amt.getText().toString();
-		if (amt.equals("")) {
-			errorMessage = "Amount cannot be empty";
-			Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
-			return null;
-		}
-
 		// category
 		Category cat;
 		if (selectedCategoryId <= 0) {
@@ -81,6 +72,18 @@ public class AAddTransaction extends AppCompatActivity implements
 			return null;
 		} else {
 			cat = cat_table.getCategory(selectedCategoryId);
+		}
+
+		// amount
+		final EditText add_trans_amt = (EditText) findViewById(R.id.add_trans_amt);
+		final String amt = add_trans_amt.getText().toString();
+		if (amt.equals("")) {
+			errorMessage = "Amount cannot be empty";
+			Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+			return null;
+		} else if (Double.valueOf(amt) > selectedAccountBalance && cat.getType() == EXPENSE) {
+			add_trans_amt.setError("Expense should not exceed Account Balance: (Rs " + selectedAccountBalance + ")");
+			return null;
 		}
 
 		// Account
@@ -108,6 +111,7 @@ public class AAddTransaction extends AppCompatActivity implements
 		return new Transaction(-1, Double.valueOf(amt), cat, acc, info, selectedDate, ex);
 
 	}
+
 
 	/**
 	 * Toolbar Menu Stuff
@@ -155,6 +159,11 @@ public class AAddTransaction extends AppCompatActivity implements
 	@Override
 	public void updateAccountId(int accountId) {
 		this.selectedAccountId = accountId;
+	}
+
+	@Override
+	public void updateAccountBalance(double amount) {
+		this.selectedAccountBalance = amount;
 	}
 
 	@Override

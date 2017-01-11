@@ -15,7 +15,10 @@ public interface IAccount {
 
 	void removeAccount(int id);
 
-	int getSumOfBalanceOfAllAccounts();
+	double getSumOfBalanceOfAllAccounts();
+
+	double getSumOfBalanceOfAccount(int selectedAccount);
 
 	void updateAccountBalance(int id, double amount, int cat_type);
+
 }

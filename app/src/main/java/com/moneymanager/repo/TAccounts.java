@@ -133,8 +133,18 @@ public class TAccounts implements IAccount {
 	}
 
 	@Override
-	public int getSumOfBalanceOfAllAccounts() {
+	public double getSumOfBalanceOfAllAccounts() {
 		final Cursor c = dbHelper.select(q_SUM_BALANCE_FROM_ALL_ACCOUNTS(), null);
+		if (c.moveToNext()) {
+			return c.getInt(c.getColumnIndex(BALANCE));
+		} else {
+			return -1;
+		}
+	}
+
+	@Override
+	public double getSumOfBalanceOfAccount(int selectedAccount) {
+		final Cursor c = dbHelper.select(q_SUM_BALANCE_OF_ACCOUNT(selectedAccount), null);
 		if (c.moveToNext()) {
 			return c.getInt(c.getColumnIndex(BALANCE));
 		} else {

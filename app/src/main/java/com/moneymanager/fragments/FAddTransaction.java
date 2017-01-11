@@ -2,7 +2,6 @@ package com.moneymanager.fragments;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -45,6 +44,14 @@ public class FAddTransaction extends Fragment {
 	private int selectedCategoryID = -1;
 	private int selectedAccountID = -1;
 
+	private double selectedAccountBalance = -1;
+
+	@Override
+	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		init();
+	}
+
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		final View rootView = inflater.inflate(R.layout.f_add_transaction, container, false);
@@ -56,9 +63,6 @@ public class FAddTransaction extends Fragment {
 				updateCategoryList();
 			}
 		});
-
-		selectedAccountID = CURRENT_ACCOUNT_ID;
-		((OnAccountSelectListener) getActivity()).updateAccountId(selectedAccountID);
 
 		final TextView cat_text = (TextView) rootView.findViewById(R.id.add_trans_cat);
 		cat_text.setOnClickListener(new View.OnClickListener() {
@@ -110,8 +114,7 @@ public class FAddTransaction extends Fragment {
 				builder.setItems(names, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialogInterface, int i) {
-						selectedAccountID = acc_id_list.get(i);
-						((OnAccountSelectListener) getActivity()).updateAccountId(selectedAccountID);
+						setAccount(acc_id_list.get(i));
 						acc_text.setText("account: " + names[i]);
 						Log.i(mylog, "selected account id: " + selectedAccountID);
 						dialogInterface.dismiss();
@@ -127,17 +130,6 @@ public class FAddTransaction extends Fragment {
 
 	}
 
-	@Override
-	public void onAttach(Context context) {
-		super.onAttach(context);
-	}
-
-	@Override
-	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		init();
-	}
-
 	/**
 	 * Initialization stuff goes here.
 	 * NOTE: No android.view.View init stuff should happen here
@@ -150,6 +142,9 @@ public class FAddTransaction extends Fragment {
 
 		updateCategoryList();
 		updateAccountsList();
+
+		setAccount(CURRENT_ACCOUNT_ID);
+
 	}
 
 	// update Category list according to 'income' 'expense' selection
@@ -177,7 +172,7 @@ public class FAddTransaction extends Fragment {
 
 	}
 
-	// Account update is onlyed needed once and is done in onActivityCreated
+	// Account update is only needed once and is done in onActivityCreated
 	private void updateAccountsList() {
 
 		final TAccounts acc = new TAccounts(getContext());
@@ -198,12 +193,26 @@ public class FAddTransaction extends Fragment {
 
 	}
 
+	// set account and along with that, update the selected account balance
+	private void setAccount(int selectedAccount) {
+
+		selectedAccountID = selectedAccount;
+		((OnAccountSelectListener) getActivity()).updateAccountId(selectedAccountID);
+
+		TAccounts tAccounts = new TAccounts(getContext());
+		selectedAccountBalance = tAccounts.getSumOfBalanceOfAccount(selectedAccount);
+		((OnAccountSelectListener) getActivity()).updateAccountBalance(selectedAccountBalance);
+
+	}
+
 	public interface OnCategorySelectListener {
 		void updateCategoryId(int categoryID);
 	}
 
 	public interface OnAccountSelectListener {
 		void updateAccountId(int accountId);
+
+		void updateAccountBalance(double amount);
 	}
 
 	public interface OnDateSelectListener {
