@@ -11,10 +11,10 @@ import com.moneymanager.entities.Category;
 import com.moneymanager.entities.Transaction;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.interfaces.ITransaction;
+import com.moneymanager.utilities.MyCalendar;
 
-import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.util.Date;
-import java.util.Locale;
 
 public class TTransactions implements ITransaction {
 
@@ -28,8 +28,11 @@ public class TTransactions implements ITransaction {
 	public static final String EXCLUDE = "trans_ex";
 	private DBHelper dbHelper;
 
+	private Context context;
+
 	public TTransactions(Context context) {
 		dbHelper = new DBHelper(context);
+		this.context = context;
 	}
 
 	/* Query Strings */
@@ -55,8 +58,27 @@ public class TTransactions implements ITransaction {
 			order = "DESC";
 		}
 		return "SELECT * FROM " + TABLE_NAME +
-				"  JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.ID +
+				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
+				" JOIN " + TAccounts.TABLE_NAME + " ON " + ACCOUNT + " = " + TAccounts.TABLE_NAME + "." + TAccounts.ID +
 				" ORDER BY " + column + " " + order;
+	}
+
+	private String q_SELECT_ALL_TRANSACTIONS_FOR_DAY(Date date) {
+		// get Date
+		final String date_format = MyCalendar.getSimpleDateFormat().format(date);
+		return "SELECT * FROM " + TABLE_NAME +
+				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
+				" JOIN " + TAccounts.TABLE_NAME + " ON " + ACCOUNT + " = " + TAccounts.TABLE_NAME + "." + TAccounts.ID +
+				" WHERE " + DATETIME + " = '" + date_format + "'";
+	}
+
+	private String q_SELECT_ACCOUNT_TRANSACTIONS_FOR_DAY(int accId, Date date) {
+		// get Date
+		final String date_format = MyCalendar.getSimpleDateFormat().format(date);
+		return "SELECT * FROM " + TABLE_NAME +
+				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
+				" JOIN " + TAccounts.TABLE_NAME + " ON " + ACCOUNT + " = " + TAccounts.TABLE_NAME + "." + TAccounts.ID +
+				" WHERE " + DATETIME + " = '" + date_format + "' AND " + ACCOUNT + " = " + accId;
 	}
 
 	@Override
@@ -82,6 +104,31 @@ public class TTransactions implements ITransaction {
 
 	}
 
+	public Transaction[] getTransactionsForDay(Date date) {
+
+		Cursor c = dbHelper.select(q_SELECT_ALL_TRANSACTIONS_FOR_DAY(date), null);
+
+		final Transaction[] t = new Transaction[c.getCount()];
+
+		while (c.moveToNext()) {
+			t[c.getPosition()] = extractTransactionFromCursor(c);
+		}
+
+		return t;
+	}
+
+	public Transaction[] getAccountSpecificTransactionsForDay(int accId, Date date) {
+		Cursor c = dbHelper.select(q_SELECT_ACCOUNT_TRANSACTIONS_FOR_DAY(accId, date), null);
+
+		final Transaction[] t = new Transaction[c.getCount()];
+
+		while (c.moveToNext()) {
+			t[c.getPosition()] = extractTransactionFromCursor(c);
+		}
+
+		return t;
+	}
+
 	@Override
 	public void insertNewTransaction(Transaction transaction) {
 
@@ -90,9 +137,13 @@ public class TTransactions implements ITransaction {
 		cv.put(CATEGORY, transaction.getCategory().getId());
 		cv.put(ACCOUNT, transaction.getAccount().getId());
 		cv.put(INFO, transaction.getInfo());
-		cv.put(DATETIME, new SimpleDateFormat("yy-MM-dd", Locale.getDefault()).format(transaction.getDateTime()));
+		cv.put(DATETIME, MyCalendar.getSimpleDateFormat().format(transaction.getDateTime()));
 		cv.put(EXCLUDE, transaction.isExclude());
 		dbHelper.insert(TABLE_NAME, cv);
+
+		// update account balance
+		TAccounts tAccounts = new TAccounts(context);
+		tAccounts.updateAccountBalance(transaction.getAccount().getId(), transaction.getAmount(), transaction.getCategory().getType());
 
 	}
 
@@ -106,7 +157,12 @@ public class TTransactions implements ITransaction {
 		final int id = c.getInt(c.getColumnIndex(ID));
 		final double amount = c.getDouble(c.getColumnIndex(AMOUNT));
 		final String info = c.getString(c.getColumnIndex(INFO));
-		final Date dateTime = new Date(c.getString(c.getColumnIndex(DATETIME)));// TODO convert properly to datetime
+		Date dateTime = null;
+		try {
+			dateTime = MyCalendar.getSimpleDateFormat().parse(c.getString(c.getColumnIndex(DATETIME)));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 		final boolean ex = c.getInt(c.getColumnIndex(EXCLUDE)) == 1;
 
 		// create categroy object

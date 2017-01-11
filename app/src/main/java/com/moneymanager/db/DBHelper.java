@@ -69,7 +69,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	 * Provide name of table to be updated, content values, where string and array of clauses
 	 * e.g.
 	 * <p>
-	 * update("Student", {roll->'1'}, "WHERE name = ?", {"Pranay"})
+	 * update("Student", {roll->'1'}, "name = ?", {"Pranay"})
 	 */
 	public void update(String tableName, ContentValues cv, String where, String[] clauses) {
 		getWritableDatabase().update(tableName, cv, where, clauses);

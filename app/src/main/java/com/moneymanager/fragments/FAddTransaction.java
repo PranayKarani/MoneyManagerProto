@@ -58,6 +58,7 @@ public class FAddTransaction extends Fragment {
 		});
 
 		selectedAccountID = CURRENT_ACCOUNT_ID;
+		((OnAccountSelectListener) getActivity()).updateAccountId(selectedAccountID);
 
 		final TextView cat_text = (TextView) rootView.findViewById(R.id.add_trans_cat);
 		cat_text.setOnClickListener(new View.OnClickListener() {

@@ -5,6 +5,7 @@ package com.moneymanager.repo;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import com.moneymanager.Common;
 import com.moneymanager.db.DBHelper;
 import com.moneymanager.entities.Account;
 import com.moneymanager.exceptions.NoAccountsException;
@@ -54,6 +55,24 @@ public class TAccounts implements IAccount {
 	private String q_SUM_BALANCE_FROM_ALL_ACCOUNTS() {
 		return "SELECT SUM( " + BALANCE + ") AS " + BALANCE + " FROM " + TABLE_NAME;
 	}
+
+	private String q_SUM_BALANCE_OF_ACCOUNT(int acc_id) {
+		return "SELECT SUM( " + BALANCE + ") AS " + BALANCE + " FROM " + TABLE_NAME + " WHERE " + ID + " = " + acc_id;
+	}
+
+	private String q_UPDATE_BALANCE(int id, int amount) {
+
+		return "UPDATE " + TABLE_NAME + " SET " + BALANCE + " = " + amount + " WHERE " + ID + " = " + id;
+
+	}
+
+
+
+
+
+
+
+
 
 	@Override
 	public long insertNewAccount(Account account) {
@@ -121,6 +140,34 @@ public class TAccounts implements IAccount {
 		} else {
 			return -1;
 		}
+	}
+
+	@Override
+	public void updateAccountBalance(int id, double amount, int cat_type) {
+
+		final Cursor c = dbHelper.select(q_SUM_BALANCE_OF_ACCOUNT(id), null);
+		c.moveToFirst();
+		final double bal = c.getDouble(c.getColumnIndex(BALANCE));
+		double new_bal = bal;// set this to bal instead of 0 so, even if something goes wrong bal won't reset to 0
+		if (cat_type == Common.INCOME) {
+			new_bal = bal + amount;
+		} else {
+			if (amount > bal) {
+				try {
+					throw new Exception("expense amount should not exceed balance");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				new_bal = bal - amount;
+			}
+		}
+		c.close();
+
+		final ContentValues cv = new ContentValues();
+		cv.put(BALANCE, new_bal);
+		dbHelper.update(TABLE_NAME, cv, ID + " = ?", new String[]{String.valueOf(id)});
+
 	}
 
 	private Account extractAccountFromCursor(Cursor c) {

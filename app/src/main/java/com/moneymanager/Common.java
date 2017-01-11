@@ -8,6 +8,11 @@ import android.support.v7.widget.Toolbar;
 public class Common {
 
 	public static final String mylog = "mylog";
+	public static final String DATE_FORMAT = "dd-MM-yy";
+
+	public static final int INCOME = 0;
+	public static final int EXPENSE = 1;
+
 	// SharedPreferences Constants
 	public static final String spFILE_NAME = "mm_sp_file";
 	public static final String spCURRENT_ACCOUNT_ID = "account_id";

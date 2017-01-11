@@ -14,8 +14,9 @@ import com.moneymanager.R;
 import com.moneymanager.entities.Account;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.TAccounts;
+import com.moneymanager.utilities.ShrPref;
 
-import static com.moneymanager.Common.setupToolbar;
+import static com.moneymanager.Common.*;
 
 public class AAccounts extends AppCompatActivity {
 
@@ -128,6 +129,8 @@ public class AAccounts extends AppCompatActivity {
 
 					Toast.makeText(myContext, "edit account with ID = " + id, Toast.LENGTH_LONG).show();
 					accTable.removeAccount(id);
+					CURRENT_ACCOUNT_ID = ALL_ACCOUNT_ID;
+					ShrPref.writeData(AAccounts.this, spCURRENT_ACCOUNT_ID, CURRENT_ACCOUNT_ID);
 
 					// refresh account list
 					final TAccounts accTable = new TAccounts(myContext);

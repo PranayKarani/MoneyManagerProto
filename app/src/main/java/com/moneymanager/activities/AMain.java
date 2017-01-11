@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,7 @@ import com.moneymanager.activities.transaction.AAddTransaction;
 import com.moneymanager.adapters.HomePagerAdapter;
 import com.moneymanager.entities.Account;
 import com.moneymanager.exceptions.NoAccountsException;
+import com.moneymanager.fragments.FHomePage;
 import com.moneymanager.repo.TAccounts;
 import com.moneymanager.utilities.ShrPref;
 
@@ -74,7 +76,7 @@ public class AMain extends AppCompatActivity {
 			accounts = accTable.getAllAccounts(TAccounts.NAME, null);
 
 			// get the current account id
-			CURRENT_ACCOUNT_ID = ShrPref.readData(this, spCURRENT_ACCOUNT_ID, -1);
+			CURRENT_ACCOUNT_ID = ShrPref.readData(this, spCURRENT_ACCOUNT_ID, ALL_ACCOUNT_ID);
 
 			if (CURRENT_ACCOUNT_ID == ALL_ACCOUNT_ID) {
 				CURRENT_ACCOUNT_NAME = "All Accounts";
@@ -100,6 +102,11 @@ public class AMain extends AppCompatActivity {
 			startActivity(new Intent(this, AAccounts.class));
 		}
 
+		if (getSupportFragmentManager().getFragments() != null) {
+			for (Fragment f : getSupportFragmentManager().getFragments()) {
+				((FHomePage) f).refreshTransList(CURRENT_ACCOUNT_ID);
+			}
+		}
 
 	}
 
@@ -163,6 +170,11 @@ public class AMain extends AppCompatActivity {
 						CURRENT_ACCOUNT_NAME = acc_names[i];
 						ShrPref.writeData(AMain.this, spCURRENT_ACCOUNT_ID, CURRENT_ACCOUNT_ID);
 						dialogInterface.dismiss();
+
+						for (Fragment f : getSupportFragmentManager().getFragments()) {
+							((FHomePage) f).refreshTransList(CURRENT_ACCOUNT_ID);
+						}
+
 					}
 				});
 				builder.create().show();

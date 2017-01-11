@@ -5,8 +5,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import com.moneymanager.fragments.FHomePage;
+import com.moneymanager.utilities.MyCalendar;
 
-import java.util.Calendar;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class HomePagerAdapter extends FragmentPagerAdapter {
@@ -20,6 +21,11 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
 		final Bundle args = new Bundle();
 		args.putInt("pos", position);
 
+		final SimpleDateFormat sdf = MyCalendar.getSimpleDateFormat();
+		args.putString("date", sdf.format(getDateForPosition(position)));
+
+		args.putString("title", getTitleString(position));
+
 		final Fragment frag = new FHomePage();
 		frag.setArguments(args);
 
@@ -30,23 +36,33 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
 	@Override
 	public CharSequence getPageTitle(int position) {
 
-		Calendar cal = Calendar.getInstance();
-		Date date = new Date();
-		int today = date.getDate();
-
-		if (position == 6) {
-			return "Today";
-		} else if (position == 5) {
-			return "Yesterday";
-		} else {
-
-			return (today - (6 - position)) + "th";
-
-		}
+		return getTitleString(position);
 
 	}
 
 	public int getCount() {
 		return 7; // because week
 	}
+
+	private Date getDateForPosition(int position) {
+		final int noofDays = (6 - position);
+		return MyCalendar.dateBeforeDays(noofDays);
+	}
+
+	private String getTitleString(int position) {
+		if (position == 6) {
+			return "Today";
+		} else if (position == 5) {
+			return "Yesterday";
+		} else {
+
+			final int noofDays = (6 - position);
+
+			final Date thatDate = MyCalendar.dateBeforeDays(noofDays);
+
+			return MyCalendar.dateToString(thatDate) + " " + MyCalendar.monthToString(thatDate);
+
+		}
+	}
+
 }

@@ -17,4 +17,5 @@ public interface IAccount {
 
 	int getSumOfBalanceOfAllAccounts();
 
+	void updateAccountBalance(int id, double amount, int cat_type);
 }
