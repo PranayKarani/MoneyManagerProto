@@ -69,7 +69,8 @@ public class TTransactions implements ITransaction {
 		return "SELECT * FROM " + TABLE_NAME +
 				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
 				" JOIN " + TAccounts.TABLE_NAME + " ON " + ACCOUNT + " = " + TAccounts.TABLE_NAME + "." + TAccounts.ID +
-				" WHERE " + DATETIME + " = '" + date_format + "'";
+				" WHERE " + DATETIME + " = '" + date_format + "'" +
+				" ORDER BY " + ACCOUNT + " ASC, " + ID + " DESC";
 	}
 
 	private String q_SELECT_ACCOUNT_TRANSACTIONS_FOR_DAY(int accId, Date date) {
@@ -79,6 +80,29 @@ public class TTransactions implements ITransaction {
 				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
 				" JOIN " + TAccounts.TABLE_NAME + " ON " + ACCOUNT + " = " + TAccounts.TABLE_NAME + "." + TAccounts.ID +
 				" WHERE " + DATETIME + " = '" + date_format + "' AND " + ACCOUNT + " = " + accId;
+	}
+
+
+	private String q_SELECT_SUM_TRANSACTION_FOR_ACCOUNT_FOR_TYPE_ON_DATE(int acc, int type, Date date) {
+
+		final String date_format = MyCalendar.getSimpleDateFormat().format(date);
+		return "SELECT SUM(" + AMOUNT + ") AS " + AMOUNT + " FROM " + TABLE_NAME +
+				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
+				" WHERE " + DATETIME + " = '" + date_format + "' AND " +
+				TCategories.TYPE + " = " + type + " AND " +
+				ACCOUNT + " = " + acc;
+
+
+	}
+
+	private String q_SELECT_SUM_TRANSACTION_FOR_TYPE_ON_DATE(int type, Date date) {
+
+		final String date_format = MyCalendar.getSimpleDateFormat().format(date);
+		return "SELECT SUM(" + AMOUNT + ") AS " + AMOUNT + " FROM " + TABLE_NAME +
+				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
+				" WHERE " + DATETIME + " = '" + date_format + "' AND " + TCategories.TYPE + " = " + type;
+
+
 	}
 
 	@Override
@@ -101,6 +125,22 @@ public class TTransactions implements ITransaction {
 		}
 
 		return trans;
+
+	}
+
+	@Override
+	public double getSumOfTransactionTypeForDay(int type, Date date) {
+		final Cursor c = dbHelper.select(q_SELECT_SUM_TRANSACTION_FOR_TYPE_ON_DATE(type, date), null);
+		c.moveToFirst();
+		return c.getDouble(c.getColumnIndex(AMOUNT));
+	}
+
+	@Override
+	public double getAccountSpecificSumOfTransactionTypeForDay(int acc, int type, Date date) {
+
+		final Cursor c = dbHelper.select(q_SELECT_SUM_TRANSACTION_FOR_ACCOUNT_FOR_TYPE_ON_DATE(acc, type, date), null);
+		c.moveToFirst();
+		return c.getDouble(c.getColumnIndex(AMOUNT));
 
 	}
 

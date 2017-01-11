@@ -10,9 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 import com.moneymanager.Common;
 import com.moneymanager.R;
 import com.moneymanager.entities.Transaction;
@@ -34,7 +32,13 @@ public class FHomePage extends Fragment {
 	private String overviewCardTitle;
 	private TTransactions tTransactions;
 	private Transaction[] myTransactions; // transactions for this page
+
+	// Views
 	private ListView transListView;
+	private TextView cardIncomeTextView;
+	private TextView cardExpenseTextView;
+	private TextView cardTotalTextView;
+
 
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,19 +85,39 @@ public class FHomePage extends Fragment {
 		text.setText(overviewCardTitle);
 
 		// set income text
+		cardIncomeTextView = (TextView) root.findViewById(R.id.f_home_overview_card_income_amt);
 
 		// set expense text
+		cardExpenseTextView = (TextView) root.findViewById(R.id.f_home_overview_card_expense_amt);
 
 		// set total text
+		cardTotalTextView = (TextView) root.findViewById(R.id.f_home_overview_card_total_amt);
+
+		refreshOverviewCardDetails(CURRENT_ACCOUNT_ID);
+
+		// no transaction text
+		if (myTransactions.length == 0) {
+			final TextView noTransText = (TextView) root.findViewById(R.id.f_home_no_trans_text);
+			noTransText.setVisibility(View.VISIBLE);
+		}
 
 		// list view
 		transListView = (ListView) root.findViewById(R.id.f_home_trans_list);
+		transListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+				Toast.makeText(getContext(), myTransactions[position].toString(), Toast.LENGTH_LONG).show();
+
+			}
+		});
 		final TransListAdapter tla = new TransListAdapter(getContext(), myTransactions);
 		transListView.setAdapter(tla);
 
 		return root;
 	}
 
+	// Also refreshes Overview Card details
 	public void refreshTransList(int currentAccount) {
 
 		if (currentAccount == ALL_ACCOUNT_ID) {
@@ -104,12 +128,40 @@ public class FHomePage extends Fragment {
 		final TransListAdapter tla = new TransListAdapter(getContext(), myTransactions);
 		transListView.setAdapter(tla);
 
+		refreshOverviewCardDetails(currentAccount);
+
+	}
+
+	public void refreshOverviewCardDetails(int acc) {
+
+		final TTransactions tTransactions = new TTransactions(getContext());
+
+		double incomeAmt, expenseAmt;
+
+		if (acc == ALL_ACCOUNT_ID) {
+
+			incomeAmt = tTransactions.getSumOfTransactionTypeForDay(INCOME, myDate);
+			expenseAmt = tTransactions.getSumOfTransactionTypeForDay(EXPENSE, myDate);
+
+		} else {
+
+			incomeAmt = tTransactions.getAccountSpecificSumOfTransactionTypeForDay(acc, INCOME, myDate);
+			expenseAmt = tTransactions.getAccountSpecificSumOfTransactionTypeForDay(acc, EXPENSE, myDate);
+
+		}
+
+		final double totalAmt = incomeAmt - expenseAmt;
+
+		cardIncomeTextView.setText("Rs " + incomeAmt);
+		cardExpenseTextView.setText("Rs " + expenseAmt);
+		cardTotalTextView.setText("Rs " + totalAmt);
+
 	}
 
 	class TransListAdapter extends ArrayAdapter<Transaction> {
 
 
-		public TransListAdapter(Context context, Transaction[] objects) {
+		TransListAdapter(Context context, Transaction[] objects) {
 			super(context, -1, objects);
 		}
 
@@ -122,6 +174,7 @@ public class FHomePage extends Fragment {
 
 			final TextView tCat = (TextView) rowView.findViewById(R.id.x_home_trans_row_cat);
 			final TextView tAmt = (TextView) rowView.findViewById(R.id.x_home_trans_row_amt);
+			final TextView tAcc = (TextView) rowView.findViewById(R.id.x_home_trans_row_acc);
 			final TextView tInfo = (TextView) rowView.findViewById(R.id.x_home_trans_row_info);
 
 			final Transaction transaction = getItem(position);
@@ -131,6 +184,13 @@ public class FHomePage extends Fragment {
 				tAmt.setTextColor(ContextCompat.getColor(getContext(), R.color.colorGreen));
 			} else {
 				tAmt.setTextColor(ContextCompat.getColor(getContext(), R.color.colorRed));
+			}
+
+			if (CURRENT_ACCOUNT_ID == ALL_ACCOUNT_ID) {
+				tAcc.setVisibility(View.VISIBLE);
+				tAcc.setText(transaction.getAccount().getName());
+			} else {
+				tAcc.setVisibility(View.GONE);
 			}
 
 			tCat.setText(transaction.getCategory().getName());

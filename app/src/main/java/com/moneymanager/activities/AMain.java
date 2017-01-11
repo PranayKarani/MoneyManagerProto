@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.moneymanager.R;
 import com.moneymanager.activities.accounts.AAccounts;
 import com.moneymanager.activities.transaction.AAddTransaction;
@@ -52,6 +53,14 @@ public class AMain extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(AMain.this, AAddTransaction.class));
+			}
+		});
+		fab.setOnLongClickListener(new View.OnLongClickListener() {
+
+			@Override
+			public boolean onLongClick(View v) {
+				Toast.makeText(AMain.this, "Soon something will happen on long press too :)", Toast.LENGTH_LONG).show();
+				return true;
 			}
 		});
 
