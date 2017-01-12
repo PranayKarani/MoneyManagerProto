@@ -113,7 +113,7 @@ public class AMain extends AppCompatActivity {
 
 		if (getSupportFragmentManager().getFragments() != null) {
 			for (Fragment f : getSupportFragmentManager().getFragments()) {
-				((FHomePage) f).refreshTransList(CURRENT_ACCOUNT_ID);
+				((FHomePage) f).refreshFragmentContent(CURRENT_ACCOUNT_ID);
 			}
 		}
 
@@ -181,7 +181,7 @@ public class AMain extends AppCompatActivity {
 						dialogInterface.dismiss();
 
 						for (Fragment f : getSupportFragmentManager().getFragments()) {
-							((FHomePage) f).refreshTransList(CURRENT_ACCOUNT_ID);
+							((FHomePage) f).refreshFragmentContent(CURRENT_ACCOUNT_ID);
 						}
 
 					}

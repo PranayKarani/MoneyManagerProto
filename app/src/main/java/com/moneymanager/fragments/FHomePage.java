@@ -96,9 +96,11 @@ public class FHomePage extends Fragment {
 		refreshOverviewCardDetails(CURRENT_ACCOUNT_ID);
 
 		// no transaction text
+		final TextView noTransText = (TextView) root.findViewById(R.id.f_home_no_trans_text);
 		if (myTransactions.length == 0) {
-			final TextView noTransText = (TextView) root.findViewById(R.id.f_home_no_trans_text);
 			noTransText.setVisibility(View.VISIBLE);
+		} else {
+			noTransText.setVisibility(View.GONE);
 		}
 
 		// list view
@@ -111,14 +113,18 @@ public class FHomePage extends Fragment {
 
 			}
 		});
-		final TransListAdapter tla = new TransListAdapter(getContext(), myTransactions);
-		transListView.setAdapter(tla);
+		refreshTransList(CURRENT_ACCOUNT_ID);
 
 		return root;
 	}
 
+	public void refreshFragmentContent(int currentAccount) {
+		refreshTransList(currentAccount);
+		refreshOverviewCardDetails(currentAccount);
+	}
+
 	// Also refreshes Overview Card details
-	public void refreshTransList(int currentAccount) {
+	private void refreshTransList(int currentAccount) {
 
 		if (currentAccount == ALL_ACCOUNT_ID) {
 			myTransactions = tTransactions.getTransactionsForDay(myDate);
@@ -128,11 +134,9 @@ public class FHomePage extends Fragment {
 		final TransListAdapter tla = new TransListAdapter(getContext(), myTransactions);
 		transListView.setAdapter(tla);
 
-		refreshOverviewCardDetails(currentAccount);
-
 	}
 
-	public void refreshOverviewCardDetails(int acc) {
+	private void refreshOverviewCardDetails(int acc) {
 
 		final TTransactions tTransactions = new TTransactions(getContext());
 
@@ -187,8 +191,8 @@ public class FHomePage extends Fragment {
 			}
 
 			if (CURRENT_ACCOUNT_ID == ALL_ACCOUNT_ID) {
-				tAcc.setVisibility(View.VISIBLE);
 				tAcc.setText(transaction.getAccount().getName());
+				tAcc.setVisibility(View.VISIBLE);
 			} else {
 				tAcc.setVisibility(View.GONE);
 			}

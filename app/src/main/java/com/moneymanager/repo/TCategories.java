@@ -123,7 +123,7 @@ public class TCategories implements ICategory {
 	private Category extractCategoryFromCursor(Cursor c) {
 		final int id = c.getInt(c.getColumnIndex(ID));
 		final String name = c.getString(c.getColumnIndex(NAME));
-		final int type = c.getInt(c.getColumnIndex(ID));
+		final int type = c.getInt(c.getColumnIndex(TYPE));
 		final boolean ex = c.getInt(c.getColumnIndex(EXCLUDE)) == 1;
 
 		return new Category(id, name, type, ex);
