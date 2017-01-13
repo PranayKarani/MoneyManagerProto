@@ -105,6 +105,17 @@ public class TCategories implements ICategory {
 		}
 	}
 
+	@Override
+	public void insertNewCategory(Category category) {
+
+		final ContentValues cv = new ContentValues();
+		cv.put(NAME, category.getName());
+		cv.put(TYPE, category.getType());
+		cv.put(EXCLUDE, category.isExclude());
+		dbHelper.insert(TABLE_NAME, cv);
+
+	}
+
 	private void whenNoCategoryFound() {
 		// insert some categories before hand
 		final ContentValues cv = new ContentValues();

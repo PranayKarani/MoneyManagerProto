@@ -16,6 +16,18 @@ public class Category {
 		this.exclude = exclude;
 	}
 
+	public static String[] extractNameStringArrayFromArray(Category[] cat_arr) {
+
+		final String[] str_arr = new String[cat_arr.length];
+		int x = 0;
+		for (Category c : cat_arr) {
+
+			str_arr[x++] = c.getName();
+
+		}
+		return str_arr;
+	}
+
 	public int getId() {
 		return id;
 	}
@@ -46,5 +58,14 @@ public class Category {
 
 	public void setExclude(boolean exclude) {
 		this.exclude = exclude;
+	}
+
+	@Override
+	public String toString() {
+		String t = type == 0 ? "income" : "expense";
+		t += " (" + type + ")";
+		return "id: " + id + "\n" +
+				"name: " + name + "\n" +
+				"type: " + t;
 	}
 }

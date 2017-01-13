@@ -3,6 +3,7 @@ package com.moneymanager.fragments;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -16,6 +17,7 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 import com.moneymanager.R;
+import com.moneymanager.activities.category.ACategories;
 import com.moneymanager.entities.Account;
 import com.moneymanager.entities.Category;
 import com.moneymanager.exceptions.NoAccountsException;
@@ -36,6 +38,8 @@ public class FAddTransaction extends Fragment {
 	// income, expense toggle
 	private ToggleButton toggle;// isChecked - expense
 
+	private Category[] income_cat_arr;
+	private Category[] expense_cat_arr;
 	private ArrayList<String> cat_name_list;
 	private ArrayList<Integer> cat_id_list;
 	private ArrayList<String> acc_name_list;
@@ -52,15 +56,23 @@ public class FAddTransaction extends Fragment {
 		init();
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		updateCategoryList();
+	}
+
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		final View rootView = inflater.inflate(R.layout.f_add_transaction, container, false);
 
 		toggle = (ToggleButton) rootView.findViewById(R.id.add_trans_type);
+		toggle.setTextColor(getMyColor(getContext(), toggle.isChecked() ? R.color.colorWhite : R.color.colorPrimaryDark));
 		toggle.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				updateCategoryList();
+				toggle.setTextColor(getMyColor(getContext(), toggle.isChecked() ? R.color.colorWhite : R.color.colorPrimaryDark));
 			}
 		});
 
@@ -85,6 +97,12 @@ public class FAddTransaction extends Fragment {
 						cat_text.setText("category: " + names[i]);
 						Log.i(mylog, "selected category id: " + selectedCategoryID);
 						dialogInterface.dismiss();
+					}
+				});
+				builder.setPositiveButton("manage categories", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						startActivity(new Intent(getContext(), ACategories.class));
 					}
 				});
 				builder.create().show();

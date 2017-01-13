@@ -15,4 +15,5 @@ public interface ICategory {
 	 */
 	Category[] getTypeSpecificCategories(int type);
 
+	void insertNewCategory(Category category);
 }

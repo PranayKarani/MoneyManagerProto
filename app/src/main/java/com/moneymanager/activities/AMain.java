@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.moneymanager.R;
 import com.moneymanager.activities.accounts.AAccounts;
+import com.moneymanager.activities.category.ACategories;
 import com.moneymanager.activities.transaction.AAddTransaction;
 import com.moneymanager.adapters.HomePagerAdapter;
 import com.moneymanager.entities.Account;
@@ -145,12 +146,26 @@ public class AMain extends AppCompatActivity {
 				return true;
 			}
 
-			case R.id.home_menu_add_account: {
+			case R.id.home_menu_manage_account: {
 
 				startActivity(new Intent(this, AAccounts.class));
 
 				return true;
 
+			}
+
+			case R.id.home_menu_manage_budget: {
+
+				Toast.makeText(this, "Coming soon :)", Toast.LENGTH_SHORT).show();
+
+				return true;
+			}
+
+			case R.id.home_menu_manage_category: {
+
+				startActivity(new Intent(this, ACategories.class));
+
+				return true;
 			}
 
 			default: {

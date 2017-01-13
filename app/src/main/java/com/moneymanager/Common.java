@@ -2,6 +2,8 @@
 
 package com.moneymanager;
 
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -26,5 +28,9 @@ public class Common {
 		toolbar.setTitle(title);
 		activity.setSupportActionBar(toolbar);
 
+	}
+
+	public static int getMyColor(Context context, int color) {
+		return ContextCompat.getColor(context, color);
 	}
 }
