@@ -77,6 +77,8 @@ public class AMain extends AppCompatActivity {
 	protected void onResume() {
 		super.onResume();
 
+		Log.i(mylog, "amain resumed");
+
 		// check if accounts exists else redirect to accounts page
 		final TAccounts accTable = new TAccounts(this);
 		try {

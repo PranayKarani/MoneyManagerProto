@@ -60,15 +60,6 @@ public class TAccounts implements IAccount {
 		return "SELECT SUM( " + BALANCE + ") AS " + BALANCE + " FROM " + TABLE_NAME + " WHERE " + ID + " = " + acc_id;
 	}
 
-	private String q_UPDATE_BALANCE(int id, int amount) {
-
-		return "UPDATE " + TABLE_NAME + " SET " + BALANCE + " = " + amount + " WHERE " + ID + " = " + id;
-
-	}
-
-
-
-
 
 
 
@@ -129,6 +120,8 @@ public class TAccounts implements IAccount {
 	public void removeAccount(int id) {
 
 		dbHelper.delete(TABLE_NAME, ID + " = ?", new String[]{String.valueOf(id)});
+
+		// TODO do something about transactions in this Account
 
 	}
 

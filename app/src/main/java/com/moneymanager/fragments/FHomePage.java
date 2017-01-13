@@ -38,6 +38,7 @@ public class FHomePage extends Fragment {
 	private TextView cardIncomeTextView;
 	private TextView cardExpenseTextView;
 	private TextView cardTotalTextView;
+	private TextView noTransText;
 
 
 	@Override
@@ -64,6 +65,11 @@ public class FHomePage extends Fragment {
 
 		Log.i(mylog, "homepage fragment created for position " + position);
 
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
 	}
 
 	@Override
@@ -96,7 +102,7 @@ public class FHomePage extends Fragment {
 		refreshOverviewCardDetails(CURRENT_ACCOUNT_ID);
 
 		// no transaction text
-		final TextView noTransText = (TextView) root.findViewById(R.id.f_home_no_trans_text);
+		noTransText = (TextView) root.findViewById(R.id.f_home_no_trans_text);
 		if (myTransactions.length == 0) {
 			noTransText.setVisibility(View.VISIBLE);
 		} else {
@@ -121,6 +127,7 @@ public class FHomePage extends Fragment {
 	public void refreshFragmentContent(int currentAccount) {
 		refreshTransList(currentAccount);
 		refreshOverviewCardDetails(currentAccount);
+		Log.i(mylog, "homefrag refreshed");
 	}
 
 	// Also refreshes Overview Card details
@@ -131,6 +138,14 @@ public class FHomePage extends Fragment {
 		} else {
 			myTransactions = tTransactions.getAccountSpecificTransactionsForDay(CURRENT_ACCOUNT_ID, myDate);
 		}
+
+		// hide the 'no transaction found' text if transaction found
+		if (myTransactions.length == 0) {
+			noTransText.setVisibility(View.VISIBLE);
+		} else {
+			noTransText.setVisibility(View.GONE);
+		}
+
 		final TransListAdapter tla = new TransListAdapter(getContext(), myTransactions);
 		transListView.setAdapter(tla);
 

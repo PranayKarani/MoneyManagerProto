@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="Android SQLite" uuid="361801ad-c981-4c36-8997-b21512d42956">
-      <driver-ref>sqlite.xerial</driver-ref>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$USER_HOME$/Library/Caches/IntelliJIdea2016.3/android/databases/SERIAL_NUMBER_57d1ee3e/com.moneymanager/internal/moneymanager.db</jdbc-url>
-    </data-source>
-  </component>
   <component name="GradleLocalSettings">
     <option name="modificationStamps">
       <map>
@@ -72,12 +65,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-  </component>
-  <component name="dataSourceStorageLocal">
-    <data-source name="Android SQLite" uuid="361801ad-c981-4c36-8997-b21512d42956">
-      <database-info product="SQLite" version="3.8.11" jdbc-version="2.1" driver-name="SQLiteJDBC" driver-version="native" />
-      <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed" />
-    </data-source>
   </component>
   <component name="libraryTable">
     <library name="animated-vector-drawable-25.1.0">
