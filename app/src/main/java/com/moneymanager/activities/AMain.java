@@ -83,7 +83,6 @@ public class AMain extends AppCompatActivity {
 		final TAccounts accTable = new TAccounts(this);
 		try {
 
-			
 			// query for account list, throw NoAccountsException if none found
 			accounts = accTable.getAllAccounts(TAccounts.NAME, null);
 
