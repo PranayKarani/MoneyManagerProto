@@ -30,6 +30,16 @@ public class TTransactions implements ITransaction {
 	private DBHelper dbHelper;
 
 	private Context context;
+	private String TID_alias = "tID";
+	private String SELECT_TRANS_JOIN_CAT_AND_ACC =
+			"SELECT " +
+					TABLE_NAME + "." + ID + " AS " + TID_alias + "," +
+					TCategories.TABLE_NAME + "." + TCategories.ID + " AS cID," +
+					TAccounts.TABLE_NAME + "." + TAccounts.ID + " AS aID," +
+					"*" +
+					" FROM " + TABLE_NAME +
+					" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
+					" JOIN " + TAccounts.TABLE_NAME + " ON " + ACCOUNT + " = " + TAccounts.TABLE_NAME + "." + TAccounts.ID;
 
 	public TTransactions(Context context) {
 		dbHelper = new DBHelper(context);
@@ -58,18 +68,13 @@ public class TTransactions implements ITransaction {
 		if (order == null) {
 			order = "DESC";
 		}
-		return "SELECT * FROM " + TABLE_NAME +
-				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
-				" JOIN " + TAccounts.TABLE_NAME + " ON " + ACCOUNT + " = " + TAccounts.TABLE_NAME + "." + TAccounts.ID +
-				" ORDER BY " + column + " " + order;
+		return SELECT_TRANS_JOIN_CAT_AND_ACC + " ORDER BY " + column + " " + order;
 	}
 
 	private String q_SELECT_ALL_TRANSACTIONS_FOR_DAY(Date date) {
 		// get Date
 		final String date_format = MyCalendar.getSimpleDateFormat().format(date);
-		return "SELECT * FROM " + TABLE_NAME +
-				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
-				" JOIN " + TAccounts.TABLE_NAME + " ON " + ACCOUNT + " = " + TAccounts.TABLE_NAME + "." + TAccounts.ID +
+		return SELECT_TRANS_JOIN_CAT_AND_ACC +
 				" WHERE " + DATETIME + " = '" + date_format + "'" +
 				" ORDER BY " + ACCOUNT + " ASC, " + ID + " DESC";
 	}
@@ -77,9 +82,7 @@ public class TTransactions implements ITransaction {
 	private String q_SELECT_ACCOUNT_TRANSACTIONS_FOR_DAY(int accId, Date date) {
 		// get Date
 		final String date_format = MyCalendar.getSimpleDateFormat().format(date);
-		return "SELECT * FROM " + TABLE_NAME +
-				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
-				" JOIN " + TAccounts.TABLE_NAME + " ON " + ACCOUNT + " = " + TAccounts.TABLE_NAME + "." + TAccounts.ID +
+		return SELECT_TRANS_JOIN_CAT_AND_ACC +
 				" WHERE " + DATETIME + " = '" + date_format + "' AND " + ACCOUNT + " = " + accId;
 	}
 
@@ -105,6 +108,7 @@ public class TTransactions implements ITransaction {
 
 
 	}
+
 
 	@Override
 	public Transaction[] getAllTransactions(String column, String order) {
@@ -208,7 +212,7 @@ public class TTransactions implements ITransaction {
 
 	private Transaction extractTransactionFromCursor(Cursor c) {
 
-		final int id = c.getInt(c.getColumnIndex(ID));
+		final int id = c.getInt(c.getColumnIndex(TID_alias));
 		final double amount = c.getDouble(c.getColumnIndex(AMOUNT));
 		final String info = c.getString(c.getColumnIndex(INFO));
 		Date dateTime = null;
