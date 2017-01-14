@@ -2,6 +2,7 @@
 
 package com.moneymanager.repo.interfaces;
 
+import com.moneymanager.entities.Category;
 import com.moneymanager.entities.Transaction;
 
 import java.util.Date;
@@ -18,4 +19,5 @@ public interface ITransaction {
 
 	void removeTransaction(int id);
 
+	void shiftDeletedTransactions(Category cat);
 }

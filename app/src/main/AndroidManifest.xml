@@ -7,7 +7,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar">
+        android:theme="@style/Theme.AppCompat.NoActionBarAppTheme">
         <activity android:name=".activities.AMain">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -23,8 +23,6 @@
         <activity android:name=".activities.transaction.AAddTransaction">
         </activity>
         <activity android:name=".activities.accounts.AAddAccount">
-        </activity>
-        <activity android:name=".activities.category.AAddCategory">
         </activity>
         <activity android:name=".activities.category.ACategories">
         </activity>

@@ -21,8 +21,11 @@ public class TCategories implements ICategory {
 	public static final int EXPENSE = 1;
 	private DBHelper dbHelper;
 
+	private Context context;
+
 	public TCategories(Context context) {
 		dbHelper = new DBHelper(context);
+		this.context = context;
 	}
 
 	/* Query Strings */
@@ -116,16 +119,38 @@ public class TCategories implements ICategory {
 
 	}
 
+	@Override
+	public void updateCategory(Category new_cat) {
+
+		final ContentValues cv = new ContentValues();
+		cv.put(NAME, new_cat.getName());
+		cv.put(TYPE, new_cat.getType());
+		dbHelper.update(TABLE_NAME, cv, ID + " = ?", new String[]{String.valueOf(new_cat.getId())});
+
+	}
+
+	@Override
+	public void removeCategory(Category cat) {
+
+		// transfer transactions in this category to 'Other'
+		TTransactions tTransactions = new TTransactions(context);
+		tTransactions.shiftDeletedTransactions(cat);
+
+		// then delete the category
+		dbHelper.delete(TABLE_NAME, ID + " = ?", new String[]{String.valueOf(cat.getId())});
+
+	}
+
 	private void whenNoCategoryFound() {
 		// insert some categories before hand
 		final ContentValues cv = new ContentValues();
-		cv.put(NAME, "Movies");
+		cv.put(NAME, "Other expense");
 		cv.put(TYPE, EXPENSE);
 		cv.put(EXCLUDE, 0);
 		dbHelper.insert(TABLE_NAME, cv);
 
 		final ContentValues cv1 = new ContentValues();
-		cv1.put(NAME, "Salary");
+		cv1.put(NAME, "Other income");
 		cv1.put(TYPE, INCOME);
 		cv1.put(EXCLUDE, 0);
 		dbHelper.insert(TABLE_NAME, cv1);

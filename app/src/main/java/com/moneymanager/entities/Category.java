@@ -52,6 +52,10 @@ public class Category {
 		this.type = type;
 	}
 
+	public String getTypeString() {
+		return type == 0 ? "income" : "expense";
+	}
+
 	public boolean isExclude() {
 		return exclude;
 	}

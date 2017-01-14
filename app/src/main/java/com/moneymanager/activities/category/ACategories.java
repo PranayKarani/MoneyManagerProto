@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -22,8 +23,7 @@ import com.moneymanager.entities.Category;
 import com.moneymanager.fragments.FCategoryList;
 import com.moneymanager.repo.TCategories;
 
-import static com.moneymanager.Common.EXPENSE;
-import static com.moneymanager.Common.INCOME;
+import static com.moneymanager.Common.*;
 
 public class ACategories extends AppCompatActivity {
 
@@ -45,7 +45,7 @@ public class ACategories extends AppCompatActivity {
 				.setCancelable(true)
 				.setTitle("Create new Category")
 				.setView(alertView)
-				.setPositiveButton("save", null)
+				.setPositiveButton("add", null)
 				.create();
 
 		dialog.setOnShowListener(new DialogInterface.OnShowListener() {
@@ -66,7 +66,7 @@ public class ACategories extends AppCompatActivity {
 
 							Category cat = new Category(-1, cat_name, type, false);
 
-							Toast.makeText(ACategories.this, cat.toString(), Toast.LENGTH_LONG).show();
+							Toast.makeText(ACategories.this, "New category " + cat.getName() + " added in " + cat.getTypeString(), Toast.LENGTH_LONG).show();
 
 							TCategories tCategories = new TCategories(ACategories.this);
 							tCategories.insertNewCategory(cat);
@@ -127,12 +127,38 @@ public class ACategories extends AppCompatActivity {
 				}
 				tl.setSelectedTabIndicatorColor(ContextCompat.getColor(ACategories.this, newcolor));
 				fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ACategories.this, newcolor)));
+				for (Fragment f : getSupportFragmentManager().getFragments()) {
+
+					((FCategoryList) f).refreshCatList();
+
+				}
 			}
 
 			@Override
 			public void onPageScrollStateChanged(int state) {
 			}
 		});
+
+	}
+
+	public void showUndoSnackbar(final FCategoryList fCategoryList, final Category dCat) {
+
+		final Snackbar sb = Snackbar.make(findViewById(R.id.a_categories_coordinate_layout),
+				"Delete category " + dCat.getName() + "?",
+				Snackbar.LENGTH_SHORT)
+				.setAction("Sure", new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+
+						TCategories tCategories = new TCategories(ACategories.this);
+						tCategories.removeCategory(dCat);
+						fCategoryList.refreshCatList();
+					}
+				});
+		View sbv = sb.getView();
+		sbv.setBackgroundColor(getMyColor(ACategories.this, R.color.colorRed));
+		sb.setActionTextColor(getMyColor(ACategories.this, R.color.colorPrimaryDark));
+		sb.show();
 
 	}
 }

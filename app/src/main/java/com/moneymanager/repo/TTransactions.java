@@ -5,6 +5,7 @@ package com.moneymanager.repo;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import com.moneymanager.Common;
 import com.moneymanager.db.DBHelper;
 import com.moneymanager.entities.Account;
 import com.moneymanager.entities.Category;
@@ -189,6 +190,19 @@ public class TTransactions implements ITransaction {
 
 	@Override
 	public void removeTransaction(int id) {
+
+	}
+
+	@Override
+	public void shiftDeletedTransactions(Category cat) {
+
+		// 1 - Other expense, 2 - Other income
+		int newCatID = cat.getType() == Common.EXPENSE ? 1 : 2;
+
+		ContentValues cv = new ContentValues();
+		cv.put(CATEGORY, newCatID);
+
+		dbHelper.update(TABLE_NAME, cv, CATEGORY + " = ?", new String[]{String.valueOf(cat.getId())});
 
 	}
 
