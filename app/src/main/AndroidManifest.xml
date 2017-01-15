@@ -17,14 +17,15 @@
         </activity>
         <activity android:name=".activities.accounts.AAccounts">
         </activity>
-        <activity
-            android:name=".activities.ASearch">
+        <activity android:name=".activities.ASearch">
         </activity>
         <activity android:name=".activities.transaction.AAddTransaction">
         </activity>
         <activity android:name=".activities.accounts.AAddAccount">
         </activity>
         <activity android:name=".activities.category.ACategories">
+        </activity>
+        <activity android:name=".activities.stats.AStats">
         </activity>
     </application>
 
