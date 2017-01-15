@@ -34,20 +34,20 @@ public class MyCalendar {
 
 	public static String dateToString(Date date) {
 		final int lastInt = date.getDate() % 10;
-		switch (lastInt) {
-			case 1:
-				int secondLastInt = (date.getDate() - lastInt) / 10;
-				if (secondLastInt == 1) {
-					return date.getDate() + "th";
-				} else {
+		int secondLastInt = (date.getDate() - lastInt) / 10;
+		if (secondLastInt == 1) {
+			return date.getDate() + "th";
+		} else {
+			switch (lastInt) {
+				case 1:
 					return date.getDate() + "st";
-				}
-			case 2:
-				return date.getDate() + "nd";
-			case 3:
-				return date.getDate() + "rd";
-			default:
-				return date.getDate() + "th";
+				case 2:
+					return date.getDate() + "nd";
+				case 3:
+					return date.getDate() + "rd";
+				default:
+					return date.getDate() + "th";
+			}
 		}
 	}
 
