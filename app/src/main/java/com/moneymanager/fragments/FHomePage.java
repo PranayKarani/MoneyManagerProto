@@ -2,10 +2,12 @@ package com.moneymanager.fragments;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import com.moneymanager.Common;
 import com.moneymanager.R;
+import com.moneymanager.activities.stats.AStats;
 import com.moneymanager.entities.Transaction;
 import com.moneymanager.repo.TTransactions;
 import com.moneymanager.utilities.MyCalendar;
@@ -68,11 +71,6 @@ public class FHomePage extends Fragment {
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
-	}
-
-	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
@@ -85,6 +83,17 @@ public class FHomePage extends Fragment {
 		Log.i(mylog, MyCalendar.getNiceFormatedCompleteDateString(myDate));
 
 		final View root = inflater.inflate(R.layout.f_home_page, container, false);
+
+		// Overcard
+		final CardView card = (CardView) root.findViewById(R.id.f_home_overview_card);
+		card.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				final Intent intent = new Intent(getContext(), AStats.class);
+				intent.putExtra("date", sdf.format(myDate));
+				startActivity(intent);
+			}
+		});
 
 		// set overview card's title
 		final TextView text = (TextView) root.findViewById(R.id.f_home_overview_card_title);

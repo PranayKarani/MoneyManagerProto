@@ -16,7 +16,7 @@ import com.moneymanager.utilities.ShrPref;
 import static com.moneymanager.Common.setupToolbar;
 import static com.moneymanager.Common.spCURRENT_ACCOUNT_ID;
 
-class AAddAccount extends AppCompatActivity {
+public class AAddAccount extends AppCompatActivity {
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

@@ -13,6 +13,13 @@ import static com.moneymanager.Common.DATE_FORMAT;
  */
 public class MyCalendar {
 
+	public static SimpleDateFormat getSimpleDateFormat() {
+		return new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
+	}
+
+
+	/* Day stuff */
+
 	public static Date dateToday() {
 		return new Date();
 	}
@@ -51,6 +58,12 @@ public class MyCalendar {
 		}
 	}
 
+	public static String stringFormatOfDate(Date date) {
+
+		return getSimpleDateFormat().format(date);
+
+	}
+
 	public static Date dateBeforeDays(int noofDays) {
 		final Date dateToday = dateToday();
 
@@ -58,6 +71,56 @@ public class MyCalendar {
 		final Date newDate = new Date(dateToday.getYear(), dateToday.getMonth(), (-noofDays));
 		return new Date(newDate.getYear(), newDate.getMonth(), newDate.getDate() + date);
 	}
+
+	public static Date dateBeforeDays(Date d, int noofDays) {
+		final Date dateToday = d;
+
+		int date = dateToday.getDate();
+		final Date newDate = new Date(dateToday.getYear(), dateToday.getMonth(), (-noofDays));
+		return new Date(newDate.getYear(), newDate.getMonth(), newDate.getDate() + date);
+	}
+
+	public static Date dateAfterDays(int noofDays) {
+		final Date dateToday = dateToday();
+
+		int date = dateToday.getDate();
+		final Date newDate = new Date(dateToday.getYear(), dateToday.getMonth(), (noofDays));
+		return new Date(newDate.getYear(), newDate.getMonth(), newDate.getDate() + date);
+	}
+
+	public static Date dateAfterDays(Date d, int noofDays) {
+		final Date dateToday = d;
+
+		int date = dateToday.getDate();
+		final Date newDate = new Date(dateToday.getYear(), dateToday.getMonth(), (noofDays));
+		return new Date(newDate.getYear(), newDate.getMonth(), newDate.getDate() + date);
+	}
+
+	/* Week stuff */
+
+	// returns specified date's week starting and ending dates
+	public static Date[] weekEndandStartDatesforDate(Date date) {
+
+		Date[] dates = new Date[2];
+
+		int week_day = date.getDay() - 1;
+
+		if (week_day < 0) {
+			week_day = 6;
+		}
+
+		System.out.println(week_day);
+
+		dates[0] = dateBeforeDays(date, week_day);
+		dates[1] = dateAfterDays(date, 6 - week_day);
+
+		return dates;
+	}
+
+
+
+
+	/* Month stuff */
 
 	public static String thisMonthString() {
 		return String.format("%tb", dateToday());
@@ -88,6 +151,10 @@ public class MyCalendar {
 		return nxtMon;
 	}
 
+
+
+	/* Year stuff */
+
 	public static int thisYear() {
 		return new Date().getYear();
 	}
@@ -101,10 +168,6 @@ public class MyCalendar {
 		final String monthStr = MyCalendar.monthToString(date);
 		final String yearStr = MyCalendar.yearToString(date);
 		return dateStr + " " + monthStr + " " + yearStr;
-	}
-
-	public static SimpleDateFormat getSimpleDateFormat() {
-		return new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
 	}
 
 }

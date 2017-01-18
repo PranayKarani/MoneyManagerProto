@@ -44,8 +44,7 @@ public class AMain extends AppCompatActivity {
 		final Toolbar home_toolbar = (Toolbar) findViewById(R.id.home_toolbar);
 		home_toolbar.setTitle("");
 		setSupportActionBar(home_toolbar);
-//		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//		getSupportActionBar().setHomeButtonEnabled(true);
+
 
 
 		// set up fab button to add new transaction

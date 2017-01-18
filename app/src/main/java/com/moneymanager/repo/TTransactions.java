@@ -86,7 +86,6 @@ public class TTransactions implements ITransaction {
 				" WHERE " + DATETIME + " = '" + date_format + "' AND " + ACCOUNT + " = " + accId;
 	}
 
-
 	private String q_SELECT_SUM_TRANSACTION_FOR_ACCOUNT_FOR_TYPE_ON_DATE(int acc, int type, Date date) {
 
 		final String date_format = MyCalendar.getSimpleDateFormat().format(date);
@@ -108,6 +107,22 @@ public class TTransactions implements ITransaction {
 
 
 	}
+
+	private String q_SELECT_ALL_TRANSACTIONS_FOR_PERIOD(String start_date, String end_date) {
+		return SELECT_TRANS_JOIN_CAT_AND_ACC +
+				" WHERE " + DATETIME + " BETWEEN '"+start_date + "' AND '" + end_date +"'" +
+				" ORDER BY " + DATETIME + " DESC";
+	}
+
+	private String q_SELECT_ACCOUNT_TRANSACTIONS_FOR_PERIOD(int accID, String start_date, String end_date) {
+		return SELECT_TRANS_JOIN_CAT_AND_ACC +
+				" WHERE " + DATETIME + " BETWEEN '"+start_date + "' AND '" + end_date +"'" +
+				" AND " + ACCOUNT + " = " + accID +
+				" ORDER BY " + DATETIME + " DESC";
+	}
+
+
+
 
 
 	@Override
@@ -162,8 +177,45 @@ public class TTransactions implements ITransaction {
 		return t;
 	}
 
+	@Override
 	public Transaction[] getAccountSpecificTransactionsForDay(int accId, Date date) {
 		Cursor c = dbHelper.select(q_SELECT_ACCOUNT_TRANSACTIONS_FOR_DAY(accId, date), null);
+
+		final Transaction[] t = new Transaction[c.getCount()];
+
+		while (c.moveToNext()) {
+			t[c.getPosition()] = extractTransactionFromCursor(c);
+		}
+
+		return t;
+	}
+
+	@Override
+	public Transaction[] getTransactionsForWeek(Date date) {
+
+		Date[] dates = MyCalendar.weekEndandStartDatesforDate(date);
+		String startDate = MyCalendar.stringFormatOfDate(dates[0]);
+		String endDate = MyCalendar.stringFormatOfDate(dates[1]);
+
+		Cursor c = dbHelper.select(q_SELECT_ALL_TRANSACTIONS_FOR_PERIOD(startDate, endDate), null);
+
+		final Transaction[] t = new Transaction[c.getCount()];
+
+		while (c.moveToNext()) {
+			t[c.getPosition()] = extractTransactionFromCursor(c);
+		}
+
+		return t;
+	}
+
+	@Override
+	public Transaction[] getAccountSpecificTransactionsForWeek(int accId, Date date) {
+
+		Date[] dates = MyCalendar.weekEndandStartDatesforDate(date);
+		String startDate = MyCalendar.stringFormatOfDate(dates[0]);
+		String endDate = MyCalendar.stringFormatOfDate(dates[1]);
+
+		Cursor c = dbHelper.select(q_SELECT_ACCOUNT_TRANSACTIONS_FOR_PERIOD(accId, startDate, endDate), null);
 
 		final Transaction[] t = new Transaction[c.getCount()];
 

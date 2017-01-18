@@ -244,7 +244,8 @@ public class FAddTransaction extends Fragment {
 			int y = cal.get(Calendar.YEAR);
 			int m = cal.get(Calendar.MONTH);
 			int d = cal.get(Calendar.DAY_OF_MONTH);
-			return new DatePickerDialog(getActivity(), this, y, m, d);
+			DatePickerDialog dp = new DatePickerDialog(getActivity(), this, y, m, d);
+			return dp;
 		}
 
 		public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -252,6 +253,7 @@ public class FAddTransaction extends Fragment {
 			final TextView text = (TextView) getActivity().findViewById(R.id.add_trans_date);
 			text.setText("Day: " + dayOfMonth + "\nMonth: " + month + "\nYear: " + year);
 
+			year -= 1900;//
 			((OnDateSelectListener) getActivity()).updateDate(new Date(year, month, dayOfMonth));
 
 		}
