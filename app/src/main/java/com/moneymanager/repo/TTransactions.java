@@ -40,6 +40,9 @@ public class TTransactions implements ITransaction {
 					" FROM " + TABLE_NAME +
 					" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
 					" JOIN " + TAccounts.TABLE_NAME + " ON " + ACCOUNT + " = " + TAccounts.TABLE_NAME + "." + TAccounts.ID;
+	private String DEFAULT_ORDER_BY = " ORDER BY " + TABLE_NAME + "." + ID + " ASC";
+	private String DEFAULT_ORDER_BY_ID = " ORDER BY " + ACCOUNT + " ASC, " + ID + " DESC";
+	private String DEFAULT_ORDER_BY_TID = " ORDER BY " + DATETIME + " DESC, " + TID_alias + " DESC";
 
 	public TTransactions(Context context) {
 		dbHelper = new DBHelper(context);
@@ -76,14 +79,15 @@ public class TTransactions implements ITransaction {
 		final String date_format = MyCalendar.getSimpleDateFormat().format(date);
 		return SELECT_TRANS_JOIN_CAT_AND_ACC +
 				" WHERE " + DATETIME + " = '" + date_format + "'" +
-				" ORDER BY " + ACCOUNT + " ASC, " + ID + " DESC";
+				DEFAULT_ORDER_BY_TID;
 	}
 
 	private String q_SELECT_ACCOUNT_TRANSACTIONS_FOR_DAY(int accId, Date date) {
 		// get Date
 		final String date_format = MyCalendar.getSimpleDateFormat().format(date);
 		return SELECT_TRANS_JOIN_CAT_AND_ACC +
-				" WHERE " + DATETIME + " = '" + date_format + "' AND " + ACCOUNT + " = " + accId;
+				" WHERE " + DATETIME + " = '" + date_format + "' AND " + ACCOUNT + " = " + accId +
+				DEFAULT_ORDER_BY_TID;
 	}
 
 	private String q_SELECT_SUM_TRANSACTION_FOR_ACCOUNT_FOR_TYPE_ON_DATE(int acc, int type, Date date) {
@@ -93,7 +97,8 @@ public class TTransactions implements ITransaction {
 				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
 				" WHERE " + DATETIME + " = '" + date_format + "' AND " +
 				TCategories.TYPE + " = " + type + " AND " +
-				ACCOUNT + " = " + acc;
+				ACCOUNT + " = " + acc +
+				DEFAULT_ORDER_BY;
 
 
 	}
@@ -103,7 +108,8 @@ public class TTransactions implements ITransaction {
 		final String date_format = MyCalendar.getSimpleDateFormat().format(date);
 		return "SELECT SUM(" + AMOUNT + ") AS " + AMOUNT + " FROM " + TABLE_NAME +
 				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
-				" WHERE " + DATETIME + " = '" + date_format + "' AND " + TCategories.TYPE + " = " + type;
+				" WHERE " + DATETIME + " = '" + date_format + "' AND " + TCategories.TYPE + " = " + type +
+				DEFAULT_ORDER_BY;
 
 
 	}
@@ -118,31 +124,29 @@ public class TTransactions implements ITransaction {
 
 	private String q_SELECT_ALL_TRANSACTIONS_FOR_PERIOD(String start_date, String end_date) {
 		return SELECT_TRANS_JOIN_CAT_AND_ACC +
-				" WHERE " + DATETIME + " BETWEEN '"+start_date + "' AND '" + end_date +"'" +
-				" ORDER BY " + DATETIME + " DESC";
+				" WHERE " + DATETIME + " BETWEEN '" + start_date + "' AND '" + end_date + "'" +
+				DEFAULT_ORDER_BY_TID;
 	}
 
 	private String q_SELECT_ACCOUNT_TRANSACTIONS_FOR_PERIOD(int accID, String start_date, String end_date) {
 		return SELECT_TRANS_JOIN_CAT_AND_ACC +
-				" WHERE " + DATETIME + " BETWEEN '"+start_date + "' AND '" + end_date +"'" +
+				" WHERE " + DATETIME + " BETWEEN '" + start_date + "' AND '" + end_date + "'" +
 				" AND " + ACCOUNT + " = " + accID +
-				" ORDER BY " + DATETIME + " DESC";
+				DEFAULT_ORDER_BY_TID;
 	}
 
 	private String q_SELECT_ALL_TRANSACTIONS_FOR_MONTH(String monthDigits) {
 		return SELECT_TRANS_JOIN_CAT_AND_ACC +
 				" WHERE strftime('%m'," + DATETIME + ") = '" + monthDigits + "'" +
-				" ORDER BY " + DATETIME + " DESC";
+				DEFAULT_ORDER_BY_TID;
 	}
 
 	private String q_SELECT_ACCOUNT_TRANSACTIONS_FOR_MONTH(int accID, String monthDigits) {
 		return SELECT_TRANS_JOIN_CAT_AND_ACC +
 				" WHERE strftime('%m'," + DATETIME + ") = '" + monthDigits + "' " +
 				" AND " + ACCOUNT + " = " + accID +
-				" ORDER BY " + DATETIME + " DESC";
+				DEFAULT_ORDER_BY_TID;
 	}
-
-
 
 
 	@Override
@@ -289,6 +293,43 @@ public class TTransactions implements ITransaction {
 		return transactions;
 
 	}
+
+
+	/* Custom Period Transactions */
+	@Override
+	public Transaction[] getTransactionsForCustomPeriod(Date startingDate, Date endingDate) {
+
+		String startDate = MyCalendar.stringFormatOfDate(startingDate);
+		String endDate = MyCalendar.stringFormatOfDate(endingDate);
+		Cursor c = dbHelper.select(q_SELECT_ALL_TRANSACTIONS_FOR_PERIOD(startDate, endDate), null);
+
+		final Transaction[] t = new Transaction[c.getCount()];
+
+		while (c.moveToNext()) {
+			t[c.getPosition()] = extractTransactionFromCursor(c);
+		}
+
+		return t;
+
+	}
+
+	@Override
+	public Transaction[] getAccountSpecificTransactionsForCustomPeriod(int accId, Date startingDate, Date endingDate) {
+
+		String startDate = MyCalendar.stringFormatOfDate(startingDate);
+		String endDate = MyCalendar.stringFormatOfDate(endingDate);
+		Cursor c = dbHelper.select(q_SELECT_ACCOUNT_TRANSACTIONS_FOR_PERIOD(accId, startDate, endDate), null);
+
+		final Transaction[] t = new Transaction[c.getCount()];
+
+		while (c.moveToNext()) {
+			t[c.getPosition()] = extractTransactionFromCursor(c);
+		}
+
+		return t;
+
+	}
+
 
 	@Override
 	public void insertNewTransaction(Transaction transaction) {

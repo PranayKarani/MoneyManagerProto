@@ -1,9 +1,12 @@
 package com.moneymanager.activities.stats;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -11,10 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
@@ -37,8 +37,12 @@ import java.util.*;
 
 import static com.moneymanager.Common.*;
 
-public class AStats extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class AStats extends AppCompatActivity {
 
+	private static boolean startDateSelected;
+	private static Date customStartDate;
+	private static Date customEndDate;
+	private static AlertDialog customDatePickerDialog;
 	private final int DAY = 324;
 	private final int WEEK = 244;
 	private final int MONTH = 824;
@@ -48,18 +52,15 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 	private SimpleDateFormat sdf;
 	private int selectedAccountID = CURRENT_ACCOUNT_ID;
 	private int selectedPeriod = DAY;
-
 	private Account[] accounts;
 	private String[] acc_names;
 	private int[] acc_ids;
-
 	// Views
 	private MenuItem period_text;
 	private TextView cardIncomeTextView, cardExpenseTextView, cardTotalTextView;
 	private CardView calenderCard;
 	private LinearLayout piechartCard;
 	private CardView bargraphCard;
-
 	private CardView income_trans_container_card, expense_trans_container_card;
 	private LinearLayout income_trans_container, expense_trans_container;
 
@@ -94,6 +95,8 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 
 		Bundle b = new Bundle();
 		b.putString("date", sdf.format(myDate));
+		b.putString("cus_end_date", sdf.format(customEndDate));
+		b.putString("cus_start_date", sdf.format(customStartDate));
 		new TransListLoader().execute(b);
 
 	}
@@ -104,6 +107,8 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 		final Intent intent = getIntent();
 		try {
 			myDate = sdf.parse(intent.getStringExtra("date"));
+			customStartDate = myDate;
+			customEndDate = myDate;
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -129,6 +134,18 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 			}
 		}
 
+	}
+
+	public void onStartDatePick(View view) {
+		startDateSelected = true;
+		final DatePickerFragment datePickerFragment = new DatePickerFragment();
+		datePickerFragment.show(getSupportFragmentManager(), "Pick Starting Date");
+	}
+
+	public void onEndDatePick(View view) {
+		startDateSelected = false;
+		final DatePickerFragment datePickerFragment = new DatePickerFragment();
+		datePickerFragment.show(getSupportFragmentManager(), "Pick Ending Date");
 	}
 
 	private void refreshCardViews() {
@@ -168,11 +185,24 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.stats_period_menu, menu);
 		period_text = menu.getItem(0);
+		period_text.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				Toast.makeText(AStats.this, "show particular " + period_text.getTitle() + " picker", Toast.LENGTH_SHORT).show();
+				return false;
+			}
+		});
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+
+		final Bundle b = new Bundle();
+		b.putString("date", sdf.format(myDate));
+		b.putString("cus_end_date", sdf.format(customEndDate));
+		b.putString("cus_start_date", sdf.format(customStartDate));
+
 		switch (item.getItemId()) {
 			case R.id.stats_menu_period_text:
 				// show selector for selected period
@@ -182,21 +212,26 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 				period_text.setTitle("Day");
 
 				selectedPeriod = DAY;
-
+				refreshCardViews();
+				new TransListLoader().execute(b);
 
 				break;
 			case R.id.stats_menu_period_week:
 				period_text.setTitle("Week");
 
 				selectedPeriod = WEEK;
+				refreshCardViews();
 
+				new TransListLoader().execute(b);
 
 				break;
 			case R.id.stats_menu_period_month:
 				period_text.setTitle("Month");
 
 				selectedPeriod = MONTH;
+				refreshCardViews();
 
+				new TransListLoader().execute(b);
 				break;
 			case R.id.stats_menu_period_year:
 				period_text.setTitle("Year");
@@ -208,29 +243,48 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 				period_text.setTitle("Custom");
 
 				selectedPeriod = CUSTOM;
+				customDatePickerDialog = new AlertDialog.Builder(this)
+						.setView(R.layout.d_custom_period_picker)
+						.setPositiveButton("Okay", null)
+						.create();
+				customDatePickerDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+					@Override
+					public void onShow(final DialogInterface dialogX) {
+						final Button button = customDatePickerDialog.getButton(AlertDialog.BUTTON_POSITIVE);
 
+						final TextView startDateText = (TextView) customDatePickerDialog.findViewById(R.id.d_custom_period_starting_date);
+						startDateText.setText(MyCalendar.getNiceFormatedCompleteDateString(customStartDate));
+						final TextView endDateText = (TextView) customDatePickerDialog.findViewById(R.id.d_custom_period_ending_date);
+						endDateText.setText(MyCalendar.getNiceFormatedCompleteDateString(customStartDate));
+
+						button.setOnClickListener(new View.OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								Log.i(mylog, "start date pick: " + customStartDate.getTime());
+								Log.i(mylog, "end date pick: " + customEndDate.getTime());
+								if (customStartDate.getTime() > customEndDate.getTime()) {
+									// start date cannot be greater than end date
+									Toast.makeText(AStats.this, "start date cannot be greater than end date", Toast.LENGTH_SHORT).show();
+								} else {
+									b.putString("cus_end_date", sdf.format(customEndDate));
+									b.putString("cus_start_date", sdf.format(customStartDate));
+									new TransListLoader().execute(b);
+									refreshCardViews();
+									customDatePickerDialog.dismiss();
+								}
+							}
+
+						});
+
+					}
+				});
+				customDatePickerDialog.show();
 				break;
 		}
 
-		refreshCardViews();
-		// refresh the stats according to selected account
-		Bundle b = new Bundle();
-		b.putString("date", sdf.format(myDate));
-		new TransListLoader().execute(b);
 
 		return true;
-	}
-
-	@Override
-	public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-		Log.i(mylog, position + " selected");
-
-	}
-
-	@Override
-	public void onNothingSelected(AdapterView<?> parent) {
-
 	}
 
 	private void refreshToolbar() {
@@ -263,6 +317,35 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 				builder.create().show();
 			}
 		});
+	}
+
+	public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			final Calendar cal = Calendar.getInstance();
+			int y = cal.get(Calendar.YEAR);
+			int m = cal.get(Calendar.MONTH);
+			int d = cal.get(Calendar.DAY_OF_MONTH);
+
+			DatePickerDialog dp = new DatePickerDialog(getActivity(), this, y, m, d);
+			return dp;
+		}
+
+		public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+
+			year -= 1900;//
+			Date newDate = new Date(year, month, dayOfMonth);
+
+			if (startDateSelected) {
+				customStartDate = newDate;
+			} else {
+				customEndDate = newDate;
+			}
+
+			final TextView text = (TextView) customDatePickerDialog.findViewById((startDateSelected ? R.id.d_custom_period_starting_date : R.id.d_custom_period_ending_date));
+			text.setText(MyCalendar.getNiceFormatedCompleteDateString(newDate));
+		}
+
 	}
 
 	class TransListLoader extends AsyncTask<Bundle, Void, Transaction[]> {
@@ -339,6 +422,21 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
+					break;
+				default:
+					try {
+						Date startdate = sdf.parse(bundle.getString("cus_start_date"));
+						Date enddate = sdf.parse(bundle.getString("cus_end_date"));
+
+						if (selectedAccountID == ALL_ACCOUNT_ID) {
+							transactions = tTransactions.getTransactionsForCustomPeriod(startdate, enddate);
+						} else {
+							transactions = tTransactions.getAccountSpecificTransactionsForCustomPeriod(selectedAccountID, startdate, enddate);
+						}
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+					break;
 
 			}
 
@@ -384,6 +482,14 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 				case YEAR:
 					break;
 				default:// Custom
+					if (customStartDate.equals(customEndDate)) {
+						String startDateText = MyCalendar.dateToString(customStartDate) + " " + MyCalendar.monthToFullString(customStartDate);
+						title.setText(startDateText + "'s Overview");
+					} else {
+						String startDateText = MyCalendar.dateToString(customStartDate) + " " + MyCalendar.monthToString(customStartDate);
+						String endDateText = MyCalendar.dateToString(customEndDate) + " " + MyCalendar.monthToString(customEndDate);
+						title.setText(startDateText + " ~ " + endDateText + " Overview");
+					}
 					break;
 
 			}
@@ -580,7 +686,6 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 				final TextView tAmt = (TextView) rowView.findViewById(R.id.x_home_trans_row_amt);
 				final TextView tAcc = (TextView) rowView.findViewById(R.id.x_home_trans_row_acc);
 				final TextView tInfo = (TextView) rowView.findViewById(R.id.x_home_trans_row_info);
-				tInfo.setVisibility(View.GONE);
 
 				if (selectedAccountID == ALL_ACCOUNT_ID) {
 					tAcc.setVisibility(View.VISIBLE);
@@ -591,6 +696,8 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 
 				tCat.setText(t.getCategory().getName());
 				tAmt.setText(t.getAmountString());
+				tInfo.setText(MyCalendar.getNiceFormatedCompleteDateString(t.getDateTime()));
+				tInfo.setTextColor(getMyColor(AStats.this, R.color.colorWhite));
 
 				if (loadForMainScreen) {
 					if (t.getCategory().getType() == INCOME) {

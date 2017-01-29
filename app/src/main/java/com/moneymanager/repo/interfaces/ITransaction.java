@@ -25,6 +25,11 @@ public interface ITransaction {
 
 	Transaction[] getAccountSpecificTransactionsForMonth(int accID, Date date);
 
+	/* Custom Period Transactions */
+	Transaction[] getTransactionsForCustomPeriod(Date startDate, Date endDate);
+
+	Transaction[] getAccountSpecificTransactionsForCustomPeriod(int accId, Date startDate, Date endDate);
+
 	void insertNewTransaction(Transaction transaction);
 
 	void removeTransaction(int id);

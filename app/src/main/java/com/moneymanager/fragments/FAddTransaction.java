@@ -23,6 +23,7 @@ import com.moneymanager.entities.Category;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.TAccounts;
 import com.moneymanager.repo.TCategories;
+import com.moneymanager.utilities.MyCalendar;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -250,12 +251,13 @@ public class FAddTransaction extends Fragment {
 
 		public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
-			final TextView text = (TextView) getActivity().findViewById(R.id.add_trans_date);
-			text.setText("Day: " + dayOfMonth + "\nMonth: " + month + "\nYear: " + year);
-
 			year -= 1900;//
-			((OnDateSelectListener) getActivity()).updateDate(new Date(year, month, dayOfMonth));
+			Date newDate = new Date(year, month, dayOfMonth);
 
+			((OnDateSelectListener) getActivity()).updateDate(newDate);
+
+			final TextView text = (TextView) getActivity().findViewById(R.id.add_trans_date);
+			text.setText(MyCalendar.getNiceFormatedCompleteDateString(newDate));
 		}
 
 	}
