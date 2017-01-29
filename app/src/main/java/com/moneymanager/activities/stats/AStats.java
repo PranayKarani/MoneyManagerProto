@@ -678,9 +678,28 @@ public class AStats extends AppCompatActivity {
 				container_layout.removeAllViews();
 			}
 
+			Date previousDate = trans[0].getDateTime(); // used in other lists like in piechart dialog
+			Date previousExpenseDate = null, previousIncomeDate = null;
+			for (Transaction t : trans) {
+
+				if (previousExpenseDate == null) {
+					if (t.getCategory().getType() == EXPENSE) {
+						previousExpenseDate = t.getDateTime();
+						continue;
+					}
+				}
+
+				if (previousIncomeDate == null) {
+					if (t.getCategory().getType() == INCOME) {
+						previousIncomeDate = t.getDateTime();
+					}
+				}
+
+			}
 			for (Transaction t : trans) {
 
 				View rowView = getLayoutInflater().inflate(row_layout, null);
+
 
 				final TextView tCat = (TextView) rowView.findViewById(R.id.x_home_trans_row_cat);
 				final TextView tAmt = (TextView) rowView.findViewById(R.id.x_home_trans_row_amt);
@@ -700,30 +719,50 @@ public class AStats extends AppCompatActivity {
 				tInfo.setTextColor(getMyColor(AStats.this, R.color.colorWhite));
 
 				if (loadForMainScreen) {
+
+					LinearLayout container;
+
 					if (t.getCategory().getType() == INCOME) {
 
 						incomeSum += t.getAmount();
 						countIncomeTrans++;
 						incomeTransactions.add(t);
 
-						income_trans_container.addView(rowView);
+						container = income_trans_container;
+						if (!t.getDateTime().equals(previousIncomeDate)) {
+							container.addView(getLayoutInflater().inflate(R.layout.x_line, null));
+						}
+						previousIncomeDate = t.getDateTime();
+
 					} else {
 
 						expenseSum += t.getAmount();
 						countExpenseTrans++;
 						expenseTransactions.add(t);
 
-
-						expense_trans_container.addView(rowView);
+						container = expense_trans_container;
+						if (!t.getDateTime().equals(previousExpenseDate)) {
+							container.addView(getLayoutInflater().inflate(R.layout.x_line, null));
+						}
+						previousExpenseDate = t.getDateTime();
 					}
+
+
+					container.addView(rowView);
+
 				} else { // loading for lists in other places e.g. piechart dialog
 
 					if (container_layout != null) {
+
+						if (!t.getDateTime().equals(previousDate)) {
+							container_layout.addView(getLayoutInflater().inflate(R.layout.x_line, null));
+							previousDate = t.getDateTime();
+						}
+
 						container_layout.addView(rowView);
 					}
 
 				}
-
 
 			}
 
