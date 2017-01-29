@@ -50,7 +50,7 @@ public class FCategoryList extends Fragment {
 		final View rootView = inflater.inflate(R.layout.f_category_list, container, false);
 
 		// setup update category dialog
-		final View alertView = inflater.inflate(R.layout.x_add_category_dialog, null);
+		final View alertView = inflater.inflate(R.layout.d_add_category, null);
 		final ToggleButton cat_type_toggle = (ToggleButton) alertView.findViewById(R.id.x_add_cat_type);
 		final EditText cat_name_edittext = (EditText) alertView.findViewById(R.id.x_add_cat_name);
 

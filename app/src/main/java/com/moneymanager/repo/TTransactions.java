@@ -108,6 +108,14 @@ public class TTransactions implements ITransaction {
 
 	}
 
+//	private String q_SELECT_TRANSACTIONS_GROUP_BY_CATEGORY_ON_DATE(int type, Date date) {
+//		final String date_format = MyCalendar.getSimpleDateFormat().format(date);
+//		return "SELECT *, SUM(" + AMOUNT + ") AS SUM FROM " + TABLE_NAME +
+//				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
+//				" WHERE " + DATETIME + " = '" + date_format + "' AND " + TCategories.TYPE + " = " + type + "" +
+//				" GROUP BY " + TCategories.NAME;
+//	}
+
 	private String q_SELECT_ALL_TRANSACTIONS_FOR_PERIOD(String start_date, String end_date) {
 		return SELECT_TRANS_JOIN_CAT_AND_ACC +
 				" WHERE " + DATETIME + " BETWEEN '"+start_date + "' AND '" + end_date +"'" +
@@ -121,6 +129,18 @@ public class TTransactions implements ITransaction {
 				" ORDER BY " + DATETIME + " DESC";
 	}
 
+	private String q_SELECT_ALL_TRANSACTIONS_FOR_MONTH(String monthDigits) {
+		return SELECT_TRANS_JOIN_CAT_AND_ACC +
+				" WHERE strftime('%m'," + DATETIME + ") = '" + monthDigits + "'" +
+				" ORDER BY " + DATETIME + " DESC";
+	}
+
+	private String q_SELECT_ACCOUNT_TRANSACTIONS_FOR_MONTH(int accID, String monthDigits) {
+		return SELECT_TRANS_JOIN_CAT_AND_ACC +
+				" WHERE strftime('%m'," + DATETIME + ") = '" + monthDigits + "' " +
+				" AND " + ACCOUNT + " = " + accID +
+				" ORDER BY " + DATETIME + " DESC";
+	}
 
 
 
@@ -164,6 +184,7 @@ public class TTransactions implements ITransaction {
 
 	}
 
+	/* Day transactions */
 	public Transaction[] getTransactionsForDay(Date date) {
 
 		Cursor c = dbHelper.select(q_SELECT_ALL_TRANSACTIONS_FOR_DAY(date), null);
@@ -190,6 +211,7 @@ public class TTransactions implements ITransaction {
 		return t;
 	}
 
+	/* Week Transactions */
 	@Override
 	public Transaction[] getTransactionsForWeek(Date date) {
 
@@ -197,7 +219,7 @@ public class TTransactions implements ITransaction {
 		String startDate = MyCalendar.stringFormatOfDate(dates[0]);
 		String endDate = MyCalendar.stringFormatOfDate(dates[1]);
 
-		Cursor c = dbHelper.select(q_SELECT_ALL_TRANSACTIONS_FOR_PERIOD(startDate, endDate), null);
+		final Cursor c = dbHelper.select(q_SELECT_ALL_TRANSACTIONS_FOR_PERIOD(startDate, endDate), null);
 
 		final Transaction[] t = new Transaction[c.getCount()];
 
@@ -224,6 +246,48 @@ public class TTransactions implements ITransaction {
 		}
 
 		return t;
+	}
+
+	/* Month Transactions */
+
+	@Override
+	public Transaction[] getTransactionsForMonth(Date date) {
+
+		String monthDigi = MyCalendar.monthToStringDigits(date);
+
+		final Cursor c = dbHelper.select(q_SELECT_ALL_TRANSACTIONS_FOR_MONTH(monthDigi), null);
+
+		final Transaction[] transactions = new Transaction[c.getCount()];
+
+		while (c.moveToNext()) {
+
+			final int pos = c.getPosition();
+			transactions[pos] = extractTransactionFromCursor(c);
+
+		}
+
+		return transactions;
+
+	}
+
+	@Override
+	public Transaction[] getAccountSpecificTransactionsForMonth(int aacID, Date date) {
+
+		String monthDigi = MyCalendar.monthToStringDigits(date);
+
+		final Cursor c = dbHelper.select(q_SELECT_ACCOUNT_TRANSACTIONS_FOR_MONTH(aacID, monthDigi), null);
+
+		final Transaction[] transactions = new Transaction[c.getCount()];
+
+		while (c.moveToNext()) {
+
+			final int pos = c.getPosition();
+			transactions[pos] = extractTransactionFromCursor(c);
+
+		}
+
+		return transactions;
+
 	}
 
 	@Override

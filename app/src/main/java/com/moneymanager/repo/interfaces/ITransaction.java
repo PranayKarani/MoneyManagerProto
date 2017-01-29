@@ -21,6 +21,10 @@ public interface ITransaction {
 
 	Transaction[] getAccountSpecificTransactionsForWeek(int accId, Date date);
 
+	Transaction[] getTransactionsForMonth(Date date);
+
+	Transaction[] getAccountSpecificTransactionsForMonth(int accID, Date date);
+
 	void insertNewTransaction(Transaction transaction);
 
 	void removeTransaction(int id);

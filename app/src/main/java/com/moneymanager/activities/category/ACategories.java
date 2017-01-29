@@ -37,7 +37,7 @@ public class ACategories extends AppCompatActivity {
 		Common.setupToolbar(this, R.id.categories_toolbar, "Categories");
 
 		// set up insert dialog
-		final View alertView = getLayoutInflater().inflate(R.layout.x_add_category_dialog, null);
+		final View alertView = getLayoutInflater().inflate(R.layout.d_add_category, null);
 		final ToggleButton cat_type_toggle = (ToggleButton) alertView.findViewById(R.id.x_add_cat_type);
 		final EditText cat_name_edittext = (EditText) alertView.findViewById(R.id.x_add_cat_name);
 

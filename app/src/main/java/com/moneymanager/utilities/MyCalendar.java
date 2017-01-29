@@ -134,6 +134,10 @@ public class MyCalendar {
 		return String.format("%tB", date);
 	}
 
+	public static String monthToStringDigits(Date date) {
+		return String.format("%tm", date);
+	}
+
 	public static int prevMonth() {
 		int prevMonth = dateToday().getMonth() - 1;
 		if (prevMonth < 0) {
