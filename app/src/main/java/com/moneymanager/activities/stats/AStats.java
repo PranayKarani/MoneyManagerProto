@@ -409,7 +409,7 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 
 		private void setUpPieChart() {
 
-			final AlertDialog ad = new AlertDialog.Builder(AStats.this)
+			final AlertDialog piechart_dialog = new AlertDialog.Builder(AStats.this)
 					.setView(R.layout.d_stats_piechart)
 					.create();
 
@@ -425,11 +425,15 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 				public void onValueSelected(Entry e, Highlight h) {
 					final String entryText = ((PieEntry) e).getLabel();
 					final int type = entryText.equals(incomeString) ? INCOME : EXPENSE;
-					ad.setOnShowListener(new DialogInterface.OnShowListener() {
+					piechart_dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
 						@Override
 						public void onShow(DialogInterface dialog) {
 
-							String period = "";
+							final LinearLayout container_layout = (LinearLayout) piechart_dialog.findViewById(R.id.d_stats_piechart_list_container);
+							container_layout.removeAllViews();
+
+							String period;
 							final int color = Common.getMyColor(AStats.this, type == INCOME ? R.color.colorGreen : R.color.colorRed);
 							switch (selectedPeriod) {
 								case DAY:
@@ -445,14 +449,16 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 									period = "in " + MyCalendar.monthToFullString(myDate);
 									break;
 								case YEAR:
+									period = "-";
 									break;
 								default:// Custom
+									period = "-";
 									break;
 
 							}
 							final String centerText = (type == INCOME ? "Income" : "Expense") + " " + period;
 
-							final PieChart dialog_piechart = (PieChart) ad.findViewById(R.id.d_stats_piechart);
+							final PieChart dialog_piechart = (PieChart) piechart_dialog.findViewById(R.id.d_stats_piechart);
 							dialog_piechart.setHoleColor(Common.getMyColor(AStats.this, R.color.transparent));
 							dialog_piechart.setHoleRadius(60);
 							dialog_piechart.setCenterTextSize(16);
@@ -495,8 +501,6 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 							dialog_piechart.setData(new PieData(pds));
 							dialog_piechart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
 
-								LinearLayout container_layout = (LinearLayout) ad.findViewById(R.id.d_stats_piechart_list_container);
-
 								@Override
 								public void onValueSelected(Entry e, Highlight h) {
 
@@ -521,7 +525,7 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 
 								@Override
 								public void onNothingSelected() {
-									dialog_piechart.setCenterText("");
+									dialog_piechart.setCenterText(centerText);
 									container_layout.removeAllViews();
 								}
 							});
@@ -530,7 +534,7 @@ public class AStats extends AppCompatActivity implements AdapterView.OnItemSelec
 						}
 					});
 
-					ad.show();
+					piechart_dialog.show();
 				}
 
 				@Override
