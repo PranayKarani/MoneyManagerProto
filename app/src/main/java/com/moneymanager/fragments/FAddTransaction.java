@@ -145,6 +145,12 @@ public class FAddTransaction extends Fragment {
 			}
 		});
 
+
+		// Set the date to today's date by default
+		TextView dateText = (TextView) rootView.findViewById(R.id.add_trans_date);
+		dateText.setText(MyCalendar.getNiceFormatedCompleteDateString(MyCalendar.dateToday()));
+		((OnDateSelectListener) getActivity()).updateDate(MyCalendar.dateToday());
+
 		return rootView;
 
 	}

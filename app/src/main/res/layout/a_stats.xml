@@ -203,20 +203,30 @@
                         android:visibility="gone"/>
                 </LinearLayout>
 
-                <android.support.v7.widget.CardView
+                <LinearLayout
                     android:id="@+id/a_stats_overview_bargraph"
                     android:layout_width="match_parent"
-                    android:layout_height="200sp"
+                    android:layout_height="250sp"
                     android:layout_marginBottom="10sp"
-                    app:cardCornerRadius="4dp"
-                    app:cardElevation="4dp">
+                    android:orientation="vertical"
+                    android:padding="2sp">
+
+                    <com.github.mikephil.charting.charts.BarChart
+                        android:id="@+id/a_stats_barchart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone">
+
+                    </com.github.mikephil.charting.charts.BarChart>
 
                     <TextView
+                        android:id="@+id/a_stats_overview_barchart_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="Bar graph Here"/>
-                </android.support.v7.widget.CardView>
+                        android:text="No data found"
+                        android:visibility="gone"/>
+                </LinearLayout>
 
                 <android.support.v7.widget.CardView
                     android:id="@+id/a_stats_income_trans_list_container_card"

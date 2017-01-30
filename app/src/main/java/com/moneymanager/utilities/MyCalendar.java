@@ -17,6 +17,14 @@ public class MyCalendar {
 		return new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
 	}
 
+	public static int daysBetween(Date startDate, Date endDate) {
+
+
+		long diff = (Math.abs(startDate.getTime() - endDate.getTime()));
+
+		return (int) (diff / (24 * 60 * 60 * 1000));
+
+	}
 
 	/* Day stuff */
 

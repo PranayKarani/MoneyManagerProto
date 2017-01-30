@@ -15,11 +15,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.*;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.moneymanager.Common;
@@ -60,9 +61,17 @@ public class AStats extends AppCompatActivity {
 	private TextView cardIncomeTextView, cardExpenseTextView, cardTotalTextView;
 	private CardView calenderCard;
 	private LinearLayout piechartCard;
-	private CardView bargraphCard;
+	private LinearLayout bargraphCard;
 	private CardView income_trans_container_card, expense_trans_container_card;
 	private LinearLayout income_trans_container, expense_trans_container;
+
+
+	// Colors
+	private int colorGreen;
+	private int colorRed;
+	private int colorTransparent;
+	private int colorWhite;
+	private int colorPrimaryDark;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +86,7 @@ public class AStats extends AppCompatActivity {
 
 		calenderCard = (CardView) findViewById(R.id.a_stats_overview_calender);
 		piechartCard = (LinearLayout) findViewById(R.id.a_stats_overview_piechart);
-		bargraphCard = (CardView) findViewById(R.id.a_stats_overview_bargraph);
+		bargraphCard = (LinearLayout) findViewById(R.id.a_stats_overview_bargraph);
 
 		refreshCardViews();
 
@@ -133,6 +142,13 @@ public class AStats extends AppCompatActivity {
 				CURRENT_ACCOUNT_NAME = acc_names[i];
 			}
 		}
+
+		// setup COlotrs
+		colorGreen = getMyColor(this, R.color.colorGreen);
+		colorRed = getMyColor(this, R.color.colorRed);
+		colorWhite = getMyColor(this, R.color.colorWhite);
+		colorTransparent = getMyColor(this, R.color.transparent);
+		colorPrimaryDark = getMyColor(this, R.color.colorPrimaryDark);
 
 	}
 
@@ -245,7 +261,8 @@ public class AStats extends AppCompatActivity {
 				selectedPeriod = CUSTOM;
 				customDatePickerDialog = new AlertDialog.Builder(this)
 						.setView(R.layout.d_custom_period_picker)
-						.setPositiveButton("Okay", null)
+						.setPositiveButton("Go", null)
+						.setCancelable(false)
 						.create();
 				customDatePickerDialog.setOnShowListener(new DialogInterface.OnShowListener() {
 					@Override
@@ -310,6 +327,8 @@ public class AStats extends AppCompatActivity {
 						// refresh the stats according to selected account
 						Bundle b = new Bundle();
 						b.putString("date", sdf.format(myDate));
+						b.putString("cus_start_date", sdf.format(customStartDate));
+						b.putString("cus_end_date", sdf.format(customEndDate));
 						new TransListLoader().execute(b);
 
 					}
@@ -350,6 +369,8 @@ public class AStats extends AppCompatActivity {
 
 	class TransListLoader extends AsyncTask<Bundle, Void, Transaction[]> {
 
+		final double[] weeklyIncomeSums = {0, 0, 0, 0, 0, 0, 0};// e.g. 2000, 0, 0 , 0, 10000, 0, 0
+		final double[] weeklyExpenseSums = {0, 0, 0, 0, 0, 0, 0};// e.g. 500, 1000, 40 , 240, 300, 0, 240
 		private final String incomeString = "income";
 		private final String expenseString = "expense";
 		Transaction[] transactions;
@@ -359,14 +380,27 @@ public class AStats extends AppCompatActivity {
 		double expenseSum = 0;
 		int countIncomeTrans = 0;
 		int countExpenseTrans = 0;
+		String weekStartDateString, weekEndDateString;
+
 		// Views
 		PieChart main_piechart;
 		TextView pchart_text;
+		BarChart barChart;
+		TextView bchart_text;
 
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
 			Log.i(mylog, "loader started");
+
+
+			//setting up Piechart
+			main_piechart = (PieChart) findViewById(R.id.a_stats_piechart);
+			pchart_text = (TextView) findViewById(R.id.a_stats_overview_piechart_text);
+
+			// setting up bar chart
+			barChart = (BarChart) findViewById(R.id.a_stats_barchart);
+			bchart_text = (TextView) findViewById(R.id.a_stats_overview_barchart_text);
 
 		}
 
@@ -471,9 +505,9 @@ public class AStats extends AppCompatActivity {
 					break;
 				case WEEK:
 					Date[] dates = MyCalendar.weekEndandStartDatesforDate(myDate);
-					String startDate = MyCalendar.dateToString(dates[0]) + " " + MyCalendar.monthToString(dates[0]);
-					String endDate = MyCalendar.dateToString(dates[1]) + " " + MyCalendar.monthToString(dates[1]);
-					title.setText(startDate + " ~ " + endDate + " Overview");
+					weekStartDateString = MyCalendar.dateToString(dates[0]) + " " + MyCalendar.monthToString(dates[0]);
+					weekEndDateString = MyCalendar.dateToString(dates[1]) + " " + MyCalendar.monthToString(dates[1]);
+					title.setText(weekStartDateString + " ~ " + weekEndDateString + " Overview");
 					break;
 				case MONTH:
 					String text = MyCalendar.monthToFullString(myDate) + "'s Overview";
@@ -498,16 +532,29 @@ public class AStats extends AppCompatActivity {
 			cardTotalTextView.setText("Rs " + (incomeSum - expenseSum));
 
 
-			//setting up Piechart
-			pchart_text = (TextView) findViewById(R.id.a_stats_overview_piechart_text);
-			main_piechart = (PieChart) findViewById(R.id.a_stats_piechart);
 			if (transactions.length == 0) {
 				pchart_text.setVisibility(View.VISIBLE);
 				main_piechart.setVisibility(View.GONE);
+
+				bchart_text.setVisibility(View.VISIBLE);
+				barChart.setVisibility(View.GONE);
+
 			} else {
 				pchart_text.setVisibility(View.GONE);
 				main_piechart.setVisibility(View.VISIBLE);
 				setUpPieChart();
+
+				bchart_text.setVisibility(View.GONE);
+				barChart.setVisibility(View.VISIBLE);
+
+				switch (selectedPeriod) {
+					case WEEK:
+						setUpWeekBarGarph();
+						break;
+
+					default:
+						break;
+				}
 			}
 
 			Log.i(mylog, "loader done loading");
@@ -520,7 +567,7 @@ public class AStats extends AppCompatActivity {
 					.create();
 
 			main_piechart.setVisibility(View.VISIBLE);
-			main_piechart.setHoleColor(Common.getMyColor(AStats.this, R.color.transparent));
+			main_piechart.setHoleColor(colorTransparent);
 			main_piechart.setHoleRadius(50);
 			main_piechart.setDrawCenterText(false);
 			main_piechart.setRotationEnabled(false);
@@ -558,7 +605,9 @@ public class AStats extends AppCompatActivity {
 									period = "-";
 									break;
 								default:// Custom
-									period = "-";
+									String startingDate = MyCalendar.dateToString(customStartDate) + " " + MyCalendar.monthToString(customStartDate);
+									String endingDate = MyCalendar.dateToString(customEndDate) + " " + MyCalendar.monthToString(customEndDate);
+									period = "between " + startingDate + " ~ " + endingDate;
 									break;
 
 							}
@@ -666,9 +715,74 @@ public class AStats extends AppCompatActivity {
 			pds.setSliceSpace(2);
 			pds.setValueTextSize(14);
 			pds.setColors(colors);
+			pds.setValueTextColor(colorPrimaryDark);
 
 			main_piechart.setData(new PieData(pds));
 			main_piechart.invalidate();
+
+		}
+
+		private void setUpWeekBarGarph() {
+
+			List<BarEntry> incomeGroup = new ArrayList<>();
+			List<BarEntry> expenseGroup = new ArrayList<>();
+
+			//ArrayList<Transaction> weekIncomeTransGroup
+			for (int i = 6; i >= 0; i--) {
+				incomeGroup.add(new BarEntry(i, (float) weeklyIncomeSums[i], "I"));
+				expenseGroup.add(new BarEntry(i, (float) weeklyExpenseSums[i], "E"));
+			}
+
+			BarDataSet inSet = new BarDataSet(incomeGroup, "income");
+			inSet.setColor(colorGreen);
+			inSet.setValueTextColor(colorGreen);
+			inSet.setValueTextSize(8);
+			BarDataSet exSet = new BarDataSet(expenseGroup, "expense");
+			exSet.setColor(colorRed);
+			exSet.setValueTextColor(colorRed);
+			exSet.setValueTextSize(8);
+
+			final float barSpace = 0.0f;
+			final float barWidth = 0.20f;
+			final float groupSpace = 1 - ((barSpace + barWidth) * 2);
+
+			BarData bd = new BarData(inSet, exSet);
+			bd.setBarWidth(barWidth);
+
+			final String[] weekDays = {"mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+
+			// Calculating weekDates
+			final String[] weekDates = new String[7];
+
+			final Date weekEnddate = MyCalendar.weekEndandStartDatesforDate(transactions[0].getDateTime())[1];
+			for (int i = 0; i < 7; i++) {
+
+				Date newDate = MyCalendar.dateBeforeDays(weekEnddate, 6 - i);
+				weekDates[i] = MyCalendar.dateToString(newDate);
+
+			}
+
+			final XAxis xAxis = barChart.getXAxis();
+			xAxis.setGranularity(1f);
+			xAxis.setTextColor(colorWhite);
+			xAxis.setLabelRotationAngle(315);
+			xAxis.setValueFormatter(new IAxisValueFormatter() {
+				@Override
+				public String getFormattedValue(float value, AxisBase axis) {
+					return weekDays[(int) value] + ", " + weekDates[(int) value];
+				}
+			});
+
+
+			barChart.setData(bd);
+			barChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
+			barChart.getAxisRight().setEnabled(false);
+			barChart.getAxisLeft().setTextColor(colorWhite);
+			barChart.groupBars(-0.5f, groupSpace, barSpace);
+			barChart.getDescription().setText(weekStartDateString + " ~ " + weekEndDateString);
+			barChart.getDescription().setTextColor(colorWhite);
+			barChart.getLegend().setEnabled(false);
+			barChart.invalidate();
 
 		}
 
@@ -678,24 +792,29 @@ public class AStats extends AppCompatActivity {
 				container_layout.removeAllViews();
 			}
 
-			Date previousDate = trans[0].getDateTime(); // used in other lists like in piechart dialog
-			Date previousExpenseDate = null, previousIncomeDate = null;
+			Date previousDate = trans.length > 0 ? trans[0].getDateTime() : null; // used in other lists like in piechart dialog
+			Date previousExpenseDate = MyCalendar.weekEndandStartDatesforDate(trans[0].getDateTime())[1];
+			Date previousIncomeDate = previousExpenseDate;
+			Date firstIncomeDateOfWeek = null, firstExpenseDayOfWeek = null;
 			for (Transaction t : trans) {
 
-				if (previousExpenseDate == null) {
+				if (firstExpenseDayOfWeek == null) {
 					if (t.getCategory().getType() == EXPENSE) {
-						previousExpenseDate = t.getDateTime();
+						firstExpenseDayOfWeek = t.getDateTime();
 						continue;
 					}
 				}
 
-				if (previousIncomeDate == null) {
+				if (firstIncomeDateOfWeek == null) {
 					if (t.getCategory().getType() == INCOME) {
-						previousIncomeDate = t.getDateTime();
+						firstIncomeDateOfWeek = t.getDateTime();
 					}
 				}
 
 			}
+
+			int currentWeekDayIndexForIncome = 0;
+			int currentWeekDayIndexForExpense = 0;
 			for (Transaction t : trans) {
 
 				View rowView = getLayoutInflater().inflate(row_layout, null);
@@ -716,7 +835,7 @@ public class AStats extends AppCompatActivity {
 				tCat.setText(t.getCategory().getName());
 				tAmt.setText(t.getAmountString());
 				tInfo.setText(MyCalendar.getNiceFormatedCompleteDateString(t.getDateTime()));
-				tInfo.setTextColor(getMyColor(AStats.this, R.color.colorWhite));
+				tInfo.setTextColor(colorWhite);
 
 				if (loadForMainScreen) {
 
@@ -730,8 +849,17 @@ public class AStats extends AppCompatActivity {
 
 						container = income_trans_container;
 						if (!t.getDateTime().equals(previousIncomeDate)) {
-							container.addView(getLayoutInflater().inflate(R.layout.x_line, null));
+							// new day
+							if (!firstIncomeDateOfWeek.equals(t.getDateTime())) {
+								container.addView(getLayoutInflater().inflate(R.layout.x_line, null));
+							}
+							currentWeekDayIndexForIncome += MyCalendar.daysBetween(previousIncomeDate, t.getDateTime());
 						}
+
+						if (selectedPeriod == WEEK) {
+							weeklyIncomeSums[currentWeekDayIndexForIncome] += t.getAmount();
+						}
+
 						previousIncomeDate = t.getDateTime();
 
 					} else {
@@ -741,9 +869,24 @@ public class AStats extends AppCompatActivity {
 						expenseTransactions.add(t);
 
 						container = expense_trans_container;
+
+						// is current transaction date does not match with previous expense date, it's a new date
 						if (!t.getDateTime().equals(previousExpenseDate)) {
-							container.addView(getLayoutInflater().inflate(R.layout.x_line, null));
+
+							// if current transaction date does not matches with first expense date of week
+							// don't add new row layout
+							// i.e. if the current transaction date is not the very first transaction date of week,
+							// add a blank row
+							if (!firstExpenseDayOfWeek.equals(t.getDateTime())) {
+								container.addView(getLayoutInflater().inflate(R.layout.x_line, null));
+							}
+							currentWeekDayIndexForExpense += MyCalendar.daysBetween(previousExpenseDate, t.getDateTime());
 						}
+
+						if (selectedPeriod == WEEK) {
+							weeklyExpenseSums[currentWeekDayIndexForExpense] += t.getAmount();
+						}
+
 						previousExpenseDate = t.getDateTime();
 					}
 
@@ -765,6 +908,8 @@ public class AStats extends AppCompatActivity {
 				}
 
 			}
+
+			Log.i(mylog, "");
 
 		}
 	}
