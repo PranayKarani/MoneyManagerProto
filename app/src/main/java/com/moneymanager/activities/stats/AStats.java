@@ -59,8 +59,7 @@ public class AStats extends AppCompatActivity {
 	// Views
 	private MenuItem period_text;
 	private TextView cardIncomeTextView, cardExpenseTextView, cardTotalTextView;
-	private CardView calenderCard;
-	private LinearLayout piechartCard;
+
 	private LinearLayout bargraphCard;
 	private CardView income_trans_container_card, expense_trans_container_card;
 	private LinearLayout income_trans_container, expense_trans_container;
@@ -68,7 +67,9 @@ public class AStats extends AppCompatActivity {
 
 	// Colors
 	private int colorGreen;
+	private int colorFaintGreen;
 	private int colorRed;
+	private int colorFaintRed;
 	private int colorTransparent;
 	private int colorWhite;
 	private int colorPrimaryDark;
@@ -84,11 +85,9 @@ public class AStats extends AppCompatActivity {
 
 		refreshToolbar();
 
-		calenderCard = (CardView) findViewById(R.id.a_stats_overview_calender);
-		piechartCard = (LinearLayout) findViewById(R.id.a_stats_overview_piechart);
 		bargraphCard = (LinearLayout) findViewById(R.id.a_stats_overview_bargraph);
 
-		refreshCardViews();
+		refreshDataLayouts();
 
 		income_trans_container_card = (CardView) findViewById(R.id.a_stats_income_trans_list_container_card);
 		income_trans_container = (LinearLayout) findViewById(R.id.a_stats_income_trans_list_container);
@@ -145,7 +144,9 @@ public class AStats extends AppCompatActivity {
 
 		// setup COlotrs
 		colorGreen = getMyColor(this, R.color.colorGreen);
+		colorFaintGreen = getMyColor(this, R.color.colorFaintGreen);
 		colorRed = getMyColor(this, R.color.colorRed);
+		colorFaintRed = getMyColor(this, R.color.colorFaintRed);
 		colorWhite = getMyColor(this, R.color.colorWhite);
 		colorTransparent = getMyColor(this, R.color.transparent);
 		colorPrimaryDark = getMyColor(this, R.color.colorPrimaryDark);
@@ -164,29 +165,25 @@ public class AStats extends AppCompatActivity {
 		datePickerFragment.show(getSupportFragmentManager(), "Pick Ending Date");
 	}
 
-	private void refreshCardViews() {
+	private void refreshDataLayouts() {
 
 		switch (selectedPeriod) {
 
 			case DAY:
 				bargraphCard.setVisibility(View.GONE);
-				calenderCard.setVisibility(View.GONE);
 				break;
 			case WEEK:
 				bargraphCard.setVisibility(View.VISIBLE);
-				calenderCard.setVisibility(View.GONE);
 				break;
 			case MONTH:
 				bargraphCard.setVisibility(View.VISIBLE);
-				calenderCard.setVisibility(View.VISIBLE);
+//				calenderCard.setVisibility(View.VISIBLE);
 				break;
 			case YEAR:
 				bargraphCard.setVisibility(View.VISIBLE);
-				calenderCard.setVisibility(View.GONE);
 				break;
 			default:
 				bargraphCard.setVisibility(View.GONE);
-				calenderCard.setVisibility(View.GONE);
 				break;
 
 		}
@@ -228,7 +225,7 @@ public class AStats extends AppCompatActivity {
 				period_text.setTitle("Day");
 
 				selectedPeriod = DAY;
-				refreshCardViews();
+				refreshDataLayouts();
 				new TransListLoader().execute(b);
 
 				break;
@@ -236,7 +233,7 @@ public class AStats extends AppCompatActivity {
 				period_text.setTitle("Week");
 
 				selectedPeriod = WEEK;
-				refreshCardViews();
+				refreshDataLayouts();
 
 				new TransListLoader().execute(b);
 
@@ -245,7 +242,7 @@ public class AStats extends AppCompatActivity {
 				period_text.setTitle("Month");
 
 				selectedPeriod = MONTH;
-				refreshCardViews();
+				refreshDataLayouts();
 
 				new TransListLoader().execute(b);
 				break;
@@ -287,7 +284,7 @@ public class AStats extends AppCompatActivity {
 									b.putString("cus_end_date", sdf.format(customEndDate));
 									b.putString("cus_start_date", sdf.format(customStartDate));
 									new TransListLoader().execute(b);
-									refreshCardViews();
+									refreshDataLayouts();
 									customDatePickerDialog.dismiss();
 								}
 							}
@@ -371,6 +368,10 @@ public class AStats extends AppCompatActivity {
 
 		final double[] weeklyIncomeSums = {0, 0, 0, 0, 0, 0, 0};// e.g. 2000, 0, 0 , 0, 10000, 0, 0
 		final double[] weeklyExpenseSums = {0, 0, 0, 0, 0, 0, 0};// e.g. 500, 1000, 40 , 240, 300, 0, 240
+
+		final double[] monthlyIncomeSums = new double[Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)];
+		final double[] monthlyExpenseSums = new double[Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH)];
+
 		private final String incomeString = "income";
 		private final String expenseString = "expense";
 		Transaction[] transactions;
@@ -385,7 +386,7 @@ public class AStats extends AppCompatActivity {
 		// Views
 		PieChart main_piechart;
 		TextView pchart_text;
-		BarChart barChart;
+		BarChart weekBarChart, monthBarChart;
 		TextView bchart_text;
 
 		@Override
@@ -393,13 +394,19 @@ public class AStats extends AppCompatActivity {
 			super.onPreExecute();
 			Log.i(mylog, "loader started");
 
+			// fill up monthly sums
+			for (int i = 0; i < monthlyIncomeSums.length; i++) {
+				monthlyIncomeSums[i] = 0;
+				monthlyExpenseSums[i] = 0;
+			}
 
 			//setting up Piechart
 			main_piechart = (PieChart) findViewById(R.id.a_stats_piechart);
 			pchart_text = (TextView) findViewById(R.id.a_stats_overview_piechart_text);
 
 			// setting up bar chart
-			barChart = (BarChart) findViewById(R.id.a_stats_barchart);
+			weekBarChart = (BarChart) findViewById(R.id.a_stats_week_barchart);
+			monthBarChart = (BarChart) findViewById(R.id.a_stats_month_barchart);
 			bchart_text = (TextView) findViewById(R.id.a_stats_overview_barchart_text);
 
 		}
@@ -451,7 +458,7 @@ public class AStats extends AppCompatActivity {
 						if (selectedAccountID == ALL_ACCOUNT_ID) {
 							transactions = tTransactions.getTransactionsForMonth(date);
 						} else {
-							transactions = tTransactions.getAccountSpecificTransactionsForWeek(selectedAccountID, date);
+							transactions = tTransactions.getAccountSpecificTransactionsForMonth(selectedAccountID, date);
 						}
 					} catch (ParseException e) {
 						e.printStackTrace();
@@ -537,7 +544,8 @@ public class AStats extends AppCompatActivity {
 				main_piechart.setVisibility(View.GONE);
 
 				bchart_text.setVisibility(View.VISIBLE);
-				barChart.setVisibility(View.GONE);
+				weekBarChart.setVisibility(View.GONE);
+				monthBarChart.setVisibility(View.GONE);
 
 			} else {
 				pchart_text.setVisibility(View.GONE);
@@ -545,13 +553,18 @@ public class AStats extends AppCompatActivity {
 				setUpPieChart();
 
 				bchart_text.setVisibility(View.GONE);
-				barChart.setVisibility(View.VISIBLE);
 
 				switch (selectedPeriod) {
 					case WEEK:
 						setUpWeekBarGarph();
+						monthBarChart.setVisibility(View.GONE);
+						weekBarChart.setVisibility(View.VISIBLE);
 						break;
-
+					case MONTH:
+						setUpMonthBarGraph();
+						weekBarChart.setVisibility(View.GONE);
+						monthBarChart.setVisibility(View.VISIBLE);
+						break;
 					default:
 						break;
 				}
@@ -724,29 +737,30 @@ public class AStats extends AppCompatActivity {
 
 		private void setUpWeekBarGarph() {
 
-			List<BarEntry> incomeGroup = new ArrayList<>();
-			List<BarEntry> expenseGroup = new ArrayList<>();
+			weekBarChart.fitScreen();
 
-			//ArrayList<Transaction> weekIncomeTransGroup
+			final List<BarEntry> incomeGroup = new ArrayList<>();
+			final List<BarEntry> expenseGroup = new ArrayList<>();
+
 			for (int i = 6; i >= 0; i--) {
-				incomeGroup.add(new BarEntry(i, (float) weeklyIncomeSums[i], "I"));
-				expenseGroup.add(new BarEntry(i, (float) weeklyExpenseSums[i], "E"));
+				incomeGroup.add(new BarEntry(i, (float) weeklyIncomeSums[i], incomeString));
+				expenseGroup.add(new BarEntry(i, (float) weeklyExpenseSums[i], expenseString));
 			}
 
-			BarDataSet inSet = new BarDataSet(incomeGroup, "income");
+			final BarDataSet inSet = new BarDataSet(incomeGroup, "income");
 			inSet.setColor(colorGreen);
 			inSet.setValueTextColor(colorGreen);
 			inSet.setValueTextSize(8);
-			BarDataSet exSet = new BarDataSet(expenseGroup, "expense");
+			final BarDataSet exSet = new BarDataSet(expenseGroup, "expense");
 			exSet.setColor(colorRed);
 			exSet.setValueTextColor(colorRed);
 			exSet.setValueTextSize(8);
 
 			final float barSpace = 0.0f;
-			final float barWidth = 0.20f;
+			final float barWidth = 0.30f;
 			final float groupSpace = 1 - ((barSpace + barWidth) * 2);
 
-			BarData bd = new BarData(inSet, exSet);
+			final BarData bd = new BarData(inSet, exSet);
 			bd.setBarWidth(barWidth);
 
 			final String[] weekDays = {"mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
@@ -762,7 +776,15 @@ public class AStats extends AppCompatActivity {
 
 			}
 
-			final XAxis xAxis = barChart.getXAxis();
+			weekBarChart.setData(bd);
+			weekBarChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
+			weekBarChart.getAxisRight().setEnabled(false);
+			weekBarChart.getAxisLeft().setTextColor(colorWhite);
+			weekBarChart.groupBars(-0.5f, groupSpace, barSpace);
+			weekBarChart.getDescription().setText(weekStartDateString + " ~ " + weekEndDateString);
+			weekBarChart.getDescription().setTextColor(colorWhite);
+			weekBarChart.getLegend().setEnabled(false);
+			final XAxis xAxis = weekBarChart.getXAxis();
 			xAxis.setGranularity(1f);
 			xAxis.setTextColor(colorWhite);
 			xAxis.setLabelRotationAngle(315);
@@ -772,17 +794,108 @@ public class AStats extends AppCompatActivity {
 					return weekDays[(int) value] + ", " + weekDates[(int) value];
 				}
 			});
+			weekBarChart.invalidate();
 
+		}
 
-			barChart.setData(bd);
-			barChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
-			barChart.getAxisRight().setEnabled(false);
-			barChart.getAxisLeft().setTextColor(colorWhite);
-			barChart.groupBars(-0.5f, groupSpace, barSpace);
-			barChart.getDescription().setText(weekStartDateString + " ~ " + weekEndDateString);
-			barChart.getDescription().setTextColor(colorWhite);
-			barChart.getLegend().setEnabled(false);
-			barChart.invalidate();
+		private void setUpMonthBarGraph() {
+
+			final AlertDialog barchart_dialog = new AlertDialog.Builder(AStats.this)
+					.setView(R.layout.d_stats_barchart)
+					.create();
+
+			monthBarChart.fitScreen();
+
+			final List<BarEntry> incomeGroup = new ArrayList<>();
+			final List<BarEntry> expenseGroup = new ArrayList<>();
+
+			for (int i = monthlyIncomeSums.length - 1; i >= 0; i--) {
+				incomeGroup.add(new BarEntry(i, (float) monthlyIncomeSums[i], incomeString));
+				expenseGroup.add(new BarEntry(i, (float) monthlyExpenseSums[i], expenseString));
+			}
+
+			final BarDataSet inSet = new BarDataSet(incomeGroup, "income");
+			inSet.setColor(colorGreen);
+			inSet.setValueTextColor(colorGreen);
+			inSet.setValueTextSize(8);
+			final BarDataSet exSet = new BarDataSet(expenseGroup, "expense");
+			exSet.setColor(colorRed);
+			exSet.setValueTextColor(colorRed);
+			exSet.setValueTextSize(8);
+
+			final float barSpace = 0.0f;
+			final float barWidth = 0.40f;
+			final float groupSpace = 1 - ((barSpace + barWidth) * 2);
+
+			final BarData bd = new BarData(inSet, exSet);
+			bd.setDrawValues(false);
+			bd.setBarWidth(barWidth);
+
+			monthBarChart.setData(bd);
+			monthBarChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
+			monthBarChart.getAxisRight().setEnabled(false);
+			monthBarChart.getAxisLeft().setTextColor(colorWhite);
+			monthBarChart.groupBars(-0.5f, groupSpace, barSpace);
+			monthBarChart.getDescription().setText(MyCalendar.monthToFullString(myDate) + "'s Stats \n(pinch horizontally for more precision)");
+			monthBarChart.getDescription().setTextColor(colorWhite);
+			monthBarChart.getLegend().setEnabled(false);
+			final XAxis xAxis = monthBarChart.getXAxis();
+			xAxis.setGranularity(1f);
+			xAxis.setTextColor(colorWhite);
+			xAxis.setValueFormatter(new IAxisValueFormatter() {
+				@Override
+				public String getFormattedValue(float value, AxisBase axis) {
+					return String.valueOf((int) value + 1);
+				}
+			});
+			monthBarChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+
+				@Override
+				public void onValueSelected(Entry e, Highlight h) {
+
+					final int type = String.valueOf(e.getData()).equals(incomeString) ? INCOME : EXPENSE;
+					final int selectDate = (int) e.getX() + (type == INCOME ? 2 : 1);
+
+					barchart_dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+						@Override
+						public void onShow(DialogInterface dialog) {
+
+							final LinearLayout container_layout = (LinearLayout) barchart_dialog.findViewById(R.id.d_stats_barchart_list_container);
+							container_layout.removeAllViews();
+							container_layout.setBackgroundColor(type == INCOME ? colorFaintGreen : colorFaintRed);
+
+							// create a transaction list of the selected category
+							ArrayList<Transaction> req_trans = new ArrayList<>();
+
+							final ArrayList<Transaction> tx = type == INCOME ? incomeTransactions : expenseTransactions;
+
+							for (Transaction t : tx) {
+								if (t.getDateTime().getDate() == selectDate) {
+									req_trans.add(t);
+								}
+							}
+
+							Transaction[] ttt = new Transaction[req_trans.size()];
+							for (int i = 0; i < ttt.length; i++) {
+								ttt[i] = req_trans.get(i);
+							}
+
+							fillTransList(R.layout.x_home_trans_row, container_layout, ttt, false);
+
+						}
+					});
+//					Log.i(mylog, type + "  " + selectDate + "  " + e.getY());
+					if (e.getY() > 0) {
+						barchart_dialog.show();
+					}
+				}
+
+				@Override
+				public void onNothingSelected() {
+
+				}
+			});
+			monthBarChart.invalidate();
 
 		}
 
@@ -793,8 +906,25 @@ public class AStats extends AppCompatActivity {
 			}
 
 			Date previousDate = trans.length > 0 ? trans[0].getDateTime() : null; // used in other lists like in piechart dialog
-			Date previousExpenseDate = MyCalendar.weekEndandStartDatesforDate(trans[0].getDateTime())[1];
+			Date previousExpenseDate = null;
+
+			switch (selectedPeriod) {
+				case WEEK:
+					if (loadForMainScreen) {
+						previousExpenseDate = MyCalendar.weekEndandStartDatesforDate(trans[0].getDateTime())[1];
+					}
+					break;
+				case MONTH:
+					if (loadForMainScreen) {
+						previousExpenseDate = MyCalendar.lastDateOfMonth(trans[0].getDateTime());
+					}
+					break;
+				default:
+					previousExpenseDate = MyCalendar.dateToday();// waste and unnecessary
+					break;
+			}
 			Date previousIncomeDate = previousExpenseDate;
+
 			Date firstIncomeDateOfWeek = null, firstExpenseDayOfWeek = null;
 			for (Transaction t : trans) {
 
@@ -860,6 +990,10 @@ public class AStats extends AppCompatActivity {
 							weeklyIncomeSums[currentWeekDayIndexForIncome] += t.getAmount();
 						}
 
+						if (selectedPeriod == MONTH) {
+							monthlyIncomeSums[currentWeekDayIndexForIncome] += t.getAmount();
+						}
+
 						previousIncomeDate = t.getDateTime();
 
 					} else {
@@ -885,6 +1019,10 @@ public class AStats extends AppCompatActivity {
 
 						if (selectedPeriod == WEEK) {
 							weeklyExpenseSums[currentWeekDayIndexForExpense] += t.getAmount();
+						}
+
+						if (selectedPeriod == MONTH) {
+							monthlyExpenseSums[currentWeekDayIndexForExpense] += t.getAmount();
 						}
 
 						previousExpenseDate = t.getDateTime();

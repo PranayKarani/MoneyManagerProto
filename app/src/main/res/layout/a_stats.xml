@@ -162,22 +162,6 @@
 
                 </android.support.v7.widget.CardView>
 
-
-                <android.support.v7.widget.CardView
-                    android:id="@+id/a_stats_overview_calender"
-                    android:layout_width="match_parent"
-                    android:layout_height="350sp"
-                    android:layout_marginBottom="10sp"
-                    app:cardCornerRadius="4dp"
-                    app:cardElevation="4dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="Calender Report Here"/>
-                </android.support.v7.widget.CardView>
-
                 <LinearLayout
                     android:id="@+id/a_stats_overview_piechart"
                     android:layout_width="match_parent"
@@ -212,7 +196,15 @@
                     android:padding="2sp">
 
                     <com.github.mikephil.charting.charts.BarChart
-                        android:id="@+id/a_stats_barchart"
+                        android:id="@+id/a_stats_week_barchart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone">
+
+                    </com.github.mikephil.charting.charts.BarChart>
+
+                    <com.github.mikephil.charting.charts.BarChart
+                        android:id="@+id/a_stats_month_barchart"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:visibility="gone">
@@ -240,7 +232,7 @@
                         android:id="@+id/a_stats_income_trans_list_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="#2359e17e"
+                        android:background="@color/colorFaintGreen"
                         android:orientation="vertical">
                     </LinearLayout>
                 </android.support.v7.widget.CardView>
@@ -257,7 +249,7 @@
                         android:id="@+id/a_stats_expense_trans_list_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="#23d74a45"
+                        android:background="@color/colorFaintRed"
                         android:orientation="vertical">
 
                     </LinearLayout>

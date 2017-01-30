@@ -135,15 +135,17 @@ public class TTransactions implements ITransaction {
 				DEFAULT_ORDER_BY_TID;
 	}
 
-	private String q_SELECT_ALL_TRANSACTIONS_FOR_MONTH(String monthDigits) {
+	private String q_SELECT_ALL_TRANSACTIONS_FOR_MONTH(String monthDigits, String yearDigits) {
 		return SELECT_TRANS_JOIN_CAT_AND_ACC +
 				" WHERE strftime('%m'," + DATETIME + ") = '" + monthDigits + "'" +
+				" AND strftime('%Y'," + DATETIME + ") = '" + yearDigits + "' " +
 				DEFAULT_ORDER_BY_TID;
 	}
 
-	private String q_SELECT_ACCOUNT_TRANSACTIONS_FOR_MONTH(int accID, String monthDigits) {
+	private String q_SELECT_ACCOUNT_TRANSACTIONS_FOR_MONTH(int accID, String monthDigits, String yearDigits) {
 		return SELECT_TRANS_JOIN_CAT_AND_ACC +
 				" WHERE strftime('%m'," + DATETIME + ") = '" + monthDigits + "' " +
+				" AND strftime('%Y'," + DATETIME + ") = '" + yearDigits + "' " +
 				" AND " + ACCOUNT + " = " + accID +
 				DEFAULT_ORDER_BY_TID;
 	}
@@ -258,8 +260,9 @@ public class TTransactions implements ITransaction {
 	public Transaction[] getTransactionsForMonth(Date date) {
 
 		String monthDigi = MyCalendar.monthToStringDigits(date);
+		String yearDigi = MyCalendar.yearToString(date);
 
-		final Cursor c = dbHelper.select(q_SELECT_ALL_TRANSACTIONS_FOR_MONTH(monthDigi), null);
+		final Cursor c = dbHelper.select(q_SELECT_ALL_TRANSACTIONS_FOR_MONTH(monthDigi, yearDigi), null);
 
 		final Transaction[] transactions = new Transaction[c.getCount()];
 
@@ -278,8 +281,9 @@ public class TTransactions implements ITransaction {
 	public Transaction[] getAccountSpecificTransactionsForMonth(int aacID, Date date) {
 
 		String monthDigi = MyCalendar.monthToStringDigits(date);
+		String yearDigi = MyCalendar.yearToString(date);
 
-		final Cursor c = dbHelper.select(q_SELECT_ACCOUNT_TRANSACTIONS_FOR_MONTH(aacID, monthDigi), null);
+		final Cursor c = dbHelper.select(q_SELECT_ACCOUNT_TRANSACTIONS_FOR_MONTH(aacID, monthDigi, yearDigi), null);
 
 		final Transaction[] transactions = new Transaction[c.getCount()];
 

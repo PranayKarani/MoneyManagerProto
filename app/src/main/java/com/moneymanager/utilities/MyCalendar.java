@@ -3,6 +3,7 @@
 package com.moneymanager.utilities;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -144,6 +145,22 @@ public class MyCalendar {
 
 	public static String monthToStringDigits(Date date) {
 		return String.format("%tm", date);
+	}
+
+	public static Date firstDateOfMonth(Date date) {
+
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.set(Calendar.DAY_OF_MONTH, 1);
+		return c.getTime();
+
+	}
+
+	public static Date lastDateOfMonth(Date date) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+		return c.getTime();
 	}
 
 	public static int prevMonth() {
