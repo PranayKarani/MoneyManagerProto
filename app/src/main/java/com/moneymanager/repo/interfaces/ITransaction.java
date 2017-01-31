@@ -4,6 +4,7 @@ package com.moneymanager.repo.interfaces;
 
 import com.moneymanager.entities.Category;
 import com.moneymanager.entities.Transaction;
+import com.moneymanager.exceptions.InsufficientBalanceException;
 
 import java.util.Date;
 
@@ -30,11 +31,13 @@ public interface ITransaction {
 
 	Transaction[] getAccountSpecificTransactionsForCustomPeriod(int accId, Date startDate, Date endDate);
 
-	void insertNewTransaction(Transaction transaction);
+	void insertNewTransaction(Transaction transaction) throws InsufficientBalanceException;
 
 	void removeTransaction(Transaction t);
 
 	void shiftDeletedTransactions(Category cat);
 
 	Transaction getTransaction(int selectedTransactionID);
+
+	void removeTransactionsForAccount(int id);
 }

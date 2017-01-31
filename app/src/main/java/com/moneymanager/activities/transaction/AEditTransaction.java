@@ -19,6 +19,7 @@ import com.moneymanager.activities.category.ACategories;
 import com.moneymanager.entities.Account;
 import com.moneymanager.entities.Category;
 import com.moneymanager.entities.Transaction;
+import com.moneymanager.exceptions.InsufficientBalanceException;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.TAccounts;
 import com.moneymanager.repo.TCategories;
@@ -262,8 +263,12 @@ public class AEditTransaction extends AppCompatActivity {
 
 				if (updatedTransaction != null) {
 
-					tTransactions.updateTransaction(updatedTransaction);
-					Toast.makeText(this, "Transaction Updated", Toast.LENGTH_SHORT).show();
+					try {
+						tTransactions.updateTransaction(updatedTransaction);
+						Toast.makeText(this, "Transaction Updated", Toast.LENGTH_SHORT).show();
+					} catch (InsufficientBalanceException e) {
+						Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+					}
 
 				}
 

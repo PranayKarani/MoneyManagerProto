@@ -16,6 +16,7 @@ import com.moneymanager.adapters.AddTransactionAdapter;
 import com.moneymanager.entities.Account;
 import com.moneymanager.entities.Category;
 import com.moneymanager.entities.Transaction;
+import com.moneymanager.exceptions.InsufficientBalanceException;
 import com.moneymanager.fragments.FAddTransaction;
 import com.moneymanager.repo.TAccounts;
 import com.moneymanager.repo.TCategories;
@@ -131,7 +132,11 @@ public class AAddTransaction extends AppCompatActivity implements
 				final TTransactions trans_table = new TTransactions(this);
 				final Transaction newTransaction = getNewTransaction();
 				if (newTransaction != null) {
-					trans_table.insertNewTransaction(newTransaction);
+					try {
+						trans_table.insertNewTransaction(newTransaction);
+					} catch (InsufficientBalanceException e) {
+						Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+					}
 					Log.i(mylog, newTransaction.toString());
 					finish();
 					Toast.makeText(this, "New Transaction added successfully in " + newTransaction.getAccount().getName(), Toast.LENGTH_SHORT).show();

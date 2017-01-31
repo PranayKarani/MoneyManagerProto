@@ -10,6 +10,7 @@ import com.moneymanager.db.DBHelper;
 import com.moneymanager.entities.Account;
 import com.moneymanager.entities.Category;
 import com.moneymanager.entities.Transaction;
+import com.moneymanager.exceptions.InsufficientBalanceException;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.interfaces.ITransaction;
 import com.moneymanager.utilities.MyCalendar;
@@ -355,7 +356,7 @@ public class TTransactions implements ITransaction {
 
 
 	@Override
-	public void insertNewTransaction(Transaction transaction) {
+	public void insertNewTransaction(Transaction transaction) throws InsufficientBalanceException {
 
 		final ContentValues cv = new ContentValues();
 		cv.put(AMOUNT, transaction.getAmount());
@@ -368,11 +369,16 @@ public class TTransactions implements ITransaction {
 
 		// update account balance
 		TAccounts tAccounts = new TAccounts(context);
-		tAccounts.updateAccountBalance(transaction.getAccount().getId(), transaction.getAmount(), transaction.getCategory().getType());
+		tAccounts.updateAccountBalance(transaction.getAccount().getId(), transaction.getAmount(), transaction.getCategory().getType() == INCOME);
 
 	}
 
-	public void updateTransaction(Transaction t) {
+	public void updateTransaction(Transaction t) throws InsufficientBalanceException {
+
+		Cursor c = dbHelper.select(q_SELECT_TRANSACTION(t.getId()), null);
+		c.moveToFirst();
+		final double oldAmt = extractTransactionFromCursor(c).getAmount();
+		final double amtDiff = t.getAmount() - oldAmt;
 
 		final ContentValues cv = new ContentValues();
 		cv.put(AMOUNT, t.getAmount());
@@ -383,6 +389,19 @@ public class TTransactions implements ITransaction {
 		cv.put(EXCLUDE, t.isExclude());
 
 		dbHelper.update(TABLE_NAME, cv, ID + " = ?", new String[]{String.valueOf(t.getId())});
+
+		TAccounts tAccounts = new TAccounts(context);
+
+		// income
+		if (t.getCategory().getType() == INCOME) {
+
+			tAccounts.updateAccountBalance(t.getAccount().getId(), amtDiff, true);
+
+		} else {
+
+			tAccounts.updateAccountBalance(t.getAccount().getId(), amtDiff, false);
+
+		}
 
 	}
 
@@ -397,12 +416,20 @@ public class TTransactions implements ITransaction {
 		TAccounts tAccounts = new TAccounts(context);
 
 		// this reversal of category is hence necessary, because updateAccountBalance(...) method,
-		// adds to balance is income, deduts if expense
-		final int cat = t.getCategory().getType() == INCOME ? EXPENSE : INCOME;
-		tAccounts.updateAccountBalance(t.getAccount().getId(), t.getAmount(), cat);
+		// adds to balance if income, deduts if expense
+		try {
+			tAccounts.updateAccountBalance(t.getAccount().getId(), t.getAmount(), t.getCategory().getType() == EXPENSE);
+		} catch (InsufficientBalanceException e) { // Here the balance should never be insufficient
+			e.printStackTrace();
+		}
 
 		dbHelper.delete(TABLE_NAME, ID + " = ?", new String[]{String.valueOf(t.getId())});
 
+	}
+
+	@Override
+	public void removeTransactionsForAccount(int id) {
+		dbHelper.delete(TABLE_NAME, ACCOUNT + " = ?", new String[]{String.valueOf(id)});
 	}
 
 	@Override

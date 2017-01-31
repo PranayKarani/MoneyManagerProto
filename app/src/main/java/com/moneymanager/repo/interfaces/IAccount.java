@@ -3,6 +3,7 @@
 package com.moneymanager.repo.interfaces;
 
 import com.moneymanager.entities.Account;
+import com.moneymanager.exceptions.InsufficientBalanceException;
 import com.moneymanager.exceptions.NoAccountsException;
 
 public interface IAccount {
@@ -19,6 +20,6 @@ public interface IAccount {
 
 	double getSumOfBalanceOfAccount(int selectedAccount);
 
-	void updateAccountBalance(int id, double amount, int cat_type);
+	void updateAccountBalance(int id, double amount, boolean add) throws InsufficientBalanceException;
 
 }

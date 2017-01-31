@@ -5,9 +5,9 @@ package com.moneymanager.repo;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import com.moneymanager.Common;
 import com.moneymanager.db.DBHelper;
 import com.moneymanager.entities.Account;
+import com.moneymanager.exceptions.InsufficientBalanceException;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.interfaces.IAccount;
 
@@ -21,10 +21,12 @@ public class TAccounts implements IAccount {
 
 	/* Query Strings */
 	private DBHelper dbHelper;
+	private Context context;
 
 	public TAccounts(Context context) {
 
 		dbHelper = new DBHelper(context);
+		this.context = context;
 
 	}
 
@@ -122,6 +124,8 @@ public class TAccounts implements IAccount {
 		dbHelper.delete(TABLE_NAME, ID + " = ?", new String[]{String.valueOf(id)});
 
 		// TODO do something about transactions in this Account
+		TTransactions tTransaction = new TTransactions(context);
+		tTransaction.removeTransactionsForAccount(id);
 
 	}
 
@@ -146,21 +150,19 @@ public class TAccounts implements IAccount {
 	}
 
 	@Override
-	public void updateAccountBalance(int id, double amount, int cat_type) {
+	public void updateAccountBalance(int id, double amount, boolean add) throws InsufficientBalanceException {
 
-		final Cursor c = dbHelper.select(q_SUM_BALANCE_OF_ACCOUNT(id), null);
+		final Cursor c = dbHelper.select(q_SELECT_ACCOUNT(id), null);
 		c.moveToFirst();
 		final double bal = c.getDouble(c.getColumnIndex(BALANCE));
 		double new_bal = bal;// set this to bal instead of 0 so, even if something goes wrong bal won't reset to 0
-		if (cat_type == Common.INCOME) {
+		if (add) {
 			new_bal = bal + amount;
 		} else {
 			if (amount > bal) {
-				try {
-					throw new Exception("expense amount should not exceed balance");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+
+				throw new InsufficientBalanceException();
+
 			} else {
 				new_bal = bal - amount;
 			}
