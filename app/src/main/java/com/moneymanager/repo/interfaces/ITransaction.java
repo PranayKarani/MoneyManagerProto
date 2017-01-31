@@ -35,4 +35,6 @@ public interface ITransaction {
 	void removeTransaction(int id);
 
 	void shiftDeletedTransactions(Category cat);
+
+	Transaction getTransaction(int selectedTransactionID);
 }

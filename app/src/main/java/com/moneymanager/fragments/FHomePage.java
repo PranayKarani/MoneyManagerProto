@@ -12,10 +12,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 import com.moneymanager.Common;
 import com.moneymanager.R;
 import com.moneymanager.activities.stats.AStats;
+import com.moneymanager.activities.transaction.AEditTransaction;
 import com.moneymanager.entities.Transaction;
 import com.moneymanager.repo.TTransactions;
 import com.moneymanager.utilities.MyCalendar;
@@ -124,7 +128,9 @@ public class FHomePage extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-				Toast.makeText(getContext(), myTransactions[position].toString(), Toast.LENGTH_LONG).show();
+				Intent intent = new Intent(getContext(), AEditTransaction.class);
+				intent.putExtra("trans_id", myTransactions[position].getId());
+				startActivity(intent);
 
 			}
 		});

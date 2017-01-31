@@ -27,6 +27,8 @@
         </activity>
         <activity android:name=".activities.stats.AStats">
         </activity>
+        <activity android:name=".activities.transaction.AEditTransaction">
+        </activity>
     </application>
 
 </manifest>

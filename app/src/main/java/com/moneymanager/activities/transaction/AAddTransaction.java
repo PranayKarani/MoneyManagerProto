@@ -20,8 +20,8 @@ import com.moneymanager.fragments.FAddTransaction;
 import com.moneymanager.repo.TAccounts;
 import com.moneymanager.repo.TCategories;
 import com.moneymanager.repo.TTransactions;
+import com.moneymanager.utilities.MyCalendar;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import static com.moneymanager.Common.*;
@@ -79,7 +79,7 @@ public class AAddTransaction extends AppCompatActivity implements
 		final String amt = add_trans_amt.getText().toString();
 		if (amt.equals("")) {
 			errorMessage = "Amount cannot be empty";
-			Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+			add_trans_amt.setError(errorMessage);
 			return null;
 		} else if (Double.valueOf(amt) > selectedAccountBalance && cat.getType() == EXPENSE) {
 			add_trans_amt.setError("Expense should not exceed Account Balance: (Rs " + selectedAccountBalance + ")");
@@ -101,8 +101,7 @@ public class AAddTransaction extends AppCompatActivity implements
 
 		// date
 		if (selectedDate == null) {
-			final Calendar cal = java.util.Calendar.getInstance();
-			selectedDate = new Date(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+			selectedDate = MyCalendar.dateToday();
 		}
 
 		// exclude

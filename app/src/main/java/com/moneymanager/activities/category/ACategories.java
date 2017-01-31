@@ -106,8 +106,12 @@ public class ACategories extends AppCompatActivity {
 		final CategoriesAdapter ca = new CategoriesAdapter(getSupportFragmentManager());
 		viewPager = (ViewPager) findViewById(R.id.categories_viewpager);
 		viewPager.setAdapter(ca);
+
+		final int currentPage = (getIntent().getIntExtra("type", EXPENSE) == INCOME) ? 1 : 0;
+		viewPager.setCurrentItem(currentPage);
+
+
 		final TabLayout tl = (TabLayout) viewPager.findViewById(R.id.categories_tab_layout);
-		tl.setSelectedTabIndicatorColor(ContextCompat.getColor(ACategories.this, R.color.colorRed));
 		viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
 			@Override
@@ -138,6 +142,18 @@ public class ACategories extends AppCompatActivity {
 			public void onPageScrollStateChanged(int state) {
 			}
 		});
+
+		int newcolor;
+		if (currentPage == 0) {
+			newcolor = R.color.colorRed;
+			cat_type_toggle.setChecked(true);
+		} else {
+			newcolor = R.color.colorGreen;
+			cat_type_toggle.setChecked(false);
+		}
+		tl.setSelectedTabIndicatorColor(ContextCompat.getColor(ACategories.this, newcolor));
+		fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ACategories.this, newcolor)));
+
 
 	}
 

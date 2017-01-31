@@ -2,6 +2,8 @@
 
 package com.moneymanager.entities;
 
+import com.moneymanager.utilities.MyCalendar;
+
 import java.util.Date;
 
 public class Transaction {
@@ -83,6 +85,10 @@ public class Transaction {
 
 	public void setDateTime(Date dateTime) {
 		this.dateTime = dateTime;
+	}
+
+	public String formatedDateTime() {
+		return MyCalendar.stringFormatOfDate(dateTime);
 	}
 
 	public boolean isExclude() {

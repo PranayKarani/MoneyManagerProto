@@ -103,7 +103,9 @@ public class FAddTransaction extends Fragment {
 				builder.setPositiveButton("manage categories", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						startActivity(new Intent(getContext(), ACategories.class));
+						Intent intent = new Intent(getContext(), ACategories.class);
+						intent.putExtra("type", toggle.isChecked() ? EXPENSE : INCOME);
+						startActivity(intent);
 					}
 				});
 				builder.create().show();

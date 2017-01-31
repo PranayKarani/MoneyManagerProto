@@ -5,6 +5,7 @@ package com.moneymanager.repo;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import com.moneymanager.Common;
 import com.moneymanager.db.DBHelper;
 import com.moneymanager.entities.Account;
@@ -16,6 +17,8 @@ import com.moneymanager.utilities.MyCalendar;
 
 import java.text.ParseException;
 import java.util.Date;
+
+import static com.moneymanager.Common.mylog;
 
 public class TTransactions implements ITransaction {
 
@@ -62,6 +65,10 @@ public class TTransactions implements ITransaction {
 				"FOREIGN KEY(" + CATEGORY + ") REFERENCES " + TCategories.TABLE_NAME + "(" + TCategories.ID + ")," +
 				"FOREIGN KEY(" + ACCOUNT + ") REFERENCES " + TAccounts.TABLE_NAME + "(" + TAccounts.ID + ")" +
 				");";
+	}
+
+	private String q_SELECT_TRANSACTION(int id) {
+		return SELECT_TRANS_JOIN_CAT_AND_ACC + " WHERE " + TID_alias + " = " + id;
 	}
 
 	private String q_SELECT_ALL_TRANSACTIONS(String column, String order) {
@@ -150,6 +157,18 @@ public class TTransactions implements ITransaction {
 				DEFAULT_ORDER_BY_TID;
 	}
 
+
+	@Override
+	public Transaction getTransaction(int selectedTransactionID) {
+		Cursor c = dbHelper.select(q_SELECT_TRANSACTION(selectedTransactionID), null);
+
+		if (c.moveToFirst()) {
+			return extractTransactionFromCursor(c);
+		} else {
+			return null;
+		}
+
+	}
 
 	@Override
 	public Transaction[] getAllTransactions(String column, String order) {
@@ -353,8 +372,26 @@ public class TTransactions implements ITransaction {
 
 	}
 
+	public void updateTransaction(Transaction t) {
+
+		final ContentValues cv = new ContentValues();
+		cv.put(AMOUNT, t.getAmount());
+		cv.put(CATEGORY, t.getCategory().getId());
+		cv.put(ACCOUNT, t.getAccount().getId());
+		cv.put(INFO, t.getInfo());
+		cv.put(DATETIME, t.formatedDateTime());
+		cv.put(EXCLUDE, t.isExclude());
+
+		dbHelper.update(TABLE_NAME, cv, ID + " = ?", new String[]{String.valueOf(t.getId())});
+
+	}
+
+
 	@Override
 	public void removeTransaction(int id) {
+
+		Log.i(mylog, "remove " + id);
+		dbHelper.delete(TABLE_NAME, ID + " = ?", new String[]{String.valueOf(id)});
 
 	}
 
