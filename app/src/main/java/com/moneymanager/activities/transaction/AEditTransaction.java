@@ -253,12 +253,13 @@ public class AEditTransaction extends AppCompatActivity {
 
 	public boolean onOptionsItemSelected(MenuItem item) {
 
+		final Transaction updatedTransaction = getUpdatedTransaction();
 
 		switch (item.getItemId()) {
 			case R.id.edit_trans_menu_save:
 				// update transaction
 
-				final Transaction updatedTransaction = getUpdatedTransaction();
+
 				if (updatedTransaction != null) {
 
 					tTransactions.updateTransaction(updatedTransaction);
@@ -277,7 +278,7 @@ public class AEditTransaction extends AppCompatActivity {
 							@Override
 							public void onClick(View v) {
 
-								tTransactions.removeTransaction(selectedTransactionID);
+								tTransactions.removeTransaction(updatedTransaction);
 								finish();
 
 							}

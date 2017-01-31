@@ -25,6 +25,7 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.moneymanager.Common;
 import com.moneymanager.R;
+import com.moneymanager.activities.transaction.AEditTransaction;
 import com.moneymanager.entities.Account;
 import com.moneymanager.entities.Transaction;
 import com.moneymanager.exceptions.NoAccountsException;
@@ -101,12 +102,16 @@ public class AStats extends AppCompatActivity {
 
 		Calendar c = Calendar.getInstance();
 
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
 		Bundle b = new Bundle();
 		b.putString("date", sdf.format(myDate));
 		b.putString("cus_end_date", sdf.format(customEndDate));
 		b.putString("cus_start_date", sdf.format(customStartDate));
 		new TransListLoader().execute(b);
-
 	}
 
 	private void init() {
@@ -389,6 +394,10 @@ public class AStats extends AppCompatActivity {
 		BarChart weekBarChart, monthBarChart;
 		TextView bchart_text;
 
+		AlertDialog piechart_dialog;
+		AlertDialog barchart_dialog;
+
+
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
@@ -575,7 +584,7 @@ public class AStats extends AppCompatActivity {
 
 		private void setUpPieChart() {
 
-			final AlertDialog piechart_dialog = new AlertDialog.Builder(AStats.this)
+			piechart_dialog = new AlertDialog.Builder(AStats.this)
 					.setView(R.layout.d_stats_piechart)
 					.create();
 
@@ -800,7 +809,7 @@ public class AStats extends AppCompatActivity {
 
 		private void setUpMonthBarGraph() {
 
-			final AlertDialog barchart_dialog = new AlertDialog.Builder(AStats.this)
+			barchart_dialog = new AlertDialog.Builder(AStats.this)
 					.setView(R.layout.d_stats_barchart)
 					.create();
 
@@ -899,7 +908,7 @@ public class AStats extends AppCompatActivity {
 
 		}
 
-		private void fillTransList(int row_layout, LinearLayout container_layout, Transaction[] trans, boolean loadForMainScreen) {
+		private void fillTransList(int row_layout, LinearLayout container_layout, Transaction[] trans, final boolean loadForMainScreen) {
 
 			if (container_layout != null) {
 				container_layout.removeAllViews();
@@ -945,10 +954,32 @@ public class AStats extends AppCompatActivity {
 
 			int currentWeekDayIndexForIncome = 0;
 			int currentWeekDayIndexForExpense = 0;
-			for (Transaction t : trans) {
+			for (final Transaction t : trans) {
 
 				View rowView = getLayoutInflater().inflate(row_layout, null);
 
+				rowView.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+
+						Intent intent = new Intent(AStats.this, AEditTransaction.class);
+						intent.putExtra("trans_id", t.getId());
+						startActivity(intent);
+
+						if (piechart_dialog != null) {
+							if (piechart_dialog.isShowing()) {
+								piechart_dialog.dismiss();
+							}
+						}
+
+						if (barchart_dialog != null) {
+							if (barchart_dialog.isShowing()) {
+								barchart_dialog.dismiss();
+							}
+						}
+
+					}
+				});
 
 				final TextView tCat = (TextView) rowView.findViewById(R.id.x_home_trans_row_cat);
 				final TextView tAmt = (TextView) rowView.findViewById(R.id.x_home_trans_row_amt);

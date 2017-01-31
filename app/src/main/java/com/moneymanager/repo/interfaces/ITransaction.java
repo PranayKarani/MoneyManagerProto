@@ -32,7 +32,7 @@ public interface ITransaction {
 
 	void insertNewTransaction(Transaction transaction);
 
-	void removeTransaction(int id);
+	void removeTransaction(Transaction t);
 
 	void shiftDeletedTransactions(Category cat);
 

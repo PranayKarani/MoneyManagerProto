@@ -25,7 +25,9 @@
         </activity>
         <activity android:name=".activities.category.ACategories">
         </activity>
-        <activity android:name=".activities.stats.AStats">
+        <activity
+            android:name=".activities.stats.AStats"
+            android:theme="@style/Theme.AppCompat.NoActionBarAppTheme.Darker">
         </activity>
         <activity android:name=".activities.transaction.AEditTransaction">
         </activity>

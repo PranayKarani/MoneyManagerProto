@@ -5,7 +5,6 @@ package com.moneymanager.repo;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 import com.moneymanager.Common;
 import com.moneymanager.db.DBHelper;
 import com.moneymanager.entities.Account;
@@ -18,7 +17,8 @@ import com.moneymanager.utilities.MyCalendar;
 import java.text.ParseException;
 import java.util.Date;
 
-import static com.moneymanager.Common.mylog;
+import static com.moneymanager.Common.EXPENSE;
+import static com.moneymanager.Common.INCOME;
 
 public class TTransactions implements ITransaction {
 
@@ -388,10 +388,20 @@ public class TTransactions implements ITransaction {
 
 
 	@Override
-	public void removeTransaction(int id) {
+	public void removeTransaction(Transaction t) {
 
-		Log.i(mylog, "remove " + id);
-		dbHelper.delete(TABLE_NAME, ID + " = ?", new String[]{String.valueOf(id)});
+		// Correct the account balance before removing the transaction
+		// if expense transaction is removed, add to account balance
+		// if income transaction is removed, dedut from account balance
+
+		TAccounts tAccounts = new TAccounts(context);
+
+		// this reversal of category is hence necessary, because updateAccountBalance(...) method,
+		// adds to balance is income, deduts if expense
+		final int cat = t.getCategory().getType() == INCOME ? EXPENSE : INCOME;
+		tAccounts.updateAccountBalance(t.getAccount().getId(), t.getAmount(), cat);
+
+		dbHelper.delete(TABLE_NAME, ID + " = ?", new String[]{String.valueOf(t.getId())});
 
 	}
 
