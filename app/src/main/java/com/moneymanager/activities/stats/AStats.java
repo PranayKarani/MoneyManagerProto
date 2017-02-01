@@ -507,7 +507,9 @@ public class AStats extends AppCompatActivity {
 			income_trans_container.removeAllViews();
 			expense_trans_container.removeAllViews();
 
-			fillTransList(R.layout.x_home_trans_row, null, transactions, true);
+			if (transactions.length > 0) {
+				fillTransList(R.layout.x_home_trans_row, null, transactions, true);
+			}
 
 			income_trans_container_card.setVisibility((countIncomeTrans == 0) ? View.GONE : View.VISIBLE);
 			expense_trans_container_card.setVisibility((countExpenseTrans == 0) ? View.GONE : View.VISIBLE);
@@ -1077,8 +1079,6 @@ public class AStats extends AppCompatActivity {
 				}
 
 			}
-
-			Log.i(mylog, "");
 
 		}
 	}

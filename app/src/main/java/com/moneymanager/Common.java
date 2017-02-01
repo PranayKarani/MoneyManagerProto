@@ -10,7 +10,7 @@ import android.support.v7.widget.Toolbar;
 public class Common {
 
 	public static final String mylog = "mylog";
-	public static final String DATE_FORMAT = "yyyy-MM-DD";
+	public static final String DATE_FORMAT = "yyyy-MM-dd";
 
 	public static final int INCOME = 0;
 	public static final int EXPENSE = 1;
