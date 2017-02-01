@@ -1,7 +1,9 @@
 package com.moneymanager.activities.transaction;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -112,6 +114,29 @@ public class AAddTransaction extends AppCompatActivity implements
 
 	}
 
+	@Override
+	public void onBackPressed() {
+
+
+		final AlertDialog alertDialog = new AlertDialog.Builder(this)
+				.setTitle("Sure you want to leave?")
+				.setMessage("your changes won't be saved")
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				})
+				.setPositiveButton("Yes, leave", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				})
+				.create();
+		alertDialog.show();
+
+	}
 
 	/**
 	 * Toolbar Menu Stuff
