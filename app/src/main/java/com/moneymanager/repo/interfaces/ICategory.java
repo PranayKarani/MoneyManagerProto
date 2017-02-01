@@ -3,6 +3,7 @@
 package com.moneymanager.repo.interfaces;
 
 import com.moneymanager.entities.Category;
+import com.moneymanager.exceptions.CategoryExistsException;
 
 public interface ICategory {
 
@@ -15,9 +16,9 @@ public interface ICategory {
 	 */
 	Category[] getTypeSpecificCategories(int type);
 
-	void insertNewCategory(Category category);
+	void insertNewCategory(Category category) throws CategoryExistsException;
 
-	void updateCategory(Category category);
+	void updateCategory(Category category) throws CategoryExistsException;
 
 	void removeCategory(Category cat);
 }

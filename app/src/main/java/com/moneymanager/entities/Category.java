@@ -11,7 +11,7 @@ public class Category {
 
 	public Category(int id, String name, int type, boolean exclude) {
 		this.id = id;
-		this.name = name;
+		this.name = name.toLowerCase().replaceFirst(String.valueOf(name.charAt(0)), String.valueOf(name.charAt(0)).toUpperCase());
 		this.type = type;
 		this.exclude = exclude;
 	}

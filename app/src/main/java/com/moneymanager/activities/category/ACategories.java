@@ -20,6 +20,7 @@ import com.moneymanager.Common;
 import com.moneymanager.R;
 import com.moneymanager.adapters.CategoriesAdapter;
 import com.moneymanager.entities.Category;
+import com.moneymanager.exceptions.CategoryExistsException;
 import com.moneymanager.fragments.FCategoryList;
 import com.moneymanager.repo.TCategories;
 
@@ -66,12 +67,14 @@ public class ACategories extends AppCompatActivity {
 
 							Category cat = new Category(-1, cat_name, type, false);
 
-							Toast.makeText(ACategories.this, "New category " + cat.getName() + " added in " + cat.getTypeString(), Toast.LENGTH_LONG).show();
-
 							TCategories tCategories = new TCategories(ACategories.this);
-							tCategories.insertNewCategory(cat);
-
-							dialogX.dismiss();
+							try {
+								tCategories.insertNewCategory(cat);
+								Toast.makeText(ACategories.this, "New category " + cat.getName() + " added in " + cat.getTypeString(), Toast.LENGTH_LONG).show();
+								dialogX.dismiss();
+							} catch (CategoryExistsException e) {
+								cat_name_edittext.setError(e.getMessage());
+							}
 
 						}
 

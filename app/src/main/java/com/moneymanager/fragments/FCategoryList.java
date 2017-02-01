@@ -15,6 +15,7 @@ import com.moneymanager.Common;
 import com.moneymanager.R;
 import com.moneymanager.activities.category.ACategories;
 import com.moneymanager.entities.Category;
+import com.moneymanager.exceptions.CategoryExistsException;
 import com.moneymanager.repo.TCategories;
 
 import static com.moneymanager.Common.*;
@@ -102,12 +103,16 @@ public class FCategoryList extends Fragment {
 							cat.setName(cat_name);
 							cat.setType(type);
 
-							Toast.makeText(getContext(), "Updated category " + cat.getName(), Toast.LENGTH_LONG).show();
-
 							TCategories tCategories = new TCategories(getContext());
-							tCategories.updateCategory(cat);
+							try {
+								tCategories.updateCategory(cat);
+								Toast.makeText(getContext(), "Updated category " + cat.getName(), Toast.LENGTH_LONG).show();
+								dialogX.dismiss();
+							} catch (CategoryExistsException e) {
+								cat_name_edittext.setError(e.getMessage());
+							}
 
-							dialogX.dismiss();
+
 
 						}
 

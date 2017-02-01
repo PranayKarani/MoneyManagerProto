@@ -7,6 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import com.moneymanager.db.DBHelper;
 import com.moneymanager.entities.Category;
+import com.moneymanager.exceptions.CategoryExistsException;
 import com.moneymanager.repo.interfaces.ICategory;
 
 public class TCategories implements ICategory {
@@ -40,6 +41,10 @@ public class TCategories implements ICategory {
 
 	private String q_SELECT_CATEGORY(int id) {
 		return "SELECT * FROM " + TABLE_NAME + " WHERE " + ID + " = " + id;
+	}
+
+	private String q_CHECK_CATEGORY(String name, int type) {
+		return "SELECT * FROM " + TABLE_NAME + " WHERE " + NAME + " = '" + name + "' AND " + TYPE + " = " + type;
 	}
 
 	private String q_SELECT_ALL_CATEGORIES() {
@@ -109,24 +114,37 @@ public class TCategories implements ICategory {
 	}
 
 	@Override
-	public void insertNewCategory(Category category) {
+	public void insertNewCategory(Category category) throws CategoryExistsException {
 
-		final ContentValues cv = new ContentValues();
-		cv.put(NAME, category.getName());
-		cv.put(TYPE, category.getType());
-		cv.put(EXCLUDE, category.isExclude());
-		dbHelper.insert(TABLE_NAME, cv);
+		Cursor c = dbHelper.select(q_CHECK_CATEGORY(category.getName().toLowerCase(), category.getType()), null);
 
+		if (c.getCount() > 0) {
+			throw new CategoryExistsException();
+		} else {
+
+			final ContentValues cv = new ContentValues();
+			cv.put(NAME, category.getName().toLowerCase());// to be stored in lower case in database
+			cv.put(TYPE, category.getType());
+			cv.put(EXCLUDE, category.isExclude());
+			dbHelper.insert(TABLE_NAME, cv);
+
+		}
 	}
 
 	@Override
-	public void updateCategory(Category new_cat) {
+	public void updateCategory(Category new_cat) throws CategoryExistsException {
 
-		final ContentValues cv = new ContentValues();
-		cv.put(NAME, new_cat.getName());
-		cv.put(TYPE, new_cat.getType());
-		dbHelper.update(TABLE_NAME, cv, ID + " = ?", new String[]{String.valueOf(new_cat.getId())});
+		Cursor c = dbHelper.select(q_CHECK_CATEGORY(new_cat.getName().toLowerCase(), new_cat.getType()), null);
 
+		if (c.getCount() > 0) {
+			throw new CategoryExistsException();
+		} else {
+
+			final ContentValues cv = new ContentValues();
+			cv.put(NAME, new_cat.getName().toLowerCase());// to be stored in lower case in database
+			cv.put(TYPE, new_cat.getType());
+			dbHelper.update(TABLE_NAME, cv, ID + " = ?", new String[]{String.valueOf(new_cat.getId())});
+		}
 	}
 
 	@Override
