@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -127,31 +128,46 @@ public class AAccounts extends AppCompatActivity {
 				@Override
 				public void onClick(View v) {
 
-					Toast.makeText(myContext, "edit account with ID = " + id, Toast.LENGTH_LONG).show();
-					accTable.removeAccount(id);
-					CURRENT_ACCOUNT_ID = ALL_ACCOUNT_ID;
-					ShrPref.writeData(AAccounts.this, spCURRENT_ACCOUNT_ID, CURRENT_ACCOUNT_ID);
+					final Snackbar sb = Snackbar.make(findViewById(R.id.a_accounts_coordinate_layout),
+							"Delete Account?",
+							Snackbar.LENGTH_SHORT)
+							.setAction("Yes", new View.OnClickListener() {
+								@Override
+								public void onClick(View v) {
 
-					// refresh account list
-					final TAccounts accTable = new TAccounts(myContext);
-					final ListView accListView = (ListView) myContext.findViewById(R.id.account_accounts_list);
+									Toast.makeText(myContext, "edit account with ID = " + id, Toast.LENGTH_LONG).show();
+									accTable.removeAccount(id);
+									CURRENT_ACCOUNT_ID = ALL_ACCOUNT_ID;
+									ShrPref.writeData(AAccounts.this, spCURRENT_ACCOUNT_ID, CURRENT_ACCOUNT_ID);
 
-					try {
-						final Account[] accounts = accTable.getAllAccounts(TAccounts.ID, null);
-						noAccounts = false;
+									// refresh account list
+									final TAccounts accTable = new TAccounts(myContext);
+									final ListView accListView = (ListView) myContext.findViewById(R.id.account_accounts_list);
 
-						accListView.setAdapter(new AccListAdapter(myContext, accounts, accTable));
+									try {
+										final Account[] accounts = accTable.getAllAccounts(TAccounts.ID, null);
+										noAccounts = false;
 
-
-					} catch (NoAccountsException e) {
-
-						noAccounts = true;
-						final TextView accTxt = (TextView) myContext.findViewById(R.id.accounts_text);
-						accTxt.setVisibility(View.VISIBLE);
-						accListView.setVisibility(View.GONE);
+										accListView.setAdapter(new AccListAdapter(myContext, accounts, accTable));
 
 
-					}
+									} catch (NoAccountsException e) {
+
+										noAccounts = true;
+										final TextView accTxt = (TextView) myContext.findViewById(R.id.accounts_text);
+										accTxt.setVisibility(View.VISIBLE);
+										accListView.setVisibility(View.GONE);
+
+
+									}
+
+
+								}
+							});
+					View sbv = sb.getView();
+					sbv.setBackgroundColor(getMyColor(AAccounts.this, R.color.colorRed));
+					sb.setActionTextColor(getMyColor(AAccounts.this, R.color.colorPrimaryDark));
+					sb.show();
 
 				}
 			});

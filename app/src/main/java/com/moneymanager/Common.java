@@ -15,6 +15,23 @@ public class Common {
 	public static final int INCOME = 0;
 	public static final int EXPENSE = 1;
 
+	/**
+	 * i have given
+	 */
+	public static final int DEBT = 5;
+	/**
+	 * i am repayed
+	 */
+	public static final int DEBT_REPAY = 6;
+	/**
+	 * i have taken
+	 */
+	public static final int LOAN = 7;
+	/**
+	 * i am repaying
+	 */
+	public static final int LOAN_REPAY = 8;
+
 	// SharedPreferences Constants
 	public static final String spFILE_NAME = "mm_sp_file";
 	public static final String spCURRENT_ACCOUNT_ID = "account_id";

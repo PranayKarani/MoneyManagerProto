@@ -15,14 +15,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.moneymanager.R;
 import com.moneymanager.adapters.AddTransactionAdapter;
-import com.moneymanager.entities.Account;
-import com.moneymanager.entities.Category;
-import com.moneymanager.entities.Transaction;
+import com.moneymanager.entities.*;
 import com.moneymanager.exceptions.InsufficientBalanceException;
+import com.moneymanager.fragments.FAddDebt;
 import com.moneymanager.fragments.FAddTransaction;
-import com.moneymanager.repo.TAccounts;
-import com.moneymanager.repo.TCategories;
-import com.moneymanager.repo.TTransactions;
+import com.moneymanager.repo.*;
 import com.moneymanager.utilities.MyCalendar;
 
 import java.util.Date;
@@ -37,6 +34,10 @@ public class AAddTransaction extends AppCompatActivity implements
 	private ViewPager viewPager;
 	private int selectedCategoryId = -1;
 	private int selectedAccountId = -1;
+	private int selectedDebtType = DEBT;
+	private double selectedDebtAmount = -1;
+	private int selectedDebtId = -1;
+	private int selectedUserId = -1;
 	private Date selectedDate = null;
 	private double selectedAccountBalance;
 
@@ -55,8 +56,18 @@ public class AAddTransaction extends AppCompatActivity implements
 
 	public void OnSetDateClick(View view) {
 
-		final FAddTransaction.TimePickerFragment timePickerFragment = new FAddTransaction.TimePickerFragment();
-		timePickerFragment.show(getSupportFragmentManager(), "Pick a Date");
+		switch (viewPager.getCurrentItem()) {
+			case 0:
+				final FAddTransaction.TimePickerFragment timePickerFragment = new FAddTransaction.TimePickerFragment();
+				timePickerFragment.show(getSupportFragmentManager(), "Pick a Date");
+				break;
+			case 1:
+				final FAddDebt.DatePickerFragment datePickerFragment = new FAddDebt.DatePickerFragment();
+				datePickerFragment.show(getSupportFragmentManager(), "Pick a Date");
+				break;
+
+		}
+
 
 	}
 
@@ -114,6 +125,105 @@ public class AAddTransaction extends AppCompatActivity implements
 
 	}
 
+	private Debt getNewDebt() {
+
+		final TUser user_table = new TUser(this);
+		final TAccounts acc_table = new TAccounts(this);
+		TDebt tDebt = new TDebt(this);
+
+		String errorMessage;
+
+		// user
+		User user;
+		if (selectedUserId <= 0) {
+			errorMessage = "Select a User";
+			Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+			return null;
+		} else {
+			user = user_table.getUser(selectedUserId);
+		}
+
+		// Account
+		Account acc;
+		if (selectedAccountId <= 0) {
+			errorMessage = "Select an Account first";// this should not happen since the account is set to current by default, but still...
+			Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+			return null;
+		} else {
+			acc = acc_table.getAccount(selectedAccountId);
+		}
+
+		// info
+		final String info = ((TextView) findViewById(R.id.add_debt_info)).getText().toString();
+
+		// date
+		if (selectedDate == null) {
+			selectedDate = MyCalendar.dateToday();
+		}
+
+		// amount
+		final EditText add_debt_amt = (EditText) findViewById(R.id.add_debt_amt);
+		double amt;
+
+		if (add_debt_amt.getText().toString().equals("")) {
+			amt = -1;
+		} else {
+			amt = Double.valueOf(add_debt_amt.getText().toString());
+		}
+
+		if (amt == -1) {
+			errorMessage = "Amount cannot be empty";
+			add_debt_amt.setError(errorMessage);
+			return null;
+		} else {
+
+			switch (selectedDebtType) {
+
+				case DEBT:
+					if (selectedAccountBalance < amt) {
+						errorMessage = "amount exceeds Account Balance: " + selectedAccountBalance;
+						add_debt_amt.setError(errorMessage);
+						return null;
+					}
+					break;
+				case DEBT_REPAY:
+					if (selectedDebtAmount < 0) {
+						errorMessage = "debt does not exists";
+						add_debt_amt.setError(errorMessage);
+						return null;
+					} else if (amt > selectedDebtAmount) {
+						errorMessage = "amount exceeds debt amount: " + selectedDebtAmount;
+						add_debt_amt.setError(errorMessage);
+						return null;
+					} else {
+						amt = selectedDebtAmount - amt;
+					}
+					break;
+				case LOAN:
+					break;
+				case LOAN_REPAY:
+
+					if (selectedDebtAmount < 0) {
+						errorMessage = "loan does not exists";
+						add_debt_amt.setError(errorMessage);
+						return null;
+					} else if (amt > selectedDebtAmount) {
+						errorMessage = "amount exceeds loan amount: " + selectedDebtAmount;
+						add_debt_amt.setError(errorMessage);
+						return null;
+					} else {
+						amt = selectedDebtAmount - amt;
+					}
+					break;
+
+			}
+
+		}
+
+		return new Debt(selectedDebtId, selectedDebtType, user, Double.valueOf(amt), acc, info, selectedDate);
+
+	}
+
 	@Override
 	public void onBackPressed() {
 
@@ -147,8 +257,6 @@ public class AAddTransaction extends AppCompatActivity implements
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// since only one item in menu
-		// no need for switch case
 
 		// whether to insert transaction or debt
 		switch (viewPager.getCurrentItem()) {
@@ -170,7 +278,27 @@ public class AAddTransaction extends AppCompatActivity implements
 			}
 
 			case 1: {
-				Toast.makeText(this, "debt insert coming soon", Toast.LENGTH_SHORT).show();
+				// insert new transaction data into database
+				final TDebt debt_table = new TDebt(this);
+				final Debt new_debt = getNewDebt();
+				if (new_debt != null) {
+
+					try {
+
+						if (new_debt.getType() == DEBT || new_debt.getType() == LOAN) {
+							debt_table.insertDebt(new_debt);
+							Toast.makeText(this, "new debt added", Toast.LENGTH_SHORT).show();
+						} else {
+							debt_table.updateDebtAmount(new_debt);
+							Toast.makeText(this, "debt updated", Toast.LENGTH_SHORT).show();
+						}
+
+
+						finish();
+					} catch (InsufficientBalanceException e) {
+						Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+					}
+				}
 				break;
 			}
 
@@ -195,8 +323,26 @@ public class AAddTransaction extends AppCompatActivity implements
 		this.selectedAccountBalance = amount;
 	}
 
+	public void updateUserId(int selectedUser) {
+		this.selectedUserId = selectedUser;
+	}
+
+	public void updateDebtType(int selectedDebtType) {
+		this.selectedDebtType = selectedDebtType;
+	}
+
+	public void updateDebtAmount(double selectedDebtAmount) {
+		this.selectedDebtAmount = selectedDebtAmount;
+	}
+
+	public void setUpdateDebtId(int id) {
+		this.selectedDebtId = id;
+	}
+
 	@Override
 	public void updateDate(Date date) {
 		selectedDate = date;
 	}
+
+
 }

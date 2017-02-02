@@ -5,9 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.moneymanager.repo.TAccounts;
-import com.moneymanager.repo.TCategories;
-import com.moneymanager.repo.TTransactions;
+import com.moneymanager.repo.*;
 
 /**
  * All queries to executed on the database should be lauched through this class only.
@@ -16,7 +14,7 @@ import com.moneymanager.repo.TTransactions;
 public class DBHelper extends SQLiteOpenHelper {
 
 
-	private static final int DB_VERSION = 1;
+	private static final int DB_VERSION = 2;
 	private static final String DB_NAME = "moneymanager.db";
 
 
@@ -29,7 +27,9 @@ public class DBHelper extends SQLiteOpenHelper {
 		final String[] newTables = {
 				TAccounts.q_CREATE_TABLE(),
 				TCategories.q_CREATE_TABLE(),
-				TTransactions.q_CREATE_TABLE()
+				TTransactions.q_CREATE_TABLE(),
+				TUser.q_CREATE_TABLE(),
+				TDebt.q_CREATE_TABLE()
 		};
 
 		for (String i : newTables) {
@@ -43,6 +43,17 @@ public class DBHelper extends SQLiteOpenHelper {
 	 */
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+
+		if (newVersion == 2) {
+			final String[] newTables = {
+					TUser.q_CREATE_TABLE(),
+					TDebt.q_CREATE_TABLE()
+			};
+
+			for (String i : newTables) {
+				db.execSQL(i);
+			}
+		}
 
 	}
 
