@@ -13,4 +13,5 @@
     <color name="colorFaintRed">#23d74a45</color>
     <color name="colorBlue">#459ad7</color>
     <color name="transparent">#00ffffff</color>
+    <color name="fadeBlack">#c3000000</color>
 </resources>

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,28 +14,29 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import com.moneymanager.R;
 import com.moneymanager.activities.accounts.AAccounts;
-import com.moneymanager.activities.category.ACategories;
+import com.moneymanager.activities.stats.AStats;
 import com.moneymanager.activities.transaction.AAddTransaction;
 import com.moneymanager.adapters.HomePagerAdapter;
 import com.moneymanager.entities.Account;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.fragments.FHomePage;
 import com.moneymanager.repo.TAccounts;
+import com.moneymanager.utilities.MyCalendar;
 import com.moneymanager.utilities.ShrPref;
 
 import static com.moneymanager.Common.*;
 
 public class AMain extends AppCompatActivity {
 
+	private final String[] nav_places = {
+			"Stats", "Accounts", "Budgets", "Debts & Loans", "Categories"
+	};
 	private Account[] accounts;
 	private String[] acc_names;
 	private int[] acc_ids;
-
 	private ViewPager viewPager;
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +47,46 @@ public class AMain extends AppCompatActivity {
 		home_toolbar.setTitle("");
 		setSupportActionBar(home_toolbar);
 
+		// setting up Navigation drawer stuff
+		DrawerLayout navD = (DrawerLayout) findViewById(R.id.a_home_nav_drawer);
+		navD.setScrimColor(getMyColor(this, R.color.fadeBlack));
 
+		ListView navigationList = (ListView) findViewById(R.id.a_home_nav_list);
+		navigationList.setAdapter(new ArrayAdapter<String>(this, R.layout.x_list_item, R.id.x_list_item_name, nav_places));
+		navigationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+				switch (position) {
+					case 0:
+						final Intent intent = new Intent(AMain.this, AStats.class);
+						intent.putExtra("date", MyCalendar.getSimpleDateFormat().format(MyCalendar.dateToday()));
+						startActivity(intent);
+						break;
+					case 1:
+						startActivity(new Intent(AMain.this, AAccounts.class));
+						break;
+					case 2:
+						Toast.makeText(AMain.this, "Budget Coming soon :)", Toast.LENGTH_SHORT).show();
+						break;
+					case 3:
+						Toast.makeText(AMain.this, "Coming soon :)", Toast.LENGTH_SHORT).show();
+						break;
+					case 4:
+						startActivity(new Intent(AMain.this, AAccounts.class));
+						break;
+				}
+
+			}
+		});
+
+		ImageButton imgBtn = (ImageButton) findViewById(R.id.a_home_nav_settings);
+		imgBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Toast.makeText(AMain.this, "Settings Coming soon :)", Toast.LENGTH_SHORT).show();
+			}
+		});
 
 		// set up fab button to add new transaction
 		final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add_transaction);
@@ -141,28 +182,6 @@ public class AMain extends AppCompatActivity {
 			case R.id.home_menu_search: {
 
 				startActivity(new Intent(this, ASearch.class));
-
-				return true;
-			}
-
-			case R.id.home_menu_manage_account: {
-
-				startActivity(new Intent(this, AAccounts.class));
-
-				return true;
-
-			}
-
-			case R.id.home_menu_manage_budget: {
-
-				Toast.makeText(this, "Coming soon :)", Toast.LENGTH_SHORT).show();
-
-				return true;
-			}
-
-			case R.id.home_menu_manage_category: {
-
-				startActivity(new Intent(this, ACategories.class));
 
 				return true;
 			}
