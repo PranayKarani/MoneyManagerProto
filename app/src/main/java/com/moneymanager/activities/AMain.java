@@ -70,7 +70,7 @@ public class AMain extends AppCompatActivity {
 						Toast.makeText(AMain.this, "Budget Coming soon :)", Toast.LENGTH_SHORT).show();
 						break;
 					case 3:
-						Toast.makeText(AMain.this, "Coming soon :)", Toast.LENGTH_SHORT).show();
+						startActivity(new Intent(AMain.this, ADebts.class));
 						break;
 					case 4:
 						startActivity(new Intent(AMain.this, AAccounts.class));

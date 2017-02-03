@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:padding="8sp">
+
+    <LinearLayout
+        android:id="@+id/x_debt_date_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="5"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/x_debt_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="24th"
+            android:textSize="22sp"/>
+
+        <TextView
+            android:id="@+id/x_debt_month_year"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Jan, \n2017"
+            android:textSize="12sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/x_debt_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4sp"
+                android:layout_weight="1"
+                android:text="User"
+                android:textSize="20sp"/>
+
+
+            <TextView
+                android:id="@+id/x_debt_amt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rs 1243"
+                android:textSize="20sp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/x_debt_acc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="(account)"
+            android:textColor="@color/colorBlue"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/x_debt_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4sp"
+            android:text="info"
+            android:textColor="@color/colorPrimaryMedium"
+            android:textSize="12sp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

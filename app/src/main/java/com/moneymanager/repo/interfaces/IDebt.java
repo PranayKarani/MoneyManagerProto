@@ -19,4 +19,5 @@ public interface IDebt {
 
 	void removeDebt(Debt debt);
 
+	Debt[] getDebts(int type);
 }

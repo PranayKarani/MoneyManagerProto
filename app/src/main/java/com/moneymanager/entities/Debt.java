@@ -72,6 +72,15 @@ public class Debt {
 		this.info = info;
 	}
 
+	public String getShortInfo() {
+		final int characterLimit = 20;
+		if (info.length() > characterLimit) {
+			return info.substring(0, characterLimit) + "...";
+		} else {
+			return info;
+		}
+	}
+
 	public Date getDate() {
 		return date;
 	}

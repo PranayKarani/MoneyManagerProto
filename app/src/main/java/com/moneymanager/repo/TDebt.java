@@ -62,6 +62,12 @@ public class TDebt implements IDebt {
 		return SELECT_DEBT_JOIN_USER_AND_ACCOUNT + " WHERE " + DID_alias + " = " + id;
 	}
 
+	private String q_SELECT_DEBTS(int type) {
+
+		return SELECT_DEBT_JOIN_USER_AND_ACCOUNT + " WHERE " + TYPE + " = " + type + " ORDER BY " + DATETIME + " DESC";
+
+	}
+
 	private String q_SELECT_VERY_SPECIFIC_DEBT(int useId, int accID, int type, String dateString) {
 		return SELECT_DEBT_JOIN_USER_AND_ACCOUNT +
 				" WHERE " + USER + " = " + useId +
@@ -123,6 +129,20 @@ public class TDebt implements IDebt {
 
 			dbHelper.update(TABLE_NAME, cv, ID + " = ?", new String[]{String.valueOf(new_debt.getId())});
 		}
+	}
+
+	@Override
+	public Debt[] getDebts(int type) {
+
+		Cursor c = dbHelper.select(q_SELECT_DEBTS(type), null);
+
+		Debt[] debts = new Debt[c.getCount()];
+
+		while (c.moveToNext()) {
+			debts[c.getPosition()] = extractDebtFromCursor(c);
+		}
+
+		return debts;
 	}
 
 	@Override
