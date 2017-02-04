@@ -62,6 +62,7 @@
                 android:textSize="22sp"/>
 
             <android.support.design.widget.TextInputLayout
+                android:id="@+id/f_add_debt_amt_textinput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10sp">

@@ -20,6 +20,7 @@ import com.moneymanager.utilities.MyCalendar;
 import java.util.Date;
 
 import static com.moneymanager.Common.DEBT;
+import static com.moneymanager.Common.LOAN;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,7 +30,7 @@ public class FDebts extends Fragment {
 
 	Date previousDebtDate;
 	Debt[] debtArray;
-
+	boolean debt;
 
 	public FDebts() {
 		// Required empty public constructor
@@ -38,6 +39,8 @@ public class FDebts extends Fragment {
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		debt = getArguments().getBoolean("debt");
 
 		refreshDebtArray();
 
@@ -58,7 +61,7 @@ public class FDebts extends Fragment {
 
 		TDebt tDebt = new TDebt(getContext());
 		debtArray = null;
-		debtArray = tDebt.getDebts(DEBT);
+		debtArray = tDebt.getDebts(debt ? DEBT : LOAN);
 
 		previousDebtDate = debtArray.length > 0 ? MyCalendar.dateBeforeDays(debtArray[0].getDate(), 2) : null;
 
@@ -79,6 +82,8 @@ public class FDebts extends Fragment {
 			View rowView = inf.inflate(R.layout.x_debt_row, null);
 			LinearLayout dateLayout = (LinearLayout) rowView.findViewById(R.id.x_debt_date_layout);
 			dateLayout.setVisibility(View.INVISIBLE);
+			LinearLayout lineLayout = (LinearLayout) rowView.findViewById(R.id.x_debt_line);
+			lineLayout.setVisibility(View.GONE);
 
 
 			Debt debt = getItem(position);
@@ -86,6 +91,9 @@ public class FDebts extends Fragment {
 			if (!debt.getDate().equals(previousDebtDate)) {
 
 				dateLayout.setVisibility(View.VISIBLE);
+				if (position > 0) {
+					lineLayout.setVisibility(View.VISIBLE);
+				}
 
 				TextView dateText = (TextView) dateLayout.findViewById(R.id.x_debt_date);
 				TextView monthYearText = (TextView) dateLayout.findViewById(R.id.x_debt_month_year);

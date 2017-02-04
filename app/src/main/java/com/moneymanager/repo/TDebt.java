@@ -79,19 +79,34 @@ public class TDebt implements IDebt {
 	@Override
 	public void insertDebt(Debt debt) throws InsufficientBalanceException {
 
-		final ContentValues cv = new ContentValues();
-		cv.put(TYPE, debt.getType());
-		cv.put(USER, debt.getUser().getId());
-		cv.put(AMOUNT, debt.getAmount());
-		cv.put(ACCOUNT, debt.getAccount().getId());
-		cv.put(INFO, debt.getInfo());
-		cv.put(DATETIME, MyCalendar.getSimpleDateFormat().format(debt.getDate()));
-		dbHelper.insert(TABLE_NAME, cv);
+		Debt existingdebt = getVerySpecificDebt(debt.getUser().getId(), debt.getAccount().getId(), debt.getType(), debt.getDate());
 
-		// update account balance if necessary
-		TAccounts tAccounts = new TAccounts(context);
-		final boolean add = debt.getType() == LOAN;
-		tAccounts.updateAccountBalance(debt.getAccount().getId(), debt.getAmount(), add);
+		// if debt does not exists, insert new else update existing one
+		if (existingdebt == null) {
+
+			final ContentValues cv = new ContentValues();
+			cv.put(TYPE, debt.getType());
+			cv.put(USER, debt.getUser().getId());
+			cv.put(AMOUNT, debt.getAmount());
+			cv.put(ACCOUNT, debt.getAccount().getId());
+			cv.put(INFO, debt.getInfo());
+			cv.put(DATETIME, MyCalendar.getSimpleDateFormat().format(debt.getDate()));
+			dbHelper.insert(TABLE_NAME, cv);
+
+			// update account balance if necessary
+			TAccounts tAccounts = new TAccounts(context);
+			final boolean add = debt.getType() == LOAN;
+			tAccounts.updateAccountBalance(debt.getAccount().getId(), debt.getAmount(), add);
+
+		} else {
+
+			final double existingAmount = existingdebt.getAmount();
+
+			existingdebt.setAmount(existingAmount + debt.getAmount());
+
+			updateDebtAmount(existingdebt);
+
+		}
 
 	}
 

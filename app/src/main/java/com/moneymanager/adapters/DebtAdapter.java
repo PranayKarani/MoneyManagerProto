@@ -2,11 +2,11 @@
 
 package com.moneymanager.adapters;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import com.moneymanager.fragments.FDebts;
-import com.moneymanager.fragments.FLoans;
 
 public class DebtAdapter extends FragmentPagerAdapter {
 
@@ -17,11 +17,11 @@ public class DebtAdapter extends FragmentPagerAdapter {
 	@Override
 	public Fragment getItem(int position) {
 
-		if (position == 0) {
-			return new FDebts();
-		} else {
-			return new FLoans();
-		}
+		final Fragment frag = new FDebts();
+		final Bundle bundle = new Bundle();
+		bundle.putBoolean("debt", position == 0);
+		frag.setArguments(bundle);
+		return frag;
 
 	}
 

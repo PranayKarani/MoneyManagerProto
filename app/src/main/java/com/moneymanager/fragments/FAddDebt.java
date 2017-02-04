@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -39,7 +40,9 @@ public class FAddDebt extends Fragment {
 
 	private static Date selectedDebtDate;
 	private final String[] debtTypeNames = {"Debt", "Debt repay", "Loan", "Loan repay"};
-	private User[] user_arr;
+	// Views
+	EditText info_text;
+	TextInputLayout tip;
 	private ArrayList<String> user_name_list;
 	private ArrayList<Integer> user_id_list;
 	private ArrayList<String> acc_name_list;
@@ -72,8 +75,10 @@ public class FAddDebt extends Fragment {
 		final TextView acc_text = (TextView) rootView.findViewById(R.id.add_debt_acc);
 		final TextView user_text = (TextView) rootView.findViewById(R.id.add_debt_user);
 		final TextView date_text = (TextView) rootView.findViewById(R.id.add_debt_date);
+		tip = (TextInputLayout) rootView.findViewById(R.id.f_add_debt_amt_textinput);
+		tip.setErrorEnabled(true);
 		final EditText amt_text = (EditText) rootView.findViewById(R.id.add_debt_amt);
-		final EditText info_text = (EditText) rootView.findViewById(R.id.add_debt_info);
+		info_text = (EditText) rootView.findViewById(R.id.add_debt_info);
 
 
 		type_text.setText("Type: " + getTypeText());
@@ -251,18 +256,42 @@ public class FAddDebt extends Fragment {
 	void updateDebtAmount() {
 
 		TDebt tDebt = new TDebt(getContext());
-		Debt debt = tDebt.getVerySpecificDebt(selectedUserID, selectedAccountID, selectedDebtType - 1, selectedDebtDate);
+		int type = DEBT;
+		switch (selectedDebtType) {
+			case DEBT:
+				type = DEBT;
+				break;
+			case LOAN:
+				type = LOAN;
+				break;
+			default:
+				type = selectedDebtType - 1;
+		}
+		Debt debt = tDebt.getVerySpecificDebt(selectedUserID, selectedAccountID, type, selectedDebtDate);
 
 		if (debt != null) {
 			debtAmt = debt.getAmount();
 			((AAddTransaction) getActivity()).setUpdateDebtId(debt.getId());
+			tip.setHint("amount: " + debtAmt);
 		} else {
 			debtAmt = -1;
+			tip.setHint("amount");
 		}
 
 		Log.i(mylog, "amount updated " + debtAmt);
 
 		((AAddTransaction) getActivity()).updateDebtAmount(debtAmt);
+
+		setDebtInfo(debt);
+	}
+
+	void setDebtInfo(Debt debt) {
+
+		if (info_text != null) {
+
+			info_text.setText(debt != null ? debt.getInfo() : "");
+
+		}
 
 	}
 
