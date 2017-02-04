@@ -93,11 +93,6 @@ public class TDebt implements IDebt {
 			cv.put(DATETIME, MyCalendar.getSimpleDateFormat().format(debt.getDate()));
 			dbHelper.insert(TABLE_NAME, cv);
 
-			// update account balance if necessary
-			TAccounts tAccounts = new TAccounts(context);
-			final boolean add = debt.getType() == LOAN;
-			tAccounts.updateAccountBalance(debt.getAccount().getId(), debt.getAmount(), add);
-
 		} else {
 
 			final double existingAmount = existingdebt.getAmount();
@@ -107,6 +102,11 @@ public class TDebt implements IDebt {
 			updateDebtAmount(existingdebt);
 
 		}
+
+		// update account balance if necessary
+		TAccounts tAccounts = new TAccounts(context);
+		final boolean add = debt.getType() == LOAN;
+		tAccounts.updateAccountBalance(debt.getAccount().getId(), debt.getAmount(), add);
 
 	}
 
