@@ -206,6 +206,12 @@ public class AMain extends AppCompatActivity {
 				final AlertDialog.Builder builder = new AlertDialog.Builder(AMain.this);
 				builder.setCancelable(true);
 				builder.setTitle("Select an Account");
+				builder.setPositiveButton("Manage Accounts", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						startActivity(new Intent(AMain.this, AAccounts.class));
+					}
+				});
 				builder.setItems(acc_names, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialogInterface, int i) {
