@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.*;
 import com.moneymanager.R;
 import com.moneymanager.activities.accounts.AAccounts;
+import com.moneymanager.activities.category.ACategories;
 import com.moneymanager.activities.stats.AStats;
 import com.moneymanager.activities.transaction.AAddTransaction;
 import com.moneymanager.adapters.HomePagerAdapter;
@@ -73,7 +74,7 @@ public class AMain extends AppCompatActivity {
 						startActivity(new Intent(AMain.this, ADebts.class));
 						break;
 					case 4:
-						startActivity(new Intent(AMain.this, AAccounts.class));
+						startActivity(new Intent(AMain.this, ACategories.class));
 						break;
 				}
 

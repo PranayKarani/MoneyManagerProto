@@ -69,6 +69,7 @@ public class TUser implements IUser {
 				SELECT_USER_JOIN_DEBT +
 						" WHERE " + TDebt.TYPE + " = " + type +
 						" AND " + TDebt.ACCOUNT + " = " + acc +
+						" GROUP BY " + NAME +
 						" ORDER BY " + NAME;
 	}
 
