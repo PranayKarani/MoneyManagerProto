@@ -6,10 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.*;
 import com.moneymanager.R;
 import com.moneymanager.entities.Account;
@@ -50,6 +47,31 @@ public class AAccounts extends AppCompatActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.accounts_menu, menu);
 		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		switch (item.getItemId()) {
+
+			case R.id.accounts_Menu_transfer:
+
+				if (noAccounts) {
+
+					Toast.makeText(this, "No Accounts found", Toast.LENGTH_SHORT).show();
+
+				} else {
+
+					startActivity(new Intent(this, AAccountTransfer.class));
+
+				}
+
+				break;
+
+		}
+
+		return true;
+
 	}
 
 	public void onBackPressed() {

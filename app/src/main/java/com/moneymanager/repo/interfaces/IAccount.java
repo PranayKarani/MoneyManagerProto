@@ -22,4 +22,5 @@ public interface IAccount {
 
 	void updateAccountBalance(int id, double amount, boolean add) throws InsufficientBalanceException;
 
+	void transferAmount(int fromAccount, int toAccount, double amt) throws InsufficientBalanceException;
 }

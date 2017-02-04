@@ -35,6 +35,8 @@
         </activity>
         <activity android:name=".activities.ADebts">
         </activity>
+        <activity android:name=".activities.accounts.AAccountTransfer">
+        </activity>
     </application>
 
 </manifest>
