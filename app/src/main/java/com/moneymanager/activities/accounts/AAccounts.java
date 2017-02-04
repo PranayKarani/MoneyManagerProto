@@ -143,6 +143,19 @@ public class AAccounts extends AppCompatActivity {
 			nametv.setText(name + " (" + id + ")");
 			final TextView baltv = (TextView) rowView.findViewById(R.id.account_view_bal);
 			baltv.setText(String.valueOf(bal));
+			final TextView infotv = (TextView) rowView.findViewById(R.id.account_view_info);
+
+			TAccounts tAccounts = new TAccounts(myContext);
+			String transactionSum, debtSum, loanSum;
+
+			final int tC = tAccounts.countTransactions(id);
+			final int cC = tAccounts.countDebt(id);
+			final int lC = tAccounts.countLoan(id);
+
+			transactionSum = tC < 0 ? "" : "transactions(" + tC + ")";
+			debtSum = cC < 0 ? "" : "debt(" + cC + ")";
+			loanSum = lC < 0 ? "" : "loan(" + lC + ")";
+			infotv.setText(transactionSum + "   " + debtSum + "   " + loanSum);
 
 			// set click listener to edit button in each row
 			final ImageButton button = (ImageButton) rowView.findViewById(R.id.account_view_edit_button);

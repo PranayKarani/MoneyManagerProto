@@ -11,6 +11,9 @@ import com.moneymanager.exceptions.InsufficientBalanceException;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.interfaces.IAccount;
 
+import static com.moneymanager.Common.DEBT;
+import static com.moneymanager.Common.LOAN;
+
 public class TAccounts implements IAccount {
 
 	public static final String TABLE_NAME = "Account";
@@ -52,6 +55,22 @@ public class TAccounts implements IAccount {
 
 	private String q_SELECT_ACCOUNT(int id) {
 		return "SELECT * FROM " + TABLE_NAME + " WHERE " + ID + " = " + id;
+	}
+
+	private String q_COUNT_TRANSACTION(int id) {
+		return "SELECT COUNT(" + TTransactions.TABLE_NAME + "." + TTransactions.ID + ") AS cT FROM " + TTransactions.TABLE_NAME + " WHERE " + TTransactions.ACCOUNT + " = " + id;
+	}
+
+	private String q_COUNT_DEBT(int id) {
+		return "SELECT COUNT(" + TDebt.TABLE_NAME + "." + TDebt.ID + ") AS cD FROM " + TDebt.TABLE_NAME +
+				" WHERE " + TDebt.ACCOUNT + " = " + id +
+				" AND " + TDebt.TYPE + " = " + DEBT;
+	}
+
+	private String q_COUNT_LOAN(int id) {
+		return "SELECT COUNT(" + TDebt.TABLE_NAME + "." + TDebt.ID + ") AS cL FROM " + TDebt.TABLE_NAME +
+				" WHERE " + TDebt.ACCOUNT + " = " + id +
+				" AND " + TDebt.TYPE + " = " + LOAN;
 	}
 
 	private String q_SUM_BALANCE_FROM_ALL_ACCOUNTS() {
@@ -97,6 +116,42 @@ public class TAccounts implements IAccount {
 		}
 
 		return accounts;
+
+	}
+
+	@Override
+	public int countTransactions(int id) {
+
+		final Cursor c = dbHelper.select(q_COUNT_TRANSACTION(id), null);
+		if (c.moveToFirst()) {
+			return c.getInt(c.getColumnIndex("cT"));
+		} else {
+			return -1;
+		}
+
+	}
+
+	@Override
+	public int countDebt(int id) {
+
+		final Cursor c = dbHelper.select(q_COUNT_DEBT(id), null);
+		if (c.moveToFirst()) {
+			return c.getInt(c.getColumnIndex("cD"));
+		} else {
+			return -1;
+		}
+
+	}
+
+	@Override
+	public int countLoan(int id) {
+
+		final Cursor c = dbHelper.select(q_COUNT_LOAN(id), null);
+		if (c.moveToFirst()) {
+			return c.getInt(c.getColumnIndex("cL"));
+		} else {
+			return -1;
+		}
 
 	}
 

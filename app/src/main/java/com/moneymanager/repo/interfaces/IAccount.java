@@ -12,6 +12,12 @@ public interface IAccount {
 
 	Account[] getAllAccounts(String column, String order) throws NoAccountsException;
 
+	int countTransactions(int id);
+
+	int countDebt(int id);
+
+	int countLoan(int id);
+
 	Account getAccount(int id);
 
 	void removeAccount(int id);
