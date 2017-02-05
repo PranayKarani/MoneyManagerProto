@@ -791,6 +791,9 @@ public class AStats extends AppCompatActivity {
 			weekBarChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
 			weekBarChart.getAxisRight().setEnabled(false);
 			weekBarChart.getAxisLeft().setTextColor(colorWhite);
+			weekBarChart.getAxisLeft().setDrawGridLines(false);
+			weekBarChart.getXAxis().setDrawGridLines(false);
+			weekBarChart.setDrawBarShadow(false);
 			weekBarChart.groupBars(-0.5f, groupSpace, barSpace);
 			weekBarChart.getDescription().setText(weekStartDateString + " ~ " + weekEndDateString);
 			weekBarChart.getDescription().setTextColor(colorWhite);
@@ -835,7 +838,7 @@ public class AStats extends AppCompatActivity {
 			exSet.setValueTextSize(8);
 
 			final float barSpace = 0.0f;
-			final float barWidth = 0.40f;
+			final float barWidth = 0.30f;
 			final float groupSpace = 1 - ((barSpace + barWidth) * 2);
 
 			final BarData bd = new BarData(inSet, exSet);
@@ -846,9 +849,13 @@ public class AStats extends AppCompatActivity {
 			monthBarChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
 			monthBarChart.getAxisRight().setEnabled(false);
 			monthBarChart.getAxisLeft().setTextColor(colorWhite);
+//			monthBarChart.getAxisLeft().setDrawGridLines(false);
+//			monthBarChart.getXAxis().setDrawGridLines(false);
+			monthBarChart.setDrawBarShadow(false);
 			monthBarChart.groupBars(-0.5f, groupSpace, barSpace);
-			monthBarChart.getDescription().setText(MyCalendar.monthToFullString(myDate) + "'s Stats \n(pinch horizontally for more precision)");
+			monthBarChart.getDescription().setText(MyCalendar.monthToFullString(myDate) + "'s Stats \n(pinch out horizontally for more precision)");
 			monthBarChart.getDescription().setTextColor(colorWhite);
+			monthBarChart.setDrawGridBackground(false);
 			monthBarChart.getLegend().setEnabled(false);
 			final XAxis xAxis = monthBarChart.getXAxis();
 			xAxis.setGranularity(1f);
