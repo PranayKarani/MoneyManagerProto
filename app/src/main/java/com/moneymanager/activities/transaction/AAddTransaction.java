@@ -220,7 +220,7 @@ public class AAddTransaction extends AppCompatActivity implements
 
 		}
 
-		return new Debt(selectedDebtId, selectedDebtType, user, Double.valueOf(amt), acc, info, selectedDate);
+		return new Debt(selectedDebtId, selectedDebtType, user, amt, acc, info, selectedDate);
 
 	}
 

@@ -14,7 +14,7 @@ import com.moneymanager.repo.*;
 public class DBHelper extends SQLiteOpenHelper {
 
 
-	private static final int DB_VERSION = 2;
+	private static final int DB_VERSION = 3;
 	private static final String DB_NAME = "moneymanager.db";
 
 
@@ -29,7 +29,8 @@ public class DBHelper extends SQLiteOpenHelper {
 				TCategories.q_CREATE_TABLE(),
 				TTransactions.q_CREATE_TABLE(),
 				TUser.q_CREATE_TABLE(),
-				TDebt.q_CREATE_TABLE()
+				TDebt.q_CREATE_TABLE(),
+				TBudget.q_CREATE_TABLE()
 		};
 
 		for (String i : newTables) {
@@ -44,10 +45,9 @@ public class DBHelper extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
 
-		if (newVersion == 2) {
+		if (newVersion == 3) {
 			final String[] newTables = {
-					TUser.q_CREATE_TABLE(),
-					TDebt.q_CREATE_TABLE()
+					TBudget.q_CREATE_TABLE(),
 			};
 
 			for (String i : newTables) {

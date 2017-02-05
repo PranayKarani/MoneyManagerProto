@@ -16,8 +16,7 @@ import com.moneymanager.utilities.MyCalendar;
 import java.text.ParseException;
 import java.util.Date;
 
-import static com.moneymanager.Common.DEBT;
-import static com.moneymanager.Common.LOAN;
+import static com.moneymanager.Common.*;
 
 public class TDebt implements IDebt {
 
@@ -129,7 +128,7 @@ public class TDebt implements IDebt {
 		final double oldDebtAmt = getDebt(new_debt.getId()).getAmount();
 		final double diff = oldDebtAmt - new_debt.getAmount();
 		TAccounts tAccounts = new TAccounts(context);
-		final boolean add = new_debt.getType() == DEBT;
+		final boolean add = new_debt.getType() == DEBT || new_debt.getType() == DEBT_REPAY;
 		tAccounts.updateAccountBalance(new_debt.getAccount().getId(), diff, add);
 
 		if (new_debt.getAmount() == 0) {
