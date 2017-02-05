@@ -8,6 +8,7 @@ import android.database.Cursor;
 import com.moneymanager.Common;
 import com.moneymanager.db.DBHelper;
 import com.moneymanager.entities.Account;
+import com.moneymanager.entities.Budget;
 import com.moneymanager.entities.Category;
 import com.moneymanager.entities.Transaction;
 import com.moneymanager.exceptions.InsufficientBalanceException;
@@ -158,6 +159,14 @@ public class TTransactions implements ITransaction {
 				DEFAULT_ORDER_BY_TID;
 	}
 
+	private String q_SELECT_TRANSACTION_FOR_BUDGET(int acc, int cat, String startDate, String endDate) {
+		return SELECT_TRANS_JOIN_CAT_AND_ACC +
+				" WHERE " + CATEGORY + " = " + cat +
+				" AND " + ACCOUNT + " = " + acc +
+				" AND " + TCategories.TYPE + " = " + EXPENSE +
+				" AND " + DATETIME + " BETWEEN '" + startDate + "' AND '" + endDate + "'" +
+				" ORDER BY " + DATETIME + " DESC";
+	}
 
 	@Override
 	public Transaction getTransaction(int selectedTransactionID) {
@@ -254,6 +263,25 @@ public class TTransactions implements ITransaction {
 		}
 
 		return t;
+	}
+
+	@Override
+	public Transaction[] getBudgetSpecificTransactions(Budget budget) {
+
+		final String startDate = MyCalendar.stringFormatOfDate(budget.getStartDate());
+		final String endDate = MyCalendar.stringFormatOfDate(MyCalendar.dateAfterDays(budget.getStartDate(), budget.getPeriod()));
+		final int cat = budget.getCategory().getId();
+		final int acc = budget.getAccount().getId();
+
+		final Cursor c = dbHelper.select(q_SELECT_TRANSACTION_FOR_BUDGET(acc, cat, startDate, endDate), null);
+
+		Transaction[] t = new Transaction[c.getCount()];
+		while (c.moveToNext()) {
+			t[c.getPosition()] = extractTransactionFromCursor(c);
+		}
+
+		return t;
+
 	}
 
 	@Override

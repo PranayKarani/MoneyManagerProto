@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16sp">
+        android:paddingLeft="14sp"
+        android:paddingRight="14sp">
 
         <android.support.v7.widget.CardView
             android:id="@+id/f_home_overview_card"
@@ -124,7 +125,9 @@
         <ListView
             android:id="@+id/f_home_trans_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="100dp"/>
 
 
     </LinearLayout>

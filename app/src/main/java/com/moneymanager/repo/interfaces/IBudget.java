@@ -10,4 +10,6 @@ public interface IBudget {
 	long insertBudget(Budget budget);
 
 	Budget[] getAllBudgets();
+
+	void removeBudget(int id);
 }

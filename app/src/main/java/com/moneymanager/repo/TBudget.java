@@ -99,6 +99,10 @@ public class TBudget implements IBudget {
 
 	}
 
+	@Override
+	public void removeBudget(int id) {
+		dbHelper.delete(TABLE_NAME, ID + " = ?", new String[]{String.valueOf(id)});
+	}
 
 	private Budget extractBudgetFromCursor(Cursor c) {
 		final int id = c.getInt(c.getColumnIndex(BID_alias));

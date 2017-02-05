@@ -2,6 +2,7 @@
 
 package com.moneymanager.repo.interfaces;
 
+import com.moneymanager.entities.Budget;
 import com.moneymanager.entities.Category;
 import com.moneymanager.entities.Transaction;
 import com.moneymanager.exceptions.InsufficientBalanceException;
@@ -19,6 +20,8 @@ public interface ITransaction {
 	Transaction[] getAccountSpecificTransactionsForDay(int accId, Date date);
 
 	Transaction[] getTransactionsForWeek(Date date);
+
+	Transaction[] getBudgetSpecificTransactions(Budget budget);
 
 	Transaction[] getAccountSpecificTransactionsForWeek(int accId, Date date);
 

@@ -286,6 +286,8 @@ public class AAddBudget extends AppCompatActivity {
 			year -= 1900;//
 			Date newDate = new Date(year, month, dayOfMonth);
 
+			((AAddBudget) getActivity()).selectedDate = newDate;
+
 			final TextView text = (TextView) getActivity().findViewById(R.id.add_budget_date);
 			text.setText(MyCalendar.getNiceFormatedCompleteDateString(newDate));
 		}
