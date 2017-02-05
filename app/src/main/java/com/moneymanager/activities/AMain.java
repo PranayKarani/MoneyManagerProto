@@ -2,6 +2,7 @@ package com.moneymanager.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.*;
 import com.moneymanager.R;
 import com.moneymanager.activities.accounts.AAccounts;
+import com.moneymanager.activities.budget.ABudgets;
 import com.moneymanager.activities.category.ACategories;
 import com.moneymanager.activities.stats.AStats;
 import com.moneymanager.activities.transaction.AAddTransaction;
@@ -38,6 +40,7 @@ public class AMain extends AppCompatActivity {
 	private Account[] accounts;
 	private String[] acc_names;
 	private int[] acc_ids;
+	private double[] acc_bals;
 	private ViewPager viewPager;
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -68,7 +71,7 @@ public class AMain extends AppCompatActivity {
 						startActivity(new Intent(AMain.this, AAccounts.class));
 						break;
 					case 2:
-						Toast.makeText(AMain.this, "Budget Coming soon :)", Toast.LENGTH_SHORT).show();
+						startActivity(new Intent(AMain.this, ABudgets.class));
 						break;
 					case 3:
 						startActivity(new Intent(AMain.this, ADebts.class));
@@ -143,9 +146,12 @@ public class AMain extends AppCompatActivity {
 			acc_names[0] = "All Accounts";
 			acc_ids = new int[accounts.length + 1];
 			acc_ids[0] = ALL_ACCOUNT_ID;
+			acc_bals = new double[accounts.length + 1];
+			acc_bals[0] = -1;
 			for (int i = 1; i < acc_names.length; i++) {
 				acc_names[i] = accounts[i - 1].getName();
 				acc_ids[i] = accounts[i - 1].getId();
+				acc_bals[i] = accounts[i - 1].getBalance();
 				if (acc_ids[i] == CURRENT_ACCOUNT_ID) {
 					CURRENT_ACCOUNT_NAME = acc_names[i];
 				}
@@ -198,7 +204,35 @@ public class AMain extends AppCompatActivity {
 	}
 
 	private void refreshToolbar() {
-		final LinearLayout layout = (LinearLayout) findViewById(R.id.home_toobar_layout);
+		final LinearLayout layout = (LinearLayout) findViewById(R.id.home_toolbar_layout);
+		final LinearLayout balLayout = (LinearLayout) findViewById(R.id.home_toolbar_bal_layout);
+
+		final TextView balText = (TextView) balLayout.findViewById(R.id.home_toolbar_bal_textview);
+
+		if (CURRENT_ACCOUNT_ID == ALL_ACCOUNT_ID) {
+			balLayout.setVisibility(View.GONE);
+		} else {
+
+
+			new AsyncTask<Void, Void, Double>() {
+
+				@Override
+				protected Double doInBackground(Void... params) {
+					TAccounts tAccounts = new TAccounts(AMain.this);
+					return tAccounts.getSumOfBalanceOfAccount(CURRENT_ACCOUNT_ID);
+				}
+
+				@Override
+				protected void onPostExecute(Double aDouble) {
+					super.onPostExecute(aDouble);
+
+					balText.setText("Rs " + aDouble);
+
+					balLayout.setVisibility(View.VISIBLE);
+				}
+			}.execute();
+
+		}
 
 		final TextView toolbar_text = (TextView) layout.findViewById(R.id.home_toolbar_textview);
 		toolbar_text.setText(CURRENT_ACCOUNT_NAME);
@@ -224,6 +258,14 @@ public class AMain extends AppCompatActivity {
 						CURRENT_ACCOUNT_NAME = acc_names[i];
 						ShrPref.writeData(AMain.this, spCURRENT_ACCOUNT_ID, CURRENT_ACCOUNT_ID);
 						dialogInterface.dismiss();
+
+						// update balance
+						if (CURRENT_ACCOUNT_ID == ALL_ACCOUNT_ID) {
+							balLayout.setVisibility(View.GONE);
+						} else {
+							balText.setText("Rs " + acc_bals[i]);
+							balLayout.setVisibility(View.VISIBLE);
+						}
 
 						for (Fragment f : getSupportFragmentManager().getFragments()) {
 							((FHomePage) f).refreshFragmentContent(CURRENT_ACCOUNT_ID);

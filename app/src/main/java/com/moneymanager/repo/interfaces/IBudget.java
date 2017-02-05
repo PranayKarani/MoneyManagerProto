@@ -2,7 +2,12 @@
 
 package com.moneymanager.repo.interfaces;
 
+import com.moneymanager.entities.Budget;
+
 public interface IBudget {
 
 
+	long insertBudget(Budget budget);
+
+	Budget[] getAllBudgets();
 }

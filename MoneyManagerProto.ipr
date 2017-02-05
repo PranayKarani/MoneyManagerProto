@@ -28,6 +28,19 @@
         </library>
       </libraries>
     </data-source>
+    <data-source source="LOCAL" name="Android SQLite" uuid="55963304-c6d6-4ea9-813b-f9aa5ca0db72">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:$USER_HOME$/Library/Caches/IntelliJIdea2016.3/android/databases/SERIAL_NUMBER_57d1ee3e/com.moneymanager/internal/moneymanager.db</jdbc-url>
+      <libraries>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.8.11.2/sqlite-jdbc-3.8.11.2.jar</url>
+        </library>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.8.11.2/xerial-sqlite-license.txt</url>
+        </library>
+      </libraries>
+    </data-source>
   </component>
   <component name="GradleLocalSettings">
     <option name="modificationStamps">
@@ -288,6 +301,10 @@
       <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed" />
     </data-source>
     <data-source name="Android SQLite" uuid="5d005e65-6ad9-487a-8a16-47dca6433ac5">
+      <database-info product="SQLite" version="3.8.11" jdbc-version="2.1" driver-name="SQLiteJDBC" driver-version="native" />
+      <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed" />
+    </data-source>
+    <data-source name="Android SQLite" uuid="55963304-c6d6-4ea9-813b-f9aa5ca0db72">
       <database-info product="SQLite" version="3.8.11" jdbc-version="2.1" driver-name="SQLiteJDBC" driver-version="native" />
       <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed" />
     </data-source>
