@@ -33,7 +33,7 @@ import static com.moneymanager.Common.*;
 public class AMain extends AppCompatActivity {
 
 	private final String[] nav_places = {
-			"Stats", "Accounts", "Budgets", "Debts & Loans", "Categories"
+			"Stats", "Accounts", "Budgets", "Debts & Loans", "Users", "Categories"
 	};
 	private Account[] accounts;
 	private String[] acc_names;
@@ -74,6 +74,9 @@ public class AMain extends AppCompatActivity {
 						startActivity(new Intent(AMain.this, ADebts.class));
 						break;
 					case 4:
+						startActivity(new Intent(AMain.this, AUser.class));
+						break;
+					case 5:
 						startActivity(new Intent(AMain.this, ACategories.class));
 						break;
 				}
