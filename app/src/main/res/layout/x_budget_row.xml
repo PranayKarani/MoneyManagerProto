@@ -112,6 +112,7 @@
                 android:layout_marginRight="4sp"
                 android:layout_weight="1"
                 android:text="Remaining"
+                android:textColor="@color/colorGreen"
                 android:textSize="16sp"/>
 
 

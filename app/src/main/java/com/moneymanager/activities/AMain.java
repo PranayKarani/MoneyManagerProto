@@ -203,15 +203,34 @@ public class AMain extends AppCompatActivity {
 		}
 	}
 
+	@Override
+	public void onBackPressed() {
+
+
+		final AlertDialog alertDialog = new AlertDialog.Builder(this)
+				.setTitle("Exit the app?")
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				})
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				})
+				.create();
+		alertDialog.show();
+
+	}
+
 	private void refreshToolbar() {
 		final LinearLayout layout = (LinearLayout) findViewById(R.id.home_toolbar_layout);
 		final LinearLayout balLayout = (LinearLayout) findViewById(R.id.home_toolbar_bal_layout);
 
 		final TextView balText = (TextView) balLayout.findViewById(R.id.home_toolbar_bal_textview);
-
-		if (CURRENT_ACCOUNT_ID == ALL_ACCOUNT_ID) {
-			balLayout.setVisibility(View.GONE);
-		} else {
 
 
 			new AsyncTask<Void, Void, Double>() {
@@ -219,7 +238,20 @@ public class AMain extends AppCompatActivity {
 				@Override
 				protected Double doInBackground(Void... params) {
 					TAccounts tAccounts = new TAccounts(AMain.this);
-					return tAccounts.getSumOfBalanceOfAccount(CURRENT_ACCOUNT_ID);
+					if (CURRENT_ACCOUNT_ID == ALL_ACCOUNT_ID) {
+						double bal = 0;
+						try {
+							Account[] accounts = tAccounts.getAllAccounts(null, null);
+							for (Account acc : accounts) {
+								bal += acc.getBalance();
+							}
+						} catch (NoAccountsException e) {
+							e.printStackTrace();
+						}
+						return bal;
+					} else {
+						return tAccounts.getSumOfBalanceOfAccount(CURRENT_ACCOUNT_ID);
+					}
 				}
 
 				@Override
@@ -228,11 +260,10 @@ public class AMain extends AppCompatActivity {
 
 					balText.setText("Rs " + aDouble);
 
-					balLayout.setVisibility(View.VISIBLE);
 				}
 			}.execute();
 
-		}
+
 
 		final TextView toolbar_text = (TextView) layout.findViewById(R.id.home_toolbar_textview);
 		toolbar_text.setText(CURRENT_ACCOUNT_NAME);
@@ -261,10 +292,37 @@ public class AMain extends AppCompatActivity {
 
 						// update balance
 						if (CURRENT_ACCOUNT_ID == ALL_ACCOUNT_ID) {
-							balLayout.setVisibility(View.GONE);
+							new AsyncTask<Void, Void, Double>() {
+
+								@Override
+								protected Double doInBackground(Void... params) {
+									TAccounts tAccounts = new TAccounts(AMain.this);
+									if (CURRENT_ACCOUNT_ID == ALL_ACCOUNT_ID) {
+										double bal = 0;
+										try {
+											Account[] accounts = tAccounts.getAllAccounts(null, null);
+											for (Account acc : accounts) {
+												bal += acc.getBalance();
+											}
+										} catch (NoAccountsException e) {
+											e.printStackTrace();
+										}
+										return bal;
+									} else {
+										return tAccounts.getSumOfBalanceOfAccount(CURRENT_ACCOUNT_ID);
+									}
+								}
+
+								@Override
+								protected void onPostExecute(Double aDouble) {
+									super.onPostExecute(aDouble);
+
+									balText.setText("Rs " + aDouble);
+
+								}
+							}.execute();
 						} else {
 							balText.setText("Rs " + acc_bals[i]);
-							balLayout.setVisibility(View.VISIBLE);
 						}
 
 						for (Fragment f : getSupportFragmentManager().getFragments()) {

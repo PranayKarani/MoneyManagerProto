@@ -151,7 +151,7 @@ public class ABudgets extends AppCompatActivity {
 			pb.setMax((int) set);
 			pb.setProgress((int) spent);
 
-			catText.setText(budget.getCategory().getName() + "'s budget for " + budget.getAccount().getName());
+			catText.setText(budget.getCategory().getName() + "'s budget in " + budget.getAccount().getName());
 			setAmtText.setText("Rs " + set);
 
 			if (spent > set) {
@@ -171,40 +171,44 @@ public class ABudgets extends AppCompatActivity {
 				@Override
 				public void onClick(View v) {
 
-					String[] trnStrs = new String[trans.length];
+					if (trans.length > 0) {
+						String[] trnStrs = new String[trans.length];
 
 
-					int i = 0;
-					for (Transaction transaction : trans) {
-						StringBuilder stringBuilder = new StringBuilder();
-						stringBuilder
-								.append(transaction.getAmountString())
-								.append(" on ")
-								.append(MyCalendar.getNiceFormatedCompleteDateString(transaction.getDateTime()));
-						trnStrs[i] = stringBuilder.toString();
-						i++;
+						int i = 0;
+						for (Transaction transaction : trans) {
+							StringBuilder stringBuilder = new StringBuilder();
+							stringBuilder
+									.append(transaction.getAmountString())
+									.append(" on ")
+									.append(MyCalendar.getNiceFormatedCompleteDateString(transaction.getDateTime()));
+							trnStrs[i] = stringBuilder.toString();
+							i++;
+						}
+
+						final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+						builder.setCancelable(true);
+						builder.setTitle(budget.getCategory().getName() + " Transactions");
+						builder.setItems(trnStrs, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialogInterface, int i) {
+								Intent intent = new Intent(getContext(), AEditTransaction.class);
+								intent.putExtra("trans_id", trans[i].getId());
+								startActivity(intent);
+
+							}
+
+						});
+//						builder.setPositiveButton("dismiss", new DialogInterface.OnClickListener() {
+//							@Override
+//							public void onClick(DialogInterface dialog, int which) {
+//								dialog.dismiss();
+//							}
+//						});
+						builder.create().show();
+					} else {
+						Toast.makeText(ABudgets.this, "No transactions for this budget yet", Toast.LENGTH_LONG).show();
 					}
-
-					final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-					builder.setCancelable(true);
-					builder.setTitle("Transactions");
-					builder.setItems(trnStrs, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialogInterface, int i) {
-							Intent intent = new Intent(getContext(), AEditTransaction.class);
-							intent.putExtra("trans_id", trans[i].getId());
-							startActivity(intent);
-
-						}
-
-					});
-					builder.setPositiveButton("dismiss", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-						}
-					});
-					builder.create().show();
 
 				}
 			});
