@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.moneymanager.R;
 import com.moneymanager.entities.Account;
 import com.moneymanager.exceptions.InsufficientBalanceException;
@@ -104,7 +105,13 @@ public class AAccountTransfer extends AppCompatActivity {
 		EditText amt = (EditText) findViewById(R.id.d_transfer_amt);
 
 		if (amt.getText().toString().equals("")) {
-			amt.setError("Enter amount value");
+			Toast.makeText(this, "Transfering into same account makes no sense", Toast.LENGTH_LONG).show();
+		}
+		if (fromAccount <= 0) {
+			Toast.makeText(this, "Select account from which transfer starts", Toast.LENGTH_LONG).show();
+		}
+		if (toAccount <= 0) {
+			Toast.makeText(this, "Select target account", Toast.LENGTH_LONG).show();
 		} else if (fromAccount == toAccount) {
 			amt.setError("Makes no sense");
 		} else {
