@@ -84,10 +84,10 @@ public class TDebt implements IDebt {
 	@Override
 	public void insertDebt(Debt debt) throws InsufficientBalanceException {
 
-		Debt existingdebt = getVerySpecificDebt(debt.getUser().getId(), debt.getAccount().getId(), debt.getType(), debt.getDate());
+//		Debt existingdebt = getVerySpecificDebt(debt.getUser().getId(), debt.getAccount().getId(), debt.getType(), debt.getDate());
 
 		// if debt does not exists, insert new else update existing one
-		if (existingdebt == null) {
+//		if (existingdebt == null) {
 
 			final ContentValues cv = new ContentValues();
 			cv.put(TYPE, debt.getType());
@@ -103,15 +103,15 @@ public class TDebt implements IDebt {
 			final boolean add = debt.getType() == LOAN;
 			tAccounts.updateAccountBalance(debt.getAccount().getId(), debt.getAmount(), add);
 
-		} else {
-
-			final double existingAmount = existingdebt.getAmount();
-
-			existingdebt.setAmount(existingAmount + debt.getAmount());
-
-			updateDebtAmount(existingdebt);
-
-		}
+//		} else {
+//
+//			final double existingAmount = existingdebt.getAmount();
+//
+//			existingdebt.setAmount(existingAmount + debt.getAmount());
+//
+//			updateDebtAmount(existingdebt);
+//
+//		}
 
 	}
 
@@ -202,16 +202,19 @@ public class TDebt implements IDebt {
 		final double oldAmt = exitsingDebt.getAmount();
 		final double amtDiff = d.getAmount() - oldAmt;
 
-		final ContentValues cv = new ContentValues();
-		cv.put(TYPE, d.getType());
-		cv.put(ACCOUNT, d.getAccount().getId());
-		cv.put(USER, d.getUser().getId());
-		cv.put(DATETIME, d.formatedDateTime());
-		cv.put(AMOUNT, d.getAmount());
-		cv.put(INFO, d.getInfo());
+		if (d.getAmount() == 0) {
+			removeDebt(d);
+		} else {
+			final ContentValues cv = new ContentValues();
+			cv.put(TYPE, d.getType());
+			cv.put(ACCOUNT, d.getAccount().getId());
+			cv.put(USER, d.getUser().getId());
+			cv.put(DATETIME, d.formatedDateTime());
+			cv.put(AMOUNT, d.getAmount());
+			cv.put(INFO, d.getInfo());
 
-		dbHelper.update(TABLE_NAME, cv, ID + " = ?", new String[]{String.valueOf(d.getId())});
-
+			dbHelper.update(TABLE_NAME, cv, ID + " = ?", new String[]{String.valueOf(d.getId())});
+		}
 		TAccounts tAccounts = new TAccounts(context);
 
 		// income

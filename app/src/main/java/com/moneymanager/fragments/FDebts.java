@@ -35,6 +35,7 @@ public class FDebts extends Fragment {
 
 	// Views
 	ListView list;
+	TextView noDebtText;
 
 	public FDebts() {
 		// Required empty public constructor
@@ -54,8 +55,18 @@ public class FDebts extends Fragment {
 	public void onResume() {
 		super.onResume();
 		refreshDebtArray();
-		list.setAdapter(null);
-		list.setAdapter(new DebtListAdapter(getContext(), debtArray));
+		if (debtArray.length == 0) {
+			list.setVisibility(View.GONE);
+
+			noDebtText.setText("No " + (debt ? "Debts" : "Loans") + " found");
+			noDebtText.setVisibility(View.VISIBLE);
+
+		} else {
+			noDebtText.setVisibility(View.GONE);
+			list.setVisibility(View.VISIBLE);
+			list.setAdapter(null);
+			list.setAdapter(new DebtListAdapter(getContext(), debtArray));
+		}
 	}
 
 	@Override
@@ -64,6 +75,7 @@ public class FDebts extends Fragment {
 		View rootView = inflater.inflate(R.layout.f_debts, container, false);
 
 		list = (ListView) rootView.findViewById(R.id.f_debt_listview);
+		noDebtText = (TextView) rootView.findViewById(R.id.f_no_debts_text);
 
 		return rootView;
 	}

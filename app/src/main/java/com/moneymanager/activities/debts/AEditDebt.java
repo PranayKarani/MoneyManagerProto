@@ -85,24 +85,6 @@ public class AEditDebt extends AppCompatActivity {
 		type_text = (TextView) findViewById(R.id.edit_debt_type);
 		type_text.setText("Type: " + getTypeText(selectedDebtType));
 		type_text.setEnabled(false);
-//		type_text.setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				final AlertDialog.Builder builder = new AlertDialog.Builder(AEditDebt.this);
-//				builder.setCancelable(true);
-//				builder.setTitle("Select the Debt Type");
-//				builder.setItems(debtTypeNames, new DialogInterface.OnClickListener() {
-//					@Override
-//					public void onClick(DialogInterface dialogInterface, int i) {
-//						selectedDebtType = i + DEBT;
-//						type_text.setText("Type: " + getTypeText(selectedDebtType));
-//						Log.i(mylog, "selected debt type: " + selectedDebtType);
-//						dialogInterface.dismiss();
-//					}
-//				});
-//				builder.create().show();
-//			}
-//		});
 
 		amt_edittext = (EditText) findViewById(R.id.edit_debt_amt);
 		amt_edittext.setText(String.valueOf(debt.getAmount()));
@@ -111,31 +93,6 @@ public class AEditDebt extends AppCompatActivity {
 		acc_text = (TextView) findViewById(R.id.edit_debt_acc);
 		acc_text.setText("account: " + debt.getAccount().getName());
 		acc_text.setEnabled(false);
-//		acc_text.setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//
-//				final String[] names = new String[acc_name_list.size()];
-//				for (int i = 0; i < names.length; i++) {
-//					names[i] = acc_name_list.get(i);
-//				}
-//
-//				final AlertDialog.Builder builder = new AlertDialog.Builder(AEditDebt.this);
-//				builder.setCancelable(true);
-//				builder.setTitle("Select an Account");
-//				builder.setItems(names, new DialogInterface.OnClickListener() {
-//					@Override
-//					public void onClick(DialogInterface dialogInterface, int i) {
-//						setAccount(acc_id_list.get(i));
-//						acc_text.setText("account: " + names[i]);
-//						dialogInterface.dismiss();
-//					}
-//				});
-//				builder.create().show();
-//
-//
-//			}
-//		});
 		setAccount(debt.getAccount().getId());
 
 		user_text = (TextView) findViewById(R.id.edit_debt_user);
@@ -312,7 +269,9 @@ public class AEditDebt extends AppCompatActivity {
 
 					try {
 						tDebt.updateDebt(updatedDebt);
-						Toast.makeText(this, "Transaction Updated", Toast.LENGTH_SHORT).show();
+						String x = debt.getType() == DEBT ? "Debt" : "Loan";
+						Toast.makeText(this, x + " Updated", Toast.LENGTH_SHORT).show();
+						finish();
 					} catch (InsufficientBalanceException e) {
 						Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
 					}
