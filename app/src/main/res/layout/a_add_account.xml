@@ -53,6 +53,7 @@
             android:layout_marginBottom="12sp"
             android:text="Exclude from reports and stats"
             android:textSize="16sp"
+            android:visibility="gone"
         />
         <Button
             android:id="@+id/insert_new_account_button"
