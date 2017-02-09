@@ -94,7 +94,8 @@
                 android:id="@+id/add_trans_ex"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Exclude from Overview and Reports"/>
+                android:text="Exclude from Overview and Reports"
+                android:visibility="gone"/>
 
 
         </LinearLayout>

@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.Toast;
 import com.moneymanager.R;
 import com.moneymanager.entities.Account;
@@ -42,11 +41,11 @@ public class AAddAccount extends AppCompatActivity {
 
 		final EditText acc_name = (EditText) findViewById(R.id.new_account_name);
 		final EditText acc_bal = (EditText) findViewById(R.id.new_account_bal);
-		final Switch acc_ex = (Switch) findViewById(R.id.new_account_exclude);
+//		final Switch acc_ex = (Switch) findViewById(R.id.new_account_exclude);
 
 		final String new_acc_name = acc_name.getText().toString();
 		final String new_acc_bal = acc_bal.getText().toString();
-		final boolean new_acc_ex = acc_ex.isChecked();
+//		final boolean new_acc_ex = acc_ex.isChecked();
 
 		final TAccounts accountTable = new TAccounts(this);
 
@@ -56,7 +55,7 @@ public class AAddAccount extends AppCompatActivity {
 			acc_bal.setError("Enter starting balance");
 
 		} else {
-			long new_account_id = accountTable.insertNewAccount(new Account(-1, new_acc_name, Double.valueOf(new_acc_bal), new_acc_ex));
+			long new_account_id = accountTable.insertNewAccount(new Account(-1, new_acc_name, Double.valueOf(new_acc_bal), false));
 			if (new_account_id >= 1) {
 				Toast.makeText(this, "New Account " + new_acc_name + " created!", Toast.LENGTH_LONG).show();
 				AAccounts.noAccounts = false;

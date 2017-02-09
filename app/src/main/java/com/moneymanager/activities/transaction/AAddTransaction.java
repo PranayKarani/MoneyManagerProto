@@ -10,7 +10,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.moneymanager.R;
@@ -130,9 +129,9 @@ public class AAddTransaction extends AppCompatActivity implements
 		}
 
 		// exclude
-		final boolean ex = ((Switch) findViewById(R.id.add_trans_ex)).isChecked();
+//		final boolean ex = ((Switch) findViewById(R.id.add_trans_ex)).isChecked();
 
-		return new Transaction(-1, Double.valueOf(amt), cat, acc, info, selectedTransactionDate, ex);
+		return new Transaction(-1, Double.valueOf(amt), cat, acc, info, selectedTransactionDate, false);
 
 	}
 

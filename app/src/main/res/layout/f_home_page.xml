@@ -27,14 +27,27 @@
                 android:orientation="vertical"
                 android:padding="8sp">
 
+
                 <TextView
                     android:id="@+id/f_home_overview_card_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
                     android:text="Today's Overview"
                     android:textAlignment="center"
-                    android:textSize="12sp"
+                    android:textSize="16sp"
                     android:textStyle="italic"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="(Tap here for Stats)"
+                    android:textAlignment="center"
+                    android:textSize="10sp"
+                    android:textStyle="italic"/>
+
 
                 <LinearLayout
                     android:layout_width="match_parent"

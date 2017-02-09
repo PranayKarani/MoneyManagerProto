@@ -2,27 +2,32 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:title="Day"
-          android:id="@+id/stats_menu_period_text"
-          app:showAsAction="always"/>
+    <item
+        android:id="@+id/stats_menu_period_text"
+        android:title="Day"
+        app:showAsAction="always"/>
 
-    <item android:title="Day"
-          android:id="@+id/stats_menu_period_day"
-          app:showAsAction="never"/>
+    <item
+        android:id="@+id/stats_menu_period_day"
+        android:title="Day"
+        app:showAsAction="never"/>
 
-    <item android:title="Week"
-          android:id="@+id/stats_menu_period_week"
-          app:showAsAction="never"/>
+    <item
+        android:id="@+id/stats_menu_period_week"
+        android:title="Week"
+        app:showAsAction="never"/>
 
-    <item android:title="Month"
-          android:id="@+id/stats_menu_period_month"
-          app:showAsAction="never"/>
+    <item
+        android:id="@+id/stats_menu_period_month"
+        android:title="Month"
+        app:showAsAction="never"/>
 
-    <item android:title="Year"
-          android:id="@+id/stats_menu_period_year"
-          app:showAsAction="never"/>
+    <!--<item android:title="Year"-->
+    <!--android:id="@+id/stats_menu_period_year"-->
+    <!--app:showAsAction="never"/>-->
 
-    <item android:title="Custom"
-          android:id="@+id/stats_menu_period_custom"
-          app:showAsAction="never"/>
+    <item
+        android:id="@+id/stats_menu_period_custom"
+        android:title="Custom"
+        app:showAsAction="never"/>
 </menu>

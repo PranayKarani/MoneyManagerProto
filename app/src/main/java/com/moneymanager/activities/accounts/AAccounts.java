@@ -140,9 +140,10 @@ public class AAccounts extends AppCompatActivity {
 
 			// fill up the layout elements
 			final TextView nametv = (TextView) rowView.findViewById(R.id.account_view_name);
-			nametv.setText(name + " (" + id + ")");
+//			nametv.setText(name + " (" + id + ")");
+			nametv.setText(name);
 			final TextView baltv = (TextView) rowView.findViewById(R.id.account_view_bal);
-			baltv.setText(String.valueOf(bal));
+			baltv.setText("Rs " + String.valueOf(bal));
 			final TextView infotv = (TextView) rowView.findViewById(R.id.account_view_info);
 
 			TAccounts tAccounts = new TAccounts(myContext);
@@ -152,13 +153,13 @@ public class AAccounts extends AppCompatActivity {
 			final int cC = tAccounts.countDebt(id);
 			final int lC = tAccounts.countLoan(id);
 
-			transactionSum = tC < 0 ? "" : "transactions(" + tC + ")";
-			debtSum = cC < 0 ? "" : "debt(" + cC + ")";
-			loanSum = lC < 0 ? "" : "loan(" + lC + ")";
-			infotv.setText(transactionSum + "   " + debtSum + "   " + loanSum);
+			transactionSum = tC <= 0 ? "" : "transactions: " + tC;
+			debtSum = cC <= 0 ? "" : "\ndebt: " + cC;
+			loanSum = lC <= 0 ? "" : "\nloan: " + lC;
+			infotv.setText(transactionSum + "" + debtSum + "" + loanSum);
 
 			// set click listener to edit button in each row
-			final ImageButton button = (ImageButton) rowView.findViewById(R.id.account_view_edit_button);
+			final ImageView button = (ImageView) rowView.findViewById(R.id.account_view_edit_button);
 			button.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {

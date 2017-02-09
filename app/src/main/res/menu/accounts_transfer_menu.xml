@@ -6,7 +6,7 @@
     <!--TODO change the icon later-->
     <item
         android:id="@+id/account_transfer_menu"
-        android:icon="@android:drawable/ic_menu_send"
+        android:icon="@drawable/ic_done_white_48dp"
         android:title="Transfer"
         app:showAsAction="always"/>
 

@@ -126,7 +126,7 @@ public class AStats extends AppCompatActivity {
 			e.printStackTrace();
 		}
 
-		Toast.makeText(this, "stats for " + MyCalendar.dateToString(myDate), Toast.LENGTH_SHORT).show();
+//		Toast.makeText(this, "stats for " + MyCalendar.dateToString(myDate), Toast.LENGTH_SHORT).show();
 
 		// setup Account related Arrays
 		TAccounts accTable = new TAccounts(this);
@@ -251,12 +251,12 @@ public class AStats extends AppCompatActivity {
 
 				new TransListLoader().execute(b);
 				break;
-			case R.id.stats_menu_period_year:
-				period_text.setTitle("Year");
-
-				selectedPeriod = YEAR;
-
-				break;
+//			case R.id.stats_menu_period_year:
+//				period_text.setTitle("Year");
+//
+//				selectedPeriod = YEAR;
+//
+//				break;
 			default: // custom
 
 				selectedPeriod = CUSTOM;
