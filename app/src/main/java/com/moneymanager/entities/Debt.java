@@ -2,6 +2,8 @@
 
 package com.moneymanager.entities;
 
+import com.moneymanager.utilities.MyCalendar;
+
 import java.util.Date;
 
 public class Debt {
@@ -87,5 +89,9 @@ public class Debt {
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+	public String formatedDateTime() {
+		return MyCalendar.stringFormatOfDate(date);
 	}
 }

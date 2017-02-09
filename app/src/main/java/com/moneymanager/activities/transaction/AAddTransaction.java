@@ -33,13 +33,16 @@ public class AAddTransaction extends AppCompatActivity implements
 
 	private ViewPager viewPager;
 	private int selectedCategoryId = -1;
-	private int selectedAccountId = -1;
+	private int selectedDebtAccountId = -1;
+	private int selectedTransactionAccountId = -1;
 	private int selectedDebtType = DEBT;
 	private double selectedDebtAmount = -1;
 	private int selectedDebtId = -1;
 	private int selectedUserId = -1;
-	private Date selectedDate = null;
-	private double selectedAccountBalance;
+	private Date selectedTransactionDate = null;
+	private double selectedTransactionAccountBalance;
+	private double selectedDebtAccountBalance;
+	private Date selectedDebtDate;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -48,9 +51,17 @@ public class AAddTransaction extends AppCompatActivity implements
 		setupToolbar(this, R.id.transaction_toolbar, "Add a Transaction");
 
 		// setting up ViewPager Stuff
-		final AddTransactionAdapter ta = new AddTransactionAdapter(getSupportFragmentManager());
+		final int debtID = getIntent().getIntExtra("debt", -1);
+		final AddTransactionAdapter ta = new AddTransactionAdapter(getSupportFragmentManager(), debtID);
+
 		viewPager = (ViewPager) findViewById(R.id.transaction_viewpager);
 		viewPager.setAdapter(ta);
+		if (debtID < 0) {
+			viewPager.setCurrentItem(0);
+		} else {
+			viewPager.setCurrentItem(1);
+
+		}
 
 	}
 
@@ -95,33 +106,33 @@ public class AAddTransaction extends AppCompatActivity implements
 			errorMessage = "Amount cannot be empty";
 			add_trans_amt.setError(errorMessage);
 			return null;
-		} else if (Double.valueOf(amt) > selectedAccountBalance && cat.getType() == EXPENSE) {
-			add_trans_amt.setError("Expense should not exceed Account Balance: (Rs " + selectedAccountBalance + ")");
+		} else if (Double.valueOf(amt) > selectedTransactionAccountBalance && cat.getType() == EXPENSE) {
+			add_trans_amt.setError("Expense should not exceed Account Balance: (Rs " + selectedTransactionAccountBalance + ")");
 			return null;
 		}
 
 		// Account
 		Account acc;
-		if (selectedAccountId <= 0) {
+		if (selectedTransactionAccountId <= 0) {
 			errorMessage = "Select an Account first";// this should not happen since the account is set to current by default, but still...
 			Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
 			return null;
 		} else {
-			acc = acc_table.getAccount(selectedAccountId);
+			acc = acc_table.getAccount(selectedTransactionAccountId);
 		}
 
 		// info
 		final String info = ((TextView) findViewById(R.id.add_trans_info)).getText().toString();
 
 		// date
-		if (selectedDate == null) {
-			selectedDate = MyCalendar.dateToday();
+		if (selectedTransactionDate == null) {
+			selectedTransactionDate = MyCalendar.dateToday();
 		}
 
 		// exclude
 		final boolean ex = ((Switch) findViewById(R.id.add_trans_ex)).isChecked();
 
-		return new Transaction(-1, Double.valueOf(amt), cat, acc, info, selectedDate, ex);
+		return new Transaction(-1, Double.valueOf(amt), cat, acc, info, selectedTransactionDate, ex);
 
 	}
 
@@ -145,20 +156,20 @@ public class AAddTransaction extends AppCompatActivity implements
 
 		// Account
 		Account acc;
-		if (selectedAccountId <= 0) {
+		if (selectedDebtAccountId <= 0) {
 			errorMessage = "Select an Account first";// this should not happen since the account is set to current by default, but still...
 			Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
 			return null;
 		} else {
-			acc = acc_table.getAccount(selectedAccountId);
+			acc = acc_table.getAccount(selectedDebtAccountId);
 		}
 
 		// info
 		final String info = ((TextView) findViewById(R.id.add_debt_info)).getText().toString();
 
 		// date
-		if (selectedDate == null) {
-			selectedDate = MyCalendar.dateToday();
+		if (selectedTransactionDate == null) {
+			selectedTransactionDate = MyCalendar.dateToday();
 		}
 
 		// amount
@@ -180,8 +191,8 @@ public class AAddTransaction extends AppCompatActivity implements
 			switch (selectedDebtType) {
 
 				case DEBT:
-					if (selectedAccountBalance < amt) {
-						errorMessage = "amount exceeds Account Balance: " + selectedAccountBalance;
+					if (selectedDebtAccountBalance < amt) {
+						errorMessage = "amount exceeds Account Balance: " + selectedDebtAccountBalance;
 						add_debt_amt.setError(errorMessage);
 						return null;
 					}
@@ -220,7 +231,7 @@ public class AAddTransaction extends AppCompatActivity implements
 
 		}
 
-		return new Debt(selectedDebtId, selectedDebtType, user, amt, acc, info, selectedDate);
+		return new Debt(selectedDebtId, selectedDebtType, user, amt, acc, info, selectedDebtDate);
 
 	}
 
@@ -314,13 +325,21 @@ public class AAddTransaction extends AppCompatActivity implements
 	}
 
 	@Override
-	public void updateAccountId(int accountId) {
-		this.selectedAccountId = accountId;
+	public void updateTransactionAccountId(int accountId) {
+		this.selectedTransactionAccountId = accountId;
+	}
+
+	public void updateDebtAccountId(int accountId) {
+		this.selectedDebtAccountId = accountId;
 	}
 
 	@Override
-	public void updateAccountBalance(double amount) {
-		this.selectedAccountBalance = amount;
+	public void updateTransactionAccountBalance(double amount) {
+		this.selectedTransactionAccountBalance = amount;
+	}
+
+	public void updateDebtAccountBalance(double amount) {
+		this.selectedDebtAccountBalance = amount;
 	}
 
 	public void updateUserId(int selectedUser) {
@@ -340,9 +359,13 @@ public class AAddTransaction extends AppCompatActivity implements
 	}
 
 	@Override
-	public void updateDate(Date date) {
-		selectedDate = date;
+	public void updateTransactionDate(Date date) {
+		selectedTransactionDate = date;
 	}
 
+
+	public void updateDebtDate(Date date) {
+		selectedDebtDate = date;
+	}
 
 }

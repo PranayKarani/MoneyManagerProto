@@ -20,6 +20,7 @@ import com.moneymanager.R;
 import com.moneymanager.activities.accounts.AAccounts;
 import com.moneymanager.activities.budget.ABudgets;
 import com.moneymanager.activities.category.ACategories;
+import com.moneymanager.activities.debts.ADebts;
 import com.moneymanager.activities.stats.AStats;
 import com.moneymanager.activities.transaction.AAddTransaction;
 import com.moneymanager.adapters.HomePagerAdapter;

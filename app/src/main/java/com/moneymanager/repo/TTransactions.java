@@ -64,9 +64,9 @@ public class TTransactions implements ITransaction {
 				INFO + " TEXT," +
 				DATETIME + " DATETIME," +
 				EXCLUDE + " INTEGER," +
-				"FOREIGN KEY(" + CATEGORY + ") REFERENCES " + TCategories.TABLE_NAME + "(" + TCategories.ID + ")," +
-				"FOREIGN KEY(" + ACCOUNT + ") REFERENCES " + TAccounts.TABLE_NAME + "(" + TAccounts.ID + ")" +
-				");";
+				"FOREIGN KEY(" + CATEGORY + ") REFERENCES " + TCategories.TABLE_NAME + "(" + TCategories.ID + ") ," +
+				"FOREIGN KEY(" + ACCOUNT + ") REFERENCES " + TAccounts.TABLE_NAME + "(" + TAccounts.ID + ") ON DELETE CASCADE " +
+				")";
 	}
 
 	private String q_SELECT_TRANSACTION(int id) {
@@ -443,7 +443,7 @@ public class TTransactions implements ITransaction {
 
 		TAccounts tAccounts = new TAccounts(context);
 
-		// this reversal of category is hence necessary, because updateAccountBalance(...) method,
+		// this reversal of category is hence necessary, because updateTransactionAccountBalance(...) method,
 		// adds to balance if income, deduts if expense
 		try {
 			tAccounts.updateAccountBalance(t.getAccount().getId(), t.getAmount(), t.getCategory().getType() == EXPENSE);

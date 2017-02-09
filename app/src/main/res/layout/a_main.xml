@@ -109,7 +109,7 @@
             android:layout_margin="24dp"
             android:src="@drawable/ic_add_black_48dp"
             app:backgroundTint="@color/colorAccent"
-            app:elevation="16dp"
+            app:elevation="32dp"
             app:fabSize="normal"
             />
 

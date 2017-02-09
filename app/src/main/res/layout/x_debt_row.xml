@@ -23,7 +23,7 @@
             android:id="@+id/x_debt_date_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="5"
+            android:layout_weight="3"
             android:orientation="vertical">
 
             <TextView
@@ -31,7 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="24th"
-                android:textSize="22sp"/>
+                android:textSize="20sp"/>
 
             <TextView
                 android:id="@+id/x_debt_month_year"
@@ -45,6 +45,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -61,24 +62,41 @@
                     android:layout_marginRight="4sp"
                     android:layout_weight="1"
                     android:text="User"
-                    android:textSize="20sp"/>
-
+                    android:textSize="18sp"/>
 
                 <TextView
                     android:id="@+id/x_debt_amt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Rs 1243"
-                    android:textSize="20sp"/>
+                    android:textAlignment="viewStart"
+
+                    android:textSize="18sp"/>
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/x_debt_acc"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="(account)"
-                android:textColor="@color/colorBlue"
-                android:textSize="12sp"/>
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/x_debt_acc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="(account)"
+                    android:textColor="@color/colorBlue"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/x_debt_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0"
+                    android:text="type"
+                    android:textSize="10sp"/>
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/x_debt_info"
@@ -91,6 +109,24 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/x_debt_spinner_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/x_debt_popbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/ic_more_vert_white_24dp">
+            </ImageButton>
+
+        </LinearLayout>
+
+
     </LinearLayout>
+
 
 </LinearLayout>

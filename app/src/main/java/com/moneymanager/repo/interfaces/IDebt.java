@@ -20,4 +20,8 @@ public interface IDebt {
 	void removeDebt(Debt debt);
 
 	Debt[] getDebts(int type);
+
+	Debt[] getAllDebtsForUser(int id);
+
+	void updateDebt(Debt updatedDebt) throws InsufficientBalanceException;
 }

@@ -33,13 +33,15 @@
         </activity>
         <activity android:name=".activities.AUser">
         </activity>
-        <activity android:name=".activities.ADebts">
+        <activity android:name=".activities.debts.ADebts">
         </activity>
         <activity android:name=".activities.accounts.AAccountTransfer">
         </activity>
         <activity android:name=".activities.budget.AAddBudget">
         </activity>
         <activity android:name=".activities.budget.ABudgets">
+        </activity>
+        <activity android:name=".activities.debts.AEditDebt">
         </activity>
     </application>
 

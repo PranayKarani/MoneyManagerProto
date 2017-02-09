@@ -21,8 +21,6 @@ import com.moneymanager.repo.TBudget;
 import com.moneymanager.repo.TTransactions;
 import com.moneymanager.utilities.MyCalendar;
 
-import java.util.Date;
-
 import static com.moneymanager.Common.getMyColor;
 import static com.moneymanager.Common.setupToolbar;
 
@@ -42,8 +40,6 @@ public class ABudgets extends AppCompatActivity {
 				startActivity(new Intent(ABudgets.this, AAddBudget.class));
 			}
 		});
-
-		// TODO remove budgets that have past their deadline
 
 	}
 
@@ -140,12 +136,7 @@ public class ABudgets extends AppCompatActivity {
 			final TextView remText = (TextView) rowView.findViewById(R.id.x_budget_row_rem_text);
 
 			final TextView periodText = (TextView) rowView.findViewById(R.id.x_budget_row_period);
-			final Date startDate = budget.getStartDate();
-			final Date endDate = MyCalendar.dateAfterDays(startDate, budget.getPeriod());
-			final String period = budget.getPeriod() + " days   ( "
-					+ MyCalendar.getNiceFormatedCompleteDateString(startDate) + "  ~  " +
-					MyCalendar.getNiceFormatedCompleteDateString(endDate) + " )";
-			periodText.setText(period);
+			periodText.setText("for " + MyCalendar.monthToFullString(budget.getStartDate()));
 
 			final ProgressBar pb = (ProgressBar) rowView.findViewById(R.id.x_budget_row_progressBar);
 			pb.setMax((int) set);

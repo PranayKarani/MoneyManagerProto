@@ -52,6 +52,10 @@ public class FAddDebt extends Fragment {
 	private int selectedDebtType = DEBT;
 	private double selectedAccountBalance = -1;
 	private double debtAmt = -1;
+	private int selectedDebtId = -1;
+
+	public FAddDebt() {
+	}
 
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -63,11 +67,17 @@ public class FAddDebt extends Fragment {
 	public void onResume() {
 		super.onResume();
 		updateUserList();
+
 	}
 
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
+
+		if (getArguments() != null) {
+			selectedDebtId = getArguments().getInt("debt_id");
+		}
+
 
 		final View rootView = inflater.inflate(R.layout.f_add_debt, container, false);
 
@@ -76,7 +86,6 @@ public class FAddDebt extends Fragment {
 		final TextView user_text = (TextView) rootView.findViewById(R.id.add_debt_user);
 		final TextView date_text = (TextView) rootView.findViewById(R.id.add_debt_date);
 		tip = (TextInputLayout) rootView.findViewById(R.id.f_add_debt_amt_textinput);
-		tip.setErrorEnabled(true);
 		final EditText amt_text = (EditText) rootView.findViewById(R.id.add_debt_amt);
 		info_text = (EditText) rootView.findViewById(R.id.add_debt_info);
 
@@ -97,7 +106,6 @@ public class FAddDebt extends Fragment {
 						Log.i(mylog, "selected debt type: " + selectedDebtType);
 						dialogInterface.dismiss();
 						updateUserList();
-						acc_text.setEnabled(true);
 						updateDebtAmount();
 					}
 				});
@@ -171,10 +179,36 @@ public class FAddDebt extends Fragment {
 			}
 		});
 
-		date_text.setText(MyCalendar.getNiceFormatedCompleteDateString(MyCalendar.dateToday()));
 		selectedDebtDate = MyCalendar.dateToday();
-		((FAddTransaction.OnDateSelectListener) getActivity()).updateDate(selectedDebtDate);
 
+		Debt debt = null;
+		if (selectedDebtId > 0) {
+			debt = new TDebt(getContext()).getDebt(selectedDebtId);
+			selectedDebtType = debt.getType() + 1;
+			((AAddTransaction) getActivity()).updateDebtType(selectedDebtType);
+			selectedAccountID = debt.getAccount().getId();
+			setAccount(selectedAccountID);
+			selectedUserID = debt.getUser().getId();
+			((AAddTransaction) getActivity()).updateUserId(selectedUserID);
+			selectedDebtDate = debt.getDate();
+			updateDebtAmount();
+		}
+		if (debt != null) {
+			type_text.setText("Type: " + getTypeText());
+			type_text.setEnabled(true);
+			acc_text.setText("account: " + debt.getAccount().getName());
+			user_text.setText(getUserType() + ": " + debt.getUser().getName());
+			user_text.setEnabled(true);
+			info_text.setText(debt.getInfo());
+			info_text.setEnabled(true);
+			date_text.setEnabled(true);
+			final double amt = debt.getAmount();
+			tip.setHint("amount: " + amt);
+			amt_text.setEnabled(true);
+
+		}
+		date_text.setText(MyCalendar.getNiceFormatedCompleteDateString(selectedDebtDate));
+		((AAddTransaction) getActivity()).updateDebtDate(selectedDebtDate);
 
 		return rootView;
 	}
@@ -207,7 +241,7 @@ public class FAddDebt extends Fragment {
 		updateUserList();
 		updateAccountsList();
 
-		setAccount(CURRENT_ACCOUNT_ID);
+		//setAccount(CURRENT_ACCOUNT_ID);
 
 	}
 
@@ -256,7 +290,7 @@ public class FAddDebt extends Fragment {
 	void updateDebtAmount() {
 
 		TDebt tDebt = new TDebt(getContext());
-		int type = DEBT;
+		int type;
 		switch (selectedDebtType) {
 			case DEBT:
 				type = DEBT;
@@ -320,11 +354,11 @@ public class FAddDebt extends Fragment {
 	private void setAccount(int selectedAccount) {
 
 		selectedAccountID = selectedAccount;
-		((FAddTransaction.OnAccountSelectListener) getActivity()).updateAccountId(selectedAccountID);
+		((AAddTransaction) getActivity()).updateDebtAccountId(selectedAccountID);
 
 		TAccounts tAccounts = new TAccounts(getContext());
 		selectedAccountBalance = tAccounts.getSumOfBalanceOfAccount(selectedAccount);
-		((FAddTransaction.OnAccountSelectListener) getActivity()).updateAccountBalance(selectedAccountBalance);
+		((AAddTransaction) getActivity()).updateDebtAccountBalance(selectedAccountBalance);
 
 	}
 
@@ -348,25 +382,24 @@ public class FAddDebt extends Fragment {
 	public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
+
 			final Calendar cal = Calendar.getInstance();
 			int y = cal.get(Calendar.YEAR);
 			int m = cal.get(Calendar.MONTH);
 			int d = cal.get(Calendar.DAY_OF_MONTH);
 			DatePickerDialog dp = new DatePickerDialog(getActivity(), this, y, m, d);
-			return dp;
+			return new DatePickerDialog(getContext(), this, selectedDebtDate.getYear() + 1900, selectedDebtDate.getMonth(), selectedDebtDate.getDate());
 		}
 
 		public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
 			year -= 1900;//
-			Date newDate = new Date(year, month, dayOfMonth);
+			selectedDebtDate = new Date(year, month, dayOfMonth);
 
-			((FAddTransaction.OnDateSelectListener) getActivity()).updateDate(newDate);
-
-			selectedDebtDate = newDate;
+			((AAddTransaction) getActivity()).updateDebtDate(selectedDebtDate);
 
 			final TextView text = (TextView) getActivity().findViewById(R.id.add_debt_date);
-			text.setText(MyCalendar.getNiceFormatedCompleteDateString(newDate));
+			text.setText(MyCalendar.getNiceFormatedCompleteDateString(selectedDebtDate));
 
 			for (Fragment f : getFragmentManager().getFragments()) {
 

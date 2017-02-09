@@ -151,7 +151,7 @@ public class FAddTransaction extends Fragment {
 		// Set the date to today's date by default
 		TextView dateText = (TextView) rootView.findViewById(R.id.add_trans_date);
 		dateText.setText(MyCalendar.getNiceFormatedCompleteDateString(MyCalendar.dateToday()));
-		((OnDateSelectListener) getActivity()).updateDate(MyCalendar.dateToday());
+		((OnDateSelectListener) getActivity()).updateTransactionDate(MyCalendar.dateToday());
 
 		return rootView;
 
@@ -224,11 +224,11 @@ public class FAddTransaction extends Fragment {
 	private void setAccount(int selectedAccount) {
 
 		selectedAccountID = selectedAccount;
-		((OnAccountSelectListener) getActivity()).updateAccountId(selectedAccountID);
+		((OnAccountSelectListener) getActivity()).updateTransactionAccountId(selectedAccountID);
 
 		TAccounts tAccounts = new TAccounts(getContext());
 		selectedAccountBalance = tAccounts.getSumOfBalanceOfAccount(selectedAccount);
-		((OnAccountSelectListener) getActivity()).updateAccountBalance(selectedAccountBalance);
+		((OnAccountSelectListener) getActivity()).updateTransactionAccountBalance(selectedAccountBalance);
 
 	}
 
@@ -237,13 +237,13 @@ public class FAddTransaction extends Fragment {
 	}
 
 	public interface OnAccountSelectListener {
-		void updateAccountId(int accountId);
+		void updateTransactionAccountId(int accountId);
 
-		void updateAccountBalance(double amount);
+		void updateTransactionAccountBalance(double amount);
 	}
 
 	public interface OnDateSelectListener {
-		void updateDate(Date date);
+		void updateTransactionDate(Date date);
 	}
 
 	public static class TimePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
@@ -262,7 +262,7 @@ public class FAddTransaction extends Fragment {
 			year -= 1900;//
 			Date newDate = new Date(year, month, dayOfMonth);
 
-			((OnDateSelectListener) getActivity()).updateDate(newDate);
+			((OnDateSelectListener) getActivity()).updateTransactionDate(newDate);
 
 			final TextView text = (TextView) getActivity().findViewById(R.id.add_trans_date);
 			text.setText(MyCalendar.getNiceFormatedCompleteDateString(newDate));

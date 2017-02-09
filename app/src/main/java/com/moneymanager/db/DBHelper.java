@@ -45,7 +45,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
 
-		if (newVersion == 3) {
+		if (newVersion == 4) {
 			final String[] newTables = {
 					TBudget.q_CREATE_TABLE(),
 			};

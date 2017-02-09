@@ -57,16 +57,19 @@ public class TAccounts implements IAccount {
 		return "SELECT * FROM " + TABLE_NAME + " WHERE " + ID + " = " + id;
 	}
 
+	// TODO shift in TTransaction
 	private String q_COUNT_TRANSACTION(int id) {
 		return "SELECT COUNT(" + TTransactions.TABLE_NAME + "." + TTransactions.ID + ") AS cT FROM " + TTransactions.TABLE_NAME + " WHERE " + TTransactions.ACCOUNT + " = " + id;
 	}
 
+	// TODO shift in TDebt
 	private String q_COUNT_DEBT(int id) {
 		return "SELECT COUNT(" + TDebt.TABLE_NAME + "." + TDebt.ID + ") AS cD FROM " + TDebt.TABLE_NAME +
 				" WHERE " + TDebt.ACCOUNT + " = " + id +
 				" AND " + TDebt.TYPE + " = " + DEBT;
 	}
 
+	// TODO shift in TDebt
 	private String q_COUNT_LOAN(int id) {
 		return "SELECT COUNT(" + TDebt.TABLE_NAME + "." + TDebt.ID + ") AS cL FROM " + TDebt.TABLE_NAME +
 				" WHERE " + TDebt.ACCOUNT + " = " + id +

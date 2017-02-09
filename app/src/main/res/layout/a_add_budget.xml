@@ -53,21 +53,6 @@
                 android:textSize="22sp">
             </TextView>
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10sp">
-
-                <EditText
-                    android:id="@+id/add_budget_period"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="number of days"
-                    android:inputType="numberDecimal"
-                    android:textSize="28sp"/>
-            </android.support.design.widget.TextInputLayout>
-
-
             <TextView
                 android:id="@+id/add_budget_acc"
                 android:layout_width="match_parent"
@@ -92,17 +77,6 @@
                     android:inputType="text"
                     />
             </android.support.design.widget.TextInputLayout>
-
-            <TextView
-                android:id="@+id/add_budget_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10sp"
-                android:background="@color/colorPrimarySuperDark"
-                android:onClick="OnSetDateClick"
-                android:padding="12sp"
-                android:text="set starting date"
-                android:textSize="22sp"/>
 
 
         </LinearLayout>

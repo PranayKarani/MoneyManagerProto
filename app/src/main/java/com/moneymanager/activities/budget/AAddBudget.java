@@ -1,17 +1,13 @@
 package com.moneymanager.activities.budget;
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -89,6 +85,7 @@ public class AAddBudget extends AppCompatActivity {
 		final TextView acc_text = (TextView) findViewById(R.id.add_budget_acc);
 		if (CURRENT_ACCOUNT_ID != ALL_ACCOUNT_ID) {
 			acc_text.setText("account: " + CURRENT_ACCOUNT_NAME);
+			selectedAccountID = CURRENT_ACCOUNT_ID;
 		} else {
 			acc_text.setText("Select Account");
 		}
@@ -119,12 +116,6 @@ public class AAddBudget extends AppCompatActivity {
 		});
 
 
-		// Set the date to today's date by default
-		TextView dateText = (TextView) findViewById(R.id.add_budget_date);
-//		dateText.setText(MyCalendar.getNiceFormatedCompleteDateString(MyCalendar.dateToday()));
-		selectedDate = MyCalendar.dateToday();
-
-
 	}
 
 	private void init() {
@@ -137,14 +128,6 @@ public class AAddBudget extends AppCompatActivity {
 		updateAccountsList();
 
 		selectedAccountID = ALL_ACCOUNT_ID;
-
-	}
-
-	public void OnSetDateClick(View view) {
-
-
-		final DatePickerFragment datePickerFragment = new DatePickerFragment();
-		datePickerFragment.show(getSupportFragmentManager(), "Pick a Date");
 
 	}
 
@@ -252,45 +235,14 @@ public class AAddBudget extends AppCompatActivity {
 
 		// date
 		if (selectedDate == null) {
-			selectedDate = MyCalendar.dateToday();
+			selectedDate = MyCalendar.firstDateOfMonth(new Date());
 		}
 
 		// period
-		final EditText add_budget_period = (EditText) findViewById(R.id.add_budget_period);
-		final int period = add_budget_period.getText().toString().equals("") ? -1 : Integer.valueOf(add_budget_period.getText().toString());
-
-		if (period <= 0) {
-			errorMessage = "Period too small";
-			add_budget_period.setError(errorMessage);
-			return null;
-		}
+		final int period = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
 
 		return new Budget(-1, cat, acc, Double.valueOf(amt), info, selectedDate, period);
 
-
-	}
-
-	public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
-
-		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			final Calendar cal = Calendar.getInstance();
-			int y = cal.get(Calendar.YEAR);
-			int m = cal.get(Calendar.MONTH);
-			int d = cal.get(Calendar.DAY_OF_MONTH);
-			DatePickerDialog dp = new DatePickerDialog(getActivity(), this, y, m, d);
-			return dp;
-		}
-
-		public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-
-			year -= 1900;//
-			Date newDate = new Date(year, month, dayOfMonth);
-
-			((AAddBudget) getActivity()).selectedDate = newDate;
-
-			final TextView text = (TextView) getActivity().findViewById(R.id.add_budget_date);
-			text.setText(MyCalendar.getNiceFormatedCompleteDateString(newDate));
-		}
 
 	}
 

@@ -1,5 +1,6 @@
 package com.moneymanager.adapters;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -8,8 +9,11 @@ import com.moneymanager.fragments.FAddTransaction;
 
 public class AddTransactionAdapter extends FragmentPagerAdapter {
 
-	public AddTransactionAdapter(FragmentManager fm) {
+	int debtID;
+
+	public AddTransactionAdapter(FragmentManager fm, int debtId) {
 		super(fm);
+		this.debtID = debtId;
 	}
 
 	public Fragment getItem(int position) {
@@ -17,7 +21,11 @@ public class AddTransactionAdapter extends FragmentPagerAdapter {
 		if (position == 0) {
 			return new FAddTransaction();
 		} else {
-			return new FAddDebt();
+			Bundle b = new Bundle();
+			b.putInt("debt_id", debtID);
+			FAddDebt f = new FAddDebt();
+			f.setArguments(b);
+			return f;
 		}
 
 

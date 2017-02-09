@@ -67,6 +67,12 @@ public class TDebt implements IDebt {
 
 	}
 
+	private String q_SELECT_ALL_DEBTS_OF_USER(int user_id) {
+
+		return SELECT_DEBT_JOIN_USER_AND_ACCOUNT + " WHERE " + USER + " = " + user_id + " ORDER BY " + DATETIME + " DESC";
+
+	}
+
 	private String q_SELECT_VERY_SPECIFIC_DEBT(int useId, int accID, int type, String dateString) {
 		return SELECT_DEBT_JOIN_USER_AND_ACCOUNT +
 				" WHERE " + USER + " = " + useId +
@@ -160,6 +166,20 @@ public class TDebt implements IDebt {
 	}
 
 	@Override
+	public Debt[] getAllDebtsForUser(int id) {
+
+		Cursor c = dbHelper.select(q_SELECT_ALL_DEBTS_OF_USER(id), null);
+
+		Debt[] debts = new Debt[c.getCount()];
+
+		while (c.moveToNext()) {
+			debts[c.getPosition()] = extractDebtFromCursor(c);
+		}
+
+		return debts;
+	}
+
+	@Override
 	public Debt getVerySpecificDebt(int useId, int accID, int type, Date date) {
 
 		String dateString = MyCalendar.getSimpleDateFormat().format(date);
@@ -173,6 +193,39 @@ public class TDebt implements IDebt {
 
 	}
 
+
+	public void updateDebt(Debt d) throws InsufficientBalanceException {
+
+		Cursor c = dbHelper.select(q_SELECT_DEBT(d.getId()), null);
+		c.moveToFirst();
+		final Debt exitsingDebt = extractDebtFromCursor(c);
+		final double oldAmt = exitsingDebt.getAmount();
+		final double amtDiff = d.getAmount() - oldAmt;
+
+		final ContentValues cv = new ContentValues();
+		cv.put(TYPE, d.getType());
+		cv.put(ACCOUNT, d.getAccount().getId());
+		cv.put(USER, d.getUser().getId());
+		cv.put(DATETIME, d.formatedDateTime());
+		cv.put(AMOUNT, d.getAmount());
+		cv.put(INFO, d.getInfo());
+
+		dbHelper.update(TABLE_NAME, cv, ID + " = ?", new String[]{String.valueOf(d.getId())});
+
+		TAccounts tAccounts = new TAccounts(context);
+
+		// income
+		if (d.getType() == DEBT) {
+
+			tAccounts.updateAccountBalance(d.getAccount().getId(), amtDiff, false);
+
+		} else {
+
+			tAccounts.updateAccountBalance(d.getAccount().getId(), amtDiff, true);
+
+		}
+
+	}
 
 	@Override
 	public void removeDebt(Debt debt) {

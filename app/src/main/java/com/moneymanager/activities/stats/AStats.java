@@ -258,13 +258,12 @@ public class AStats extends AppCompatActivity {
 
 				break;
 			default: // custom
-				period_text.setTitle("Custom");
 
 				selectedPeriod = CUSTOM;
 				customDatePickerDialog = new AlertDialog.Builder(this)
 						.setView(R.layout.d_custom_period_picker)
 						.setPositiveButton("Go", null)
-						.setCancelable(false)
+						.setCancelable(true)
 						.create();
 				customDatePickerDialog.setOnShowListener(new DialogInterface.OnShowListener() {
 					@Override
@@ -291,6 +290,7 @@ public class AStats extends AppCompatActivity {
 									new TransListLoader().execute(b);
 									refreshDataLayouts();
 									customDatePickerDialog.dismiss();
+									period_text.setTitle("Custom");
 								}
 							}
 

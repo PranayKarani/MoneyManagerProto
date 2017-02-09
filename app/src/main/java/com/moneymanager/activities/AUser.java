@@ -38,7 +38,8 @@ public class AUser extends AppCompatActivity {
 
 				TUser tUser = new TUser(AUser.this);
 
-				tUser.removeUser(new User(user_name_id.get(position), user_name_list.get(position)));
+				// Removing User not allowed
+				//tUser.removeUser(new User(user_name_id.get(position), user_name_list.get(position)));
 				refreshUserList();
 
 			}
