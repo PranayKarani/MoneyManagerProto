@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -33,7 +32,7 @@ import com.moneymanager.utilities.ShrPref;
 
 import static com.moneymanager.Common.*;
 
-public class AMain extends AppCompatActivity {
+public class AMain extends MyBaseActivity {
 
 	private final String[] nav_places = {
 			"Stats", "Accounts", "Budgets", "Debts & Loans", "Users", "Categories"
@@ -57,7 +56,7 @@ public class AMain extends AppCompatActivity {
 		navD.setScrimColor(getMyColor(this, R.color.fadeBlack));
 
 		ListView navigationList = (ListView) findViewById(R.id.a_home_nav_list);
-		navigationList.setAdapter(new ArrayAdapter<String>(this, R.layout.x_list_item, R.id.x_list_item_name, nav_places));
+		navigationList.setAdapter(new ArrayAdapter<>(this, R.layout.x_list_item, R.id.x_list_item_name, nav_places));
 		navigationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -92,7 +91,7 @@ public class AMain extends AppCompatActivity {
 		imgBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Toast.makeText(AMain.this, "Settings Coming soon :)", Toast.LENGTH_SHORT).show();
+				startActivity(new Intent(AMain.this, ASettings.class));
 			}
 		});
 
@@ -108,7 +107,7 @@ public class AMain extends AppCompatActivity {
 
 			@Override
 			public boolean onLongClick(View v) {
-				Toast.makeText(AMain.this, "Soon something will happen on long press too :)", Toast.LENGTH_LONG).show();
+
 				return true;
 			}
 		});
@@ -119,14 +118,19 @@ public class AMain extends AppCompatActivity {
 		viewPager.setAdapter(hmp);
 		viewPager.setCurrentItem(6);
 
+	}
+
+	@Override
+	protected void onStart() {
+
+		super.onStart();
+
 
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-
-		Log.i(mylog, "amain resumed");
 
 		// check if accounts exists else redirect to accounts page
 		final TAccounts accTable = new TAccounts(this);
@@ -162,7 +166,9 @@ public class AMain extends AppCompatActivity {
 
 
 		} catch (NoAccountsException e) {
-			startActivity(new Intent(this, AAccounts.class));
+			final Intent intent = new Intent(this, AAccounts.class);
+			intent.putExtra("checkForBackup", true);
+			startActivity(intent);
 		}
 
 		if (getSupportFragmentManager().getFragments() != null) {
@@ -179,6 +185,12 @@ public class AMain extends AppCompatActivity {
 
 		// store current account id
 		ShrPref.writeData(this, spCURRENT_ACCOUNT_ID, CURRENT_ACCOUNT_ID);
+
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
 
 	}
 
@@ -233,38 +245,7 @@ public class AMain extends AppCompatActivity {
 
 		final TextView balText = (TextView) balLayout.findViewById(R.id.home_toolbar_bal_textview);
 
-
-			new AsyncTask<Void, Void, Double>() {
-
-				@Override
-				protected Double doInBackground(Void... params) {
-					TAccounts tAccounts = new TAccounts(AMain.this);
-					if (CURRENT_ACCOUNT_ID == ALL_ACCOUNT_ID) {
-						double bal = 0;
-						try {
-							Account[] accounts = tAccounts.getAllAccounts(null, null);
-							for (Account acc : accounts) {
-								bal += acc.getBalance();
-							}
-						} catch (NoAccountsException e) {
-							e.printStackTrace();
-						}
-						return bal;
-					} else {
-						return tAccounts.getSumOfBalanceOfAccount(CURRENT_ACCOUNT_ID);
-					}
-				}
-
-				@Override
-				protected void onPostExecute(Double aDouble) {
-					super.onPostExecute(aDouble);
-
-					balText.setText("Rs " + aDouble);
-
-				}
-			}.execute();
-
-
+		new ToolbarRefresherThread(balText).execute();
 
 		final TextView toolbar_text = (TextView) layout.findViewById(R.id.home_toolbar_textview);
 		toolbar_text.setText(CURRENT_ACCOUNT_NAME);
@@ -293,35 +274,7 @@ public class AMain extends AppCompatActivity {
 
 						// update balance
 						if (CURRENT_ACCOUNT_ID == ALL_ACCOUNT_ID) {
-							new AsyncTask<Void, Void, Double>() {
-
-								@Override
-								protected Double doInBackground(Void... params) {
-									TAccounts tAccounts = new TAccounts(AMain.this);
-									if (CURRENT_ACCOUNT_ID == ALL_ACCOUNT_ID) {
-										double bal = 0;
-										try {
-											Account[] accounts = tAccounts.getAllAccounts(null, null);
-											for (Account acc : accounts) {
-												bal += acc.getBalance();
-											}
-										} catch (NoAccountsException e) {
-											e.printStackTrace();
-										}
-										return bal;
-									} else {
-										return tAccounts.getSumOfBalanceOfAccount(CURRENT_ACCOUNT_ID);
-									}
-								}
-
-								@Override
-								protected void onPostExecute(Double aDouble) {
-									super.onPostExecute(aDouble);
-
-									balText.setText("Rs " + aDouble);
-
-								}
-							}.execute();
+							new ToolbarRefresherThread(balText).execute();
 						} else {
 							balText.setText("Rs " + acc_bals[i]);
 						}
@@ -335,6 +288,43 @@ public class AMain extends AppCompatActivity {
 				builder.create().show();
 			}
 		});
+	}
+
+	private class ToolbarRefresherThread extends AsyncTask<Void, Void, Double> {
+
+
+		private final TextView balText;
+
+		ToolbarRefresherThread(TextView balText) {
+			this.balText = balText;
+		}
+
+		@Override
+		protected Double doInBackground(Void... params) {
+			TAccounts tAccounts = new TAccounts(AMain.this);
+			if (CURRENT_ACCOUNT_ID == ALL_ACCOUNT_ID) {
+				double bal = 0;
+				try {
+					Account[] accounts = tAccounts.getAllAccounts(null, null);
+					for (Account acc : accounts) {
+						bal += acc.getBalance();
+					}
+				} catch (NoAccountsException e) {
+					e.printStackTrace();
+				}
+				return bal;
+			} else {
+				return tAccounts.getSumOfBalanceOfAccount(CURRENT_ACCOUNT_ID);
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Double aDouble) {
+			super.onPostExecute(aDouble);
+
+			balText.setText("Rs " + aDouble);
+
+		}
 	}
 
 }

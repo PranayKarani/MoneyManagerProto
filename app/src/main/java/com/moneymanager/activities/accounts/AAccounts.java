@@ -2,23 +2,34 @@ package com.moneymanager.activities.accounts;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.*;
 import android.widget.*;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
 import com.moneymanager.R;
+import com.moneymanager.activities.MyBaseActivity;
 import com.moneymanager.entities.Account;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.TAccounts;
+import com.moneymanager.utilities.BackupManager;
 import com.moneymanager.utilities.ShrPref;
 
 import static com.moneymanager.Common.*;
 
-public class AAccounts extends AppCompatActivity {
+public class AAccounts extends MyBaseActivity {
 
 	public static boolean noAccounts = true;
+	private final int RESOLVE_CONNECTION_REQUEST_CODE = 234;
+	private GoogleApiClient googleApiClient;
+	private boolean checkForBackup = false;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -36,12 +47,70 @@ public class AAccounts extends AppCompatActivity {
 			}
 		});
 
+		checkForBackup = getIntent().getBooleanExtra("checkForBackup", false);
+
+		googleApiClient = new GoogleApiClient.Builder(this)
+				.addApi(Drive.API)
+				.addScope(Drive.SCOPE_FILE)
+				.addScope(Drive.SCOPE_APPFOLDER)
+				.addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+					@Override
+					public void onConnected(@Nullable Bundle bundle) {
+
+
+						BackupManager bm = new BackupManager(AAccounts.this, googleApiClient);
+						bm.restoreBackup();
+						refreshAccountsList();
+
+					}
+
+					@Override
+					public void onConnectionSuspended(int i) {
+
+					}
+				})
+				.addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+					@Override
+					public void onConnectionFailed(@NonNull ConnectionResult result) {
+
+						log_i("GoogleApiClient connection failed: " + result.getErrorMessage());
+
+						if (!result.hasResolution()) {
+
+							GoogleApiAvailability.getInstance().getErrorDialog(AAccounts.this, result.getErrorCode(), 0).show();
+							return;
+
+						}
+
+						try {
+							result.startResolutionForResult(AAccounts.this, RESOLVE_CONNECTION_REQUEST_CODE);
+						} catch (IntentSender.SendIntentException e) {
+							e.printStackTrace();
+						}
+
+
+					}
+				})
+				.build();
 
 	}
 
 	public void onResume() {
 		super.onResume();
-		refreshAccountsList();
+		if (checkForBackup) {
+
+			if (!googleApiClient.isConnected()) {
+				googleApiClient.connect();
+			} else {
+				BackupManager backupManager = new BackupManager(this, googleApiClient);
+				backupManager.restoreBackup();
+			}
+
+			checkForBackup = false;
+
+		} else {
+			refreshAccountsList();
+		}
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -68,6 +137,17 @@ public class AAccounts extends AppCompatActivity {
 
 				break;
 
+			case R.id.accounts_Menu_restore:
+
+				if (!googleApiClient.isConnected()) {
+					googleApiClient.connect();
+				} else {
+					BackupManager backupManager = new BackupManager(this, googleApiClient);
+					backupManager.restoreBackup();
+				}
+
+				break;
+
 		}
 
 		return true;
@@ -85,7 +165,26 @@ public class AAccounts extends AppCompatActivity {
 
 	}
 
-	private void refreshAccountsList() {
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+
+		switch (requestCode) {
+
+			case RESOLVE_CONNECTION_REQUEST_CODE:
+
+				if (resultCode == RESULT_OK) {
+					googleApiClient.connect();
+				}
+				break;
+
+		}
+
+
+	}
+
+	public void refreshAccountsList() {
 		final TAccounts accTable = new TAccounts(this);
 
 		final ListView accListView = (ListView) findViewById(R.id.account_accounts_list);

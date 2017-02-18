@@ -43,6 +43,8 @@
         </activity>
         <activity android:name=".activities.debts.AEditDebt">
         </activity>
+        <activity android:name=".activities.ASettings">
+        </activity>
     </application>
 
 </manifest>

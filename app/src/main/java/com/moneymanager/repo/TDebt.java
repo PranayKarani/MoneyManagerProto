@@ -44,7 +44,7 @@ public class TDebt implements IDebt {
 	}
 
 	public static String q_CREATE_TABLE() {
-		return "CREATE TABLE " + TABLE_NAME + " (" +
+		return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
 				ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 				TYPE + " INTEGER," +
 				USER + " INTEGER," +

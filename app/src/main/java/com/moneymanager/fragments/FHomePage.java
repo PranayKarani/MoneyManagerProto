@@ -70,8 +70,6 @@ public class FHomePage extends Fragment {
 			myTransactions = tTransactions.getAccountSpecificTransactionsForDay(CURRENT_ACCOUNT_ID, myDate);
 		}
 
-		Log.i(mylog, "homepage fragment created for position " + position);
-
 	}
 
 	@Override
@@ -142,7 +140,6 @@ public class FHomePage extends Fragment {
 	public void refreshFragmentContent(int currentAccount) {
 		refreshTransList(currentAccount);
 		refreshOverviewCardDetails(currentAccount);
-		Log.i(mylog, "homefrag refreshed");
 	}
 
 	// Also refreshes Overview Card details

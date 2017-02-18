@@ -14,8 +14,8 @@ import com.moneymanager.repo.*;
 public class DBHelper extends SQLiteOpenHelper {
 
 
+	public static final String DB_NAME = "moneymanager.db";
 	private static final int DB_VERSION = 3;
-	private static final String DB_NAME = "moneymanager.db";
 
 
 	public DBHelper(Context context) {

@@ -56,7 +56,7 @@ public class TTransactions implements ITransaction {
 
 	/* Query Strings */
 	public static String q_CREATE_TABLE() {
-		return "CREATE TABLE " + TABLE_NAME + " (" +
+		return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
 				ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 				AMOUNT + " DOUBLE," +
 				CATEGORY + " INTEGER," +
