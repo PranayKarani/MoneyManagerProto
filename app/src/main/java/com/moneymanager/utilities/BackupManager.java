@@ -218,6 +218,35 @@ public class BackupManager {
 		@Override
 		protected Void doInBackground(Void... params) {
 
+			// delete all remote backup files first
+			final Query query = new Query.Builder()
+					.addFilter(Filters.eq(SearchableField.TITLE, DBHelper.DB_NAME))
+					.build();
+
+			final DriveApi.MetadataBufferResult metadataBufferResult = Drive.DriveApi
+					.getAppFolder(apiClient)
+					.queryChildren(apiClient, query)
+					.await();
+			final MetadataBuffer metadataBuffer = metadataBufferResult.getMetadataBuffer();
+
+			for (final Metadata m : metadataBuffer) {
+
+				DriveFile file = m.getDriveId().asDriveFile();
+				file.delete(apiClient).setResultCallback(new ResultCallback<com.google.android.gms.common.api.Status>() {
+					@Override
+					public void onResult(@NonNull com.google.android.gms.common.api.Status status) {
+
+						if (status.isSuccess()) {
+							activity.log_i(m.getTitle() + " created on " + MyCalendar.getNiceFormatedCompleteDateTimeString(m.getCreatedDate()) + " deleted");
+						} else {
+							activity.log_i(m.getTitle() + " created on " + MyCalendar.getNiceFormatedCompleteDateTimeString(m.getCreatedDate()) + " not deleted");
+						}
+
+					}
+				});
+			}
+
+
 			// first get the backup script
 			final String script = createBackupScript();
 			OutputStream outputStream = contents.getOutputStream();
@@ -290,7 +319,7 @@ public class BackupManager {
 			final MetadataBuffer metadataBuffer = metadataBufferResult.getMetadataBuffer();
 
 			for (Metadata m : metadataBuffer) {
-				activity.log_i(m.getTitle() + " created on " + m.getCreatedDate() + ", " + m.getDriveId());
+				activity.log_i(m.getTitle() + " created on " + MyCalendar.getNiceFormatedCompleteDateTimeString(m.getCreatedDate()));
 			}
 
 			if (metadataBuffer.getCount() > 0) {
@@ -340,7 +369,7 @@ public class BackupManager {
 				final AlertDialog alertDialog = new AlertDialog.Builder(activity)
 						.setCancelable(true)
 						.setTitle("Backup Found")
-						.setMessage("created on " + MyCalendar.getNiceFormatedCompleteDateString(metadata.getCreatedDate()) + "\n(" + metadata.getCreatedDate().toString() + ")")
+						.setMessage("created on:\n" + MyCalendar.getNiceFormatedCompleteDateTimeString(metadata.getCreatedDate()))
 						.setPositiveButton("restore", new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {

@@ -27,6 +27,18 @@ public class MyCalendar {
 
 	}
 
+	public static String timeToString(Date date) {
+
+		int hours = date.getHours();
+		int minutes = date.getMinutes();
+		String am = (hours >= 12) ? "pm" : "am";
+
+		hours = (hours > 12) ? hours - 12 : hours;
+
+		return hours + ":" + minutes + " " + am;
+
+	}
+
 	/* Day stuff */
 
 	public static Date dateToday() {
@@ -197,6 +209,13 @@ public class MyCalendar {
 		final String monthStr = MyCalendar.monthToString(date);
 		final String yearStr = MyCalendar.yearToString(date);
 		return dateStr + " " + monthStr + " " + yearStr;
+	}
+
+	public static String getNiceFormatedCompleteDateTimeString(Date date) {
+		final String dateStr = MyCalendar.dateToString(date);
+		final String monthStr = MyCalendar.monthToString(date);
+		final String yearStr = MyCalendar.yearToString(date);
+		return dateStr + " " + monthStr + " " + yearStr + ", " + timeToString(date);
 	}
 
 }
