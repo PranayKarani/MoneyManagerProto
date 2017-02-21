@@ -50,8 +50,6 @@ public class AMain extends MyBaseActivity {
 	private double[] acc_bals;
 	private ViewPager viewPager;
 	private DrawerLayout navD;
-	private ImageView hamburgerImage;
-	private ImageView hamBob;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -97,7 +95,6 @@ public class AMain extends MyBaseActivity {
 			}
 		});
 
-		hamburgerImage = (ImageView) findViewById(R.id.home_hamburger_menu);
 		FrameLayout hamLayout = (FrameLayout) findViewById(R.id.home_hamburger_layout);
 
 		hamLayout.setOnClickListener(new View.OnClickListener() {
@@ -110,7 +107,6 @@ public class AMain extends MyBaseActivity {
 				}
 			}
 		});
-		hamBob = (ImageView) findViewById(R.id.home_hamburger_bob);
 
 
 		ImageButton imgBtn = (ImageButton) findViewById(R.id.a_home_nav_settings);
@@ -252,6 +248,7 @@ public class AMain extends MyBaseActivity {
 						LinearLayout linearLayout = (LinearLayout) super.getView(position, convertView, parent);
 						TextView textView = (TextView) linearLayout.findViewById(R.id.x_list_item_name);
 
+						final ImageView hamBob = (ImageView) findViewById(R.id.home_hamburger_bob);
 						if (overpsent) {
 							hamBob.setVisibility(View.VISIBLE);
 						} else {
