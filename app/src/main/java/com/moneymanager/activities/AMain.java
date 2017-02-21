@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -48,6 +49,9 @@ public class AMain extends MyBaseActivity {
 	private int[] acc_ids;
 	private double[] acc_bals;
 	private ViewPager viewPager;
+	private DrawerLayout navD;
+	private ImageView hamburgerImage;
+	private ImageView hamBob;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -58,7 +62,8 @@ public class AMain extends MyBaseActivity {
 		setSupportActionBar(home_toolbar);
 
 		// setting up Navigation drawer stuff
-		DrawerLayout navD = (DrawerLayout) findViewById(R.id.a_home_nav_drawer);
+
+		navD = (DrawerLayout) findViewById(R.id.a_home_nav_drawer);
 		navD.setScrimColor(getMyColor(this, R.color.fadeBlack));
 
 		ListView navigationList = (ListView) findViewById(R.id.a_home_nav_list);
@@ -91,6 +96,22 @@ public class AMain extends MyBaseActivity {
 
 			}
 		});
+
+		hamburgerImage = (ImageView) findViewById(R.id.home_hamburger_menu);
+		FrameLayout hamLayout = (FrameLayout) findViewById(R.id.home_hamburger_layout);
+
+		hamLayout.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (navD.isDrawerOpen(GravityCompat.START)) {
+					navD.closeDrawer(GravityCompat.START);
+				} else {
+					navD.openDrawer(GravityCompat.START);
+				}
+			}
+		});
+		hamBob = (ImageView) findViewById(R.id.home_hamburger_bob);
+
 
 		ImageButton imgBtn = (ImageButton) findViewById(R.id.a_home_nav_settings);
 		imgBtn.setOnClickListener(new View.OnClickListener() {
@@ -231,6 +252,12 @@ public class AMain extends MyBaseActivity {
 						LinearLayout linearLayout = (LinearLayout) super.getView(position, convertView, parent);
 						TextView textView = (TextView) linearLayout.findViewById(R.id.x_list_item_name);
 
+						if (overpsent) {
+							hamBob.setVisibility(View.VISIBLE);
+						} else {
+							hamBob.setVisibility(View.INVISIBLE);
+						}
+
 						if (textView.getText().equals(nav_places[2]) && overpsent) {
 							textView.setTextColor(getMyColor(AMain.this, R.color.colorRed));
 						} else {
@@ -288,23 +315,28 @@ public class AMain extends MyBaseActivity {
 	@Override
 	public void onBackPressed() {
 
+		if (navD.isDrawerOpen(GravityCompat.START)) {
+			navD.closeDrawer(GravityCompat.START);
+		} else {
 
-		final AlertDialog alertDialog = new AlertDialog.Builder(this)
-				.setTitle("Exit the app?")
-				.setNegativeButton("No", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				})
-				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						finish();
-					}
-				})
-				.create();
-		alertDialog.show();
+			final AlertDialog alertDialog = new AlertDialog.Builder(this)
+					.setTitle("Exit the app?")
+					.setNegativeButton("No", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+						}
+					})
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+
+							finish();
+						}
+					})
+					.create();
+			alertDialog.show();
+		}
 
 	}
 
