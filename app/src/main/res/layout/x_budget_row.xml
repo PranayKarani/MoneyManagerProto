@@ -26,9 +26,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="4sp"
-                android:layout_weight="1"
+                android:layout_weight="0"
                 android:text="Category Budget"
                 android:textSize="18sp"/>
+
+            <TextView
+                android:id="@+id/x_budget_row_acc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4sp"
+                android:layout_weight="1"
+                android:text="Account"
+                android:textColor="@color/colorBlue"
+                android:textSize="10sp"/>
+
 
             <ImageView
                 android:id="@+id/x_budget_row_del"
@@ -43,7 +54,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Period"
-            android:textColor="@color/colorBlue"
             android:textSize="10sp"/>
 
         <ProgressBar

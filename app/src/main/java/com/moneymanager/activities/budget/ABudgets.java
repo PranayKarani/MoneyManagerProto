@@ -3,9 +3,13 @@ package com.moneymanager.activities.budget;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -20,9 +24,9 @@ import com.moneymanager.entities.Transaction;
 import com.moneymanager.repo.TBudget;
 import com.moneymanager.repo.TTransactions;
 import com.moneymanager.utilities.MyCalendar;
+import com.moneymanager.utilities.ShrPref;
 
-import static com.moneymanager.Common.getMyColor;
-import static com.moneymanager.Common.setupToolbar;
+import static com.moneymanager.Common.*;
 
 public class ABudgets extends AppCompatActivity {
 
@@ -101,8 +105,14 @@ public class ABudgets extends AppCompatActivity {
 				spent += t.getAmount();
 			}
 
-			double rem = 0;
-			rem = set - spent;
+			double rem = set - spent;
+
+			final int budgetLimit = ShrPref.readData(ABudgets.this, spBUDGET_LIMIT, 10);
+			final double expectedRem = (budgetLimit * set) / 100;
+			final boolean aboutToOverpsend = rem <= expectedRem;
+			final boolean overspent = spent > set;
+
+
 
 			ImageView delImg = (ImageView) rowView.findViewById(R.id.x_budget_row_del);
 			delImg.setOnClickListener(new View.OnClickListener() {
@@ -130,6 +140,7 @@ public class ABudgets extends AppCompatActivity {
 			});
 
 			final TextView catText = (TextView) rowView.findViewById(R.id.x_budget_row_cat);
+			final TextView accText = (TextView) rowView.findViewById(R.id.x_budget_row_acc);
 			final TextView setAmtText = (TextView) rowView.findViewById(R.id.x_budget_row_amt_set);
 			final TextView spentAmtText = (TextView) rowView.findViewById(R.id.x_budget_row_amt_spent);
 			final TextView remAmtText = (TextView) rowView.findViewById(R.id.x_budget_row_amt_rem);
@@ -138,23 +149,41 @@ public class ABudgets extends AppCompatActivity {
 			final TextView periodText = (TextView) rowView.findViewById(R.id.x_budget_row_period);
 			periodText.setText("for " + MyCalendar.monthToFullString(budget.getStartDate()));
 
+			accText.setText("in " + budget.getAccount().getName());
+
 			final ProgressBar pb = (ProgressBar) rowView.findViewById(R.id.x_budget_row_progressBar);
 			pb.setMax((int) set);
 			pb.setProgress((int) spent);
 
-			catText.setText(budget.getCategory().getName() + "'s budget in " + budget.getAccount().getName());
+			catText.setText(budget.getCategory().getName());
 			setAmtText.setText("Rs " + set);
 
-			if (spent > set) {
-				spentAmtText.setTextColor(Common.getMyColor(ABudgets.this, R.color.colorRed));
-				spentAmtText.setText("Rs " + spent);
+			spentAmtText.setText("Rs " + spent);
+			remAmtText.setText("Rs " + rem);
+
+			if (aboutToOverpsend) {
+				remText.setTextColor(Common.getMyColor(ABudgets.this, R.color.colorOrange));
+				remAmtText.setTextColor(Common.getMyColor(ABudgets.this, R.color.colorOrange));
+			}
+
+			if (overspent) {
 				remText.setTextColor(Common.getMyColor(ABudgets.this, R.color.colorRed));
 				remText.setText("Overspent");
 				remAmtText.setTextColor(Common.getMyColor(ABudgets.this, R.color.colorRed));
 				remAmtText.setText("by Rs " + Math.abs(rem));
-			} else {
-				spentAmtText.setText("Rs " + spent);
-				remAmtText.setText("Rs " + rem);
+			}
+
+			if (aboutToOverpsend) {
+				int pbColor = Common.getMyColor(ABudgets.this, overspent ? R.color.colorRed : R.color.colorOrange);
+
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+
+					Drawable wrapDrawable = DrawableCompat.wrap(pb.getIndeterminateDrawable());
+					DrawableCompat.setTint(wrapDrawable, pbColor);
+					pb.setIndeterminateDrawable(DrawableCompat.unwrap(wrapDrawable));
+				} else {
+					pb.setProgressTintList(ColorStateList.valueOf(pbColor));
+				}
 			}
 
 			rowView.setOnClickListener(new View.OnClickListener() {

@@ -251,12 +251,12 @@ public class AStats extends AppCompatActivity {
 
 				new TransListLoader().execute(b);
 				break;
-//			case R.id.stats_menu_period_year:
-//				period_text.setTitle("Year");
-//
-//				selectedPeriod = YEAR;
-//
-//				break;
+			case R.id.stats_menu_period_year:
+				period_text.setTitle("Year");
+
+				selectedPeriod = YEAR;
+
+				break;
 			default: // custom
 
 				selectedPeriod = CUSTOM;

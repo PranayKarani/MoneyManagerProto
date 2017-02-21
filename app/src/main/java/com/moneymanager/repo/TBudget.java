@@ -22,7 +22,6 @@ public class TBudget implements IBudget {
 	public static final String AMOUNT = "bud_amt";
 	public static final String CATEGORY = "bud_cat";
 	public static final String ACCOUNT = "bud_acc";
-	public static final String INFO = "bud_info";
 	public static final String DATETIME = "bud_datetime";
 	public static final String PERIOD = "bud_period";
 	public static final String NOTIFY = "bud_notify";
@@ -53,7 +52,6 @@ public class TBudget implements IBudget {
 				AMOUNT + " DOUBLE," +
 				CATEGORY + " INTEGER," +
 				ACCOUNT + " INTEGER," +
-				INFO + " TEXT," +
 				DATETIME + " DATETIME," +
 				PERIOD + " INTEGER," +
 				NOTIFY + " INTEGER," +
@@ -76,7 +74,6 @@ public class TBudget implements IBudget {
 		cv.put(AMOUNT, budget.getAmount());
 		cv.put(CATEGORY, budget.getCategory().getId());
 		cv.put(ACCOUNT, budget.getAccount().getId());
-		cv.put(INFO, budget.getInfo());
 		cv.put(DATETIME, MyCalendar.getSimpleDateFormat().format(budget.getStartDate()));
 		cv.put(PERIOD, budget.getPeriod());
 		cv.put(NOTIFY, 1);
@@ -107,7 +104,6 @@ public class TBudget implements IBudget {
 	private Budget extractBudgetFromCursor(Cursor c) {
 		final int id = c.getInt(c.getColumnIndex(BID_alias));
 		final double amount = c.getDouble(c.getColumnIndex(AMOUNT));
-		final String info = c.getString(c.getColumnIndex(INFO));
 		Date dateTime = null;
 		try {
 			dateTime = MyCalendar.getSimpleDateFormat().parse(c.getString(c.getColumnIndex(DATETIME)));
@@ -130,7 +126,7 @@ public class TBudget implements IBudget {
 		final boolean acc_exclude = c.getInt(c.getColumnIndex(TAccounts.EXCLUDE)) == 1;
 		final Account account = new Account(acc_id, acc_name, acc_balance, acc_exclude);
 
-		return new Budget(id, category, account, amount, info, dateTime, period);
+		return new Budget(id, category, account, amount, dateTime, period);
 	}
 
 }

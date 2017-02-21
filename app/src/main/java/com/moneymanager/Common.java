@@ -35,6 +35,8 @@ public class Common {
 	// SharedPreferences Constants
 	public static final String spFILE_NAME = "mm_sp_file";
 	public static final String spCURRENT_ACCOUNT_ID = "account_id";
+	public static final String spBUDGET_LIMIT = "budget_limit";
+
 	public static int ALL_ACCOUNT_ID = -9837; // Used to get info of all accounts
 	public static int CURRENT_ACCOUNT_ID = ALL_ACCOUNT_ID;
 	public static String CURRENT_ACCOUNT_NAME;

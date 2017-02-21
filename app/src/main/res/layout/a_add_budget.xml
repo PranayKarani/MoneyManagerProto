@@ -63,21 +63,6 @@
                 android:text="Select Account"
                 android:textSize="22sp"/>
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10sp">
-
-                <EditText
-                    android:id="@+id/add_budget_info"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="info"
-                    android:inputType="text"
-                    />
-            </android.support.design.widget.TextInputLayout>
-
 
         </LinearLayout>
 

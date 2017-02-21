@@ -11,7 +11,9 @@
     <color name="colorGreen">#4adf72</color>>
     <color name="colorFaintGreen">#2359e17e</color>
     <color name="colorRed">#d74a45</color>
+    <color name="colorLightRed">#ff8480</color>
     <color name="colorFaintRed">#23d74a45</color>
+    <color name="colorOrange">#faa86d</color>
     <color name="colorBlue">#7ec8fd</color>
     <color name="transparent">#00ffffff</color>
     <color name="fadeBlack">#c3000000</color>

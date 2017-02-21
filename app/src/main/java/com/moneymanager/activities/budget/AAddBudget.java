@@ -230,9 +230,6 @@ public class AAddBudget extends AppCompatActivity {
 			acc = acc_table.getAccount(selectedAccountID);
 		}
 
-		// info
-		final String info = ((TextView) findViewById(R.id.add_budget_info)).getText().toString();
-
 		// date
 		if (selectedDate == null) {
 			selectedDate = MyCalendar.firstDateOfMonth(new Date());
@@ -241,7 +238,7 @@ public class AAddBudget extends AppCompatActivity {
 		// period
 		final int period = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
 
-		return new Budget(-1, cat, acc, Double.valueOf(amt), info, selectedDate, period);
+		return new Budget(-1, cat, acc, Double.valueOf(amt), selectedDate, period);
 
 
 	}

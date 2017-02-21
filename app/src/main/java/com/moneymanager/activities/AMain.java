@@ -2,6 +2,7 @@ package com.moneymanager.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 import com.moneymanager.R;
 import com.moneymanager.activities.accounts.AAccounts;
@@ -24,9 +26,13 @@ import com.moneymanager.activities.stats.AStats;
 import com.moneymanager.activities.transaction.AAddTransaction;
 import com.moneymanager.adapters.HomePagerAdapter;
 import com.moneymanager.entities.Account;
+import com.moneymanager.entities.Budget;
+import com.moneymanager.entities.Transaction;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.fragments.FHomePage;
 import com.moneymanager.repo.TAccounts;
+import com.moneymanager.repo.TBudget;
+import com.moneymanager.repo.TTransactions;
 import com.moneymanager.utilities.MyCalendar;
 import com.moneymanager.utilities.ShrPref;
 
@@ -56,7 +62,6 @@ public class AMain extends MyBaseActivity {
 		navD.setScrimColor(getMyColor(this, R.color.fadeBlack));
 
 		ListView navigationList = (ListView) findViewById(R.id.a_home_nav_list);
-		navigationList.setAdapter(new ArrayAdapter<>(this, R.layout.x_list_item, R.id.x_list_item_name, nav_places));
 		navigationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -177,6 +182,70 @@ public class AMain extends MyBaseActivity {
 			}
 		}
 
+		// check for budget overspendings
+		new AsyncTask<Void, Void, Boolean>() {
+
+			@Override
+			protected Boolean doInBackground(Void... params) {
+
+				final int budgetLimit = ShrPref.readData(AMain.this, spBUDGET_LIMIT, 10);
+				final TBudget tBudget = new TBudget(AMain.this);
+				final Budget[] budgets = tBudget.getAllBudgets();
+
+				for (Budget budget : budgets) {
+
+
+					final Transaction[] trans = new TTransactions(AMain.this).getBudgetSpecificTransactions(budget);
+
+					final double set = budget.getAmount();
+					double spent = 0;
+					for (Transaction t : trans) {
+						spent += t.getAmount();
+					}
+
+					final double rem = set - spent;
+
+					final double expectedRem = (budgetLimit * set) / 100;
+
+					if (rem <= expectedRem) {
+						return true;
+					}
+
+				}
+
+				return false;
+			}
+
+			@Override
+			protected void onPostExecute(final Boolean overpsent) {
+				super.onPostExecute(overpsent);
+
+
+				ListView navigationList = (ListView) findViewById(R.id.a_home_nav_list);
+
+				final ColorStateList defColor = ((TextView) (getLayoutInflater().inflate(R.layout.x_list_item, null).findViewById(R.id.x_list_item_name))).getTextColors();
+
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(AMain.this, R.layout.x_list_item, R.id.x_list_item_name, nav_places) {
+					@Override
+					public View getView(int position, View convertView, ViewGroup parent) {
+						LinearLayout linearLayout = (LinearLayout) super.getView(position, convertView, parent);
+						TextView textView = (TextView) linearLayout.findViewById(R.id.x_list_item_name);
+
+						if (textView.getText().equals(nav_places[2]) && overpsent) {
+							textView.setTextColor(getMyColor(AMain.this, R.color.colorRed));
+						} else {
+							textView.setTextColor(defColor);
+						}
+						return linearLayout;
+					}
+				};
+				navigationList.setAdapter(null);
+				navigationList.setAdapter(adapter);
+
+			}
+		}.execute();
+
+
 	}
 
 	@Override
@@ -195,7 +264,7 @@ public class AMain extends MyBaseActivity {
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
-//		getMenuInflater().inflate(R.menu.home_menu, menu);
+		getMenuInflater().inflate(R.menu.home_menu, menu);
 		return true;
 	}
 

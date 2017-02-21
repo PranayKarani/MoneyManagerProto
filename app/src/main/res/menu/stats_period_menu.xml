@@ -22,9 +22,10 @@
         android:title="Month"
         app:showAsAction="never"/>
 
-    <!--<item android:title="Year"-->
-    <!--android:id="@+id/stats_menu_period_year"-->
-    <!--app:showAsAction="never"/>-->
+    <item
+        android:id="@+id/stats_menu_period_year"
+        android:title="Year"
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/stats_menu_period_custom"
