@@ -15,6 +15,17 @@ public class Account {
 		this.exclude = exclude;
 	}
 
+	public static String[] extractNameStringArrayFromArray(Account[] accounts) {
+		final String[] str_arr = new String[accounts.length];
+		int x = 0;
+		for (Account c : accounts) {
+
+			str_arr[x++] = c.getName();
+
+		}
+		return str_arr;
+	}
+
 	public int getId() {
 		return id;
 	}

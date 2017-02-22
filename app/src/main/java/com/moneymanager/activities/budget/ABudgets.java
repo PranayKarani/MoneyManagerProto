@@ -114,7 +114,6 @@ public class ABudgets extends AppCompatActivity {
 			final boolean overspent = spent > set;
 
 
-
 			ImageView delImg = (ImageView) rowView.findViewById(R.id.x_budget_row_del);
 			delImg.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -148,7 +147,8 @@ public class ABudgets extends AppCompatActivity {
 			final TextView remText = (TextView) rowView.findViewById(R.id.x_budget_row_rem_text);
 
 			final TextView periodText = (TextView) rowView.findViewById(R.id.x_budget_row_period);
-			final String remainingDays = (MyCalendar.lastDateOfMonth(budget.getStartDate()).getDate() - dateToday().getDate()) + " days remaining";
+			final int noofDays = (MyCalendar.lastDateOfMonth(budget.getStartDate()).getDate() - dateToday().getDate());
+			final String remainingDays = noofDays + (noofDays == 1 ? " day" : " days") + " remaining";
 			periodText.setText("for " + MyCalendar.monthToFullString(budget.getStartDate()) + ", " + remainingDays);
 
 			accText.setText("in " + budget.getAccount().getName());
