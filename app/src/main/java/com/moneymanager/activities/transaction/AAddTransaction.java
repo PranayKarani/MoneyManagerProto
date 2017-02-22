@@ -98,6 +98,16 @@ public class AAddTransaction extends AppCompatActivity implements
 			cat = cat_table.getCategory(selectedCategoryId);
 		}
 
+		// Account
+		Account acc;
+		if (selectedTransactionAccountId <= 0) {
+			errorMessage = "Select an Account first";// this should not happen since the account is set to current by default, but still...
+			Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+			return null;
+		} else {
+			acc = acc_table.getAccount(selectedTransactionAccountId);
+		}
+
 		// amount
 		final EditText add_trans_amt = (EditText) findViewById(R.id.add_trans_amt);
 		final String amt = add_trans_amt.getText().toString();
@@ -108,16 +118,6 @@ public class AAddTransaction extends AppCompatActivity implements
 		} else if (Double.valueOf(amt) > selectedTransactionAccountBalance && cat.getType() == EXPENSE) {
 			add_trans_amt.setError("Expense should not exceed Account Balance: (Rs " + selectedTransactionAccountBalance + ")");
 			return null;
-		}
-
-		// Account
-		Account acc;
-		if (selectedTransactionAccountId <= 0) {
-			errorMessage = "Select an Account first";// this should not happen since the account is set to current by default, but still...
-			Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
-			return null;
-		} else {
-			acc = acc_table.getAccount(selectedTransactionAccountId);
 		}
 
 		// info

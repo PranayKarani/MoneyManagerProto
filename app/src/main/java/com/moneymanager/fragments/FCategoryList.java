@@ -2,6 +2,7 @@ package com.moneymanager.fragments;
 
 
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -159,8 +160,21 @@ public class FCategoryList extends Fragment {
 
 	public void refreshCatList() {
 
-		refreshCatArrays();
-		listView.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, myCategoriesNameArray));
+		new AsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void... params) {
+				refreshCatArrays();
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void aVoid) {
+				super.onPostExecute(aVoid);
+				listView.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, myCategoriesNameArray));
+			}
+		}.execute();
+
+
 
 	}
 
