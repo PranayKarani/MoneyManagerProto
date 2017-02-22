@@ -29,6 +29,7 @@ public class FCategoryList extends Fragment {
 	private ListView listView;
 
 	private int selectedCategoryIndex = -1;
+	private String searchText = "";
 
 	public FCategoryList() {
 		// Required empty public constructor
@@ -168,11 +169,20 @@ public class FCategoryList extends Fragment {
 		TCategories tc = new TCategories(getContext());
 		// 0- expense, 1- income
 		myCategories = null;
-		myCategories = tc.getTypeSpecificCategories(position == 0 ? EXPENSE : INCOME);
+
+		if (searchText == null || searchText.equals("")) {
+			myCategories = tc.getTypeSpecificCategories(position == 0 ? EXPENSE : INCOME);
+		} else {
+			myCategories = tc.getTypeSpecificSearchedCategories(position == 0 ? EXPENSE : INCOME, searchText);
+		}
 
 		myCategoriesNameArray = null;
 		myCategoriesNameArray = Category.extractNameStringArrayFromArray(myCategories);
 
+	}
+
+	public void setSearchText(String searchText) {
+		this.searchText = searchText;
 	}
 
 }

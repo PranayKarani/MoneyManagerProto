@@ -19,4 +19,5 @@ public interface IUser {
 
 	void removeUser(User user);
 
+	User[] getSearchedUsers(String searchText);
 }

@@ -11,11 +11,10 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-import android.widget.ToggleButton;
+import android.widget.*;
 import com.moneymanager.Common;
 import com.moneymanager.R;
 import com.moneymanager.adapters.CategoriesAdapter;
@@ -179,5 +178,34 @@ public class ACategories extends AppCompatActivity {
 		sb.setActionTextColor(getMyColor(ACategories.this, R.color.colorPrimaryDark));
 		sb.show();
 
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+		getMenuInflater().inflate(R.menu.categories_menu, menu);
+		MenuItem menuItem = menu.findItem(R.id.category_search);
+
+		SearchView search = (SearchView) menuItem.getActionView();
+		search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+			@Override
+			public boolean onQueryTextSubmit(String query) {
+				return false;
+			}
+
+			@Override
+			public boolean onQueryTextChange(String newText) {
+
+				for (Fragment f : getSupportFragmentManager().getFragments()) {
+
+					((FCategoryList) f).setSearchText(newText);
+					((FCategoryList) f).refreshCatList();
+
+				}
+
+				return true;
+			}
+		});
+		return true;
 	}
 }

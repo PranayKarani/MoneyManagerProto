@@ -55,6 +55,10 @@ public class TCategories implements ICategory {
 		return "SELECT * FROM " + TABLE_NAME + " WHERE " + TYPE + " = " + type;
 	}
 
+	private String q_SELECT_SEARCHED_TYPE_CATEGORIES(int type, String searchText) {
+		return "SELECT * FROM " + TABLE_NAME + " WHERE " + TYPE + " = " + type + " AND " + NAME + " LIKE '%" + searchText + "%'";
+	}
+
 	@Override
 	public Category getCategory(int id) {
 
@@ -111,6 +115,22 @@ public class TCategories implements ICategory {
 			return cats;
 
 		}
+	}
+
+	@Override
+	public Category[] getTypeSpecificSearchedCategories(int type, String searchText) {
+		final Cursor c = dbHelper.select(q_SELECT_SEARCHED_TYPE_CATEGORIES(type, searchText), null);
+
+		final Category[] cats = new Category[c.getCount()];
+
+		while (c.moveToNext()) {
+
+			cats[c.getPosition()] = extractCategoryFromCursor(c);
+
+		}
+
+		return cats;
+
 	}
 
 	@Override

@@ -77,6 +77,12 @@ public class TUser implements IUser {
 						" ORDER BY " + NAME;
 	}
 
+	private String q_SELECT_SEARCHED_USERS(String searchText) {
+
+		return SELECT + " WHERE " + NAME + " LIKE '%" + searchText + "%' ORDER BY " + NAME;
+
+	}
+
 	@Override
 	public long addUser(User user) throws UserExistsException {
 
@@ -110,6 +116,22 @@ public class TUser implements IUser {
 	@Override
 	public User[] getAllUsers() {
 		final Cursor c = dbHelper.select(q_SELECT_ALL_USERS(), null);
+
+		final User[] users = new User[c.getCount()];
+
+		while (c.moveToNext()) {
+
+			users[c.getPosition()] = extractUserFromCursor(c);
+
+		}
+
+		return users;
+	}
+
+	@Override
+	public User[] getSearchedUsers(String searchText) {
+
+		final Cursor c = dbHelper.select(q_SELECT_SEARCHED_USERS(searchText), null);
 
 		final User[] users = new User[c.getCount()];
 

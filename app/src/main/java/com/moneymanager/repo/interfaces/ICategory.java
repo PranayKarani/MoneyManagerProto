@@ -21,4 +21,6 @@ public interface ICategory {
 	void updateCategory(Category category) throws CategoryExistsException;
 
 	void removeCategory(Category cat);
+
+	Category[] getTypeSpecificSearchedCategories(int i, String searchText);
 }

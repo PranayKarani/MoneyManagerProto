@@ -1,10 +1,12 @@
 package com.moneymanager.activities;
 
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 import com.moneymanager.R;
@@ -16,12 +18,13 @@ import java.util.ArrayList;
 
 import static com.moneymanager.Common.setupToolbar;
 
-public class AUser extends AppCompatActivity {
+public class AUser extends MyBaseActivity {
 
 	private ArrayList<String> user_name_list = new ArrayList<>();
 	private ArrayList<Integer> user_name_id = new ArrayList<>();
 
 	private ListView listView;
+	private String searchText;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -112,18 +115,58 @@ public class AUser extends AppCompatActivity {
 
 	}
 
-	private void refreshUserList() {
-		final TUser tUser = new TUser(this);
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
 
-		final User[] user_array = tUser.getAllUsers();
+		getMenuInflater().inflate(R.menu.users_menu, menu);
+		MenuItem menuItem = menu.findItem(R.id.user_search);
 
-		user_name_list.clear();
-		user_name_id.clear();
+		SearchView search = (SearchView) menuItem.getActionView();
+		search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+			@Override
+			public boolean onQueryTextSubmit(String query) {
+				return false;
+			}
 
-		for (User user : user_array) {
-			user_name_list.add(user.getName());
-			user_name_id.add(user.getId());
-		}
-		listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, user_name_list));
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				searchText = newText;
+				refreshUserList();
+				return true;
+			}
+		});
+
+		return true;
 	}
+
+	private void refreshUserList() {
+
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				final TUser tUser = new TUser(AUser.this);
+
+				final User[] user_array = (searchText == null || searchText.equals("")) ? tUser.getAllUsers() : tUser.getSearchedUsers(searchText);
+
+				user_name_list.clear();
+				user_name_id.clear();
+
+				for (User user : user_array) {
+					user_name_list.add(user.getName());
+					user_name_id.add(user.getId());
+				}
+
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void aVoid) {
+				super.onPostExecute(aVoid);
+				listView.setAdapter(new ArrayAdapter<String>(AUser.this, android.R.layout.simple_list_item_1, user_name_list));
+			}
+		}.execute();
+
+	}
+
 }
