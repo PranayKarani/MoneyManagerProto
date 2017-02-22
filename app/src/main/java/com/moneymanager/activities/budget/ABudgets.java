@@ -27,6 +27,7 @@ import com.moneymanager.utilities.MyCalendar;
 import com.moneymanager.utilities.ShrPref;
 
 import static com.moneymanager.Common.*;
+import static com.moneymanager.utilities.MyCalendar.dateToday;
 
 public class ABudgets extends AppCompatActivity {
 
@@ -147,7 +148,8 @@ public class ABudgets extends AppCompatActivity {
 			final TextView remText = (TextView) rowView.findViewById(R.id.x_budget_row_rem_text);
 
 			final TextView periodText = (TextView) rowView.findViewById(R.id.x_budget_row_period);
-			periodText.setText("for " + MyCalendar.monthToFullString(budget.getStartDate()));
+			final String remainingDays = (MyCalendar.lastDateOfMonth(budget.getStartDate()).getDate() - dateToday().getDate()) + " days remaining";
+			periodText.setText("for " + MyCalendar.monthToFullString(budget.getStartDate()) + ", " + remainingDays);
 
 			accText.setText("in " + budget.getAccount().getName());
 
