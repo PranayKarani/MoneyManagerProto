@@ -1,31 +1,42 @@
-package com.moneymanager.activities;
+package com.moneymanager.activities.search;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.moneymanager.R;
+import com.moneymanager.activities.MyBaseActivity;
 import com.moneymanager.entities.Account;
 import com.moneymanager.entities.Category;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.TAccounts;
 import com.moneymanager.repo.TCategories;
 import com.moneymanager.repo.TTransactions;
+import com.moneymanager.utilities.MyCalendar;
+
+import java.util.Calendar;
+import java.util.Date;
 
 import static com.moneymanager.Common.*;
 
 public class ASearch extends MyBaseActivity {
 
+	private static Date startDate = MyCalendar.dateToday();
+	private static Date endDate = MyCalendar.dateToday();
 	private final int ANY = 234;
 	private final int GREATER = 235;
 	private final int LESS = 236;
 	private final int EQUALS = 237;
 	private final int BETWEEN = 238;
-
 	private final String[] queries = {"", "", "", "", "", ""};
 	private final int AMT_QUETY_IDX = 0;
 	private final int CAT_QUETY_IDX = 1;
@@ -33,18 +44,11 @@ public class ASearch extends MyBaseActivity {
 	private final int PERIOD_QUETY_IDX = 3;
 	private final int INFO_QUETY_IDX = 4;
 
-
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a_search);
 
 		setupToolbar(this, R.id.search_toolbar, "Search");
-
-		final TextView amtText = (TextView) findViewById(R.id.a_search_trans_amt);
-		final TextView catText = (TextView) findViewById(R.id.a_search_trans_cat);
-		final TextView accText = (TextView) findViewById(R.id.a_search_trans_acc);
-		final TextView periodText = (TextView) findViewById(R.id.a_search_trans_period);
-		final TextView infoText = (TextView) findViewById(R.id.a_search_trans_info);
 
 	}
 
@@ -57,22 +61,17 @@ public class ASearch extends MyBaseActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
-		switch (item.getItemId()) {
-
-			case R.id.search_menu_reset:
-				showShortToast("fields will be reset shortly");
-				break;
-
-			case R.id.search_menu_go:
-				for (String q : queries) {
-					log_i(q);
-				}
-				break;
-
-			default:
-				return super.onOptionsItemSelected(item);
-
+		final TextView infoText = (TextView) findViewById(R.id.a_search_trans_info);
+		if (infoText.getText().toString().length() > 0) {
+			final String query = TTransactions.INFO + " LIKE '%" + infoText.getText() + "%'";
+			queries[INFO_QUETY_IDX] = query;
+		} else {
+			queries[INFO_QUETY_IDX] = "";
 		}
+
+		Intent i = new Intent(this, ASearchResults.class);
+		i.putExtra("queries", queries);
+		startActivity(i);
 
 		return true;
 	}
@@ -164,9 +163,28 @@ public class ASearch extends MyBaseActivity {
 										.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 											@Override
 											public void onClick(DialogInterface dialog, int which) {
-												dialog.dismiss();
+
+												// first validate inputs
+												if (startAmt.getText().toString().equals("")) {
+													startAmt.setError("Enter starting amount");
+													return;
+												}
+
+												if (endAmt.getText().toString().equals("")) {
+													endAmt.setError("Enter ending amount");
+													return;
+												}
+
 												selectedAmount[0] = Double.parseDouble(startAmt.getText().toString());
 												selectedAmount[1] = Double.parseDouble(endAmt.getText().toString());
+
+												if (selectedAmount[0] > selectedAmount[1]) {
+													showLongToast("Ending amount cannot be greater than starting amount");
+													return;
+												}
+
+												dialog.dismiss();
+
 												query[0] += selectedAmount[0] + " AND " + selectedAmount[1];
 												query[1] += "Rs " + selectedAmount[0] + " and Rs " + selectedAmount[1];
 												queries[AMT_QUETY_IDX] = query[0];
@@ -325,5 +343,176 @@ public class ASearch extends MyBaseActivity {
 
 
 	}
+
+	public void onPeriodTextClick(View view) {
+
+		final String[] options = {"any", "after", "before", "on", "between"};
+
+		final TextView periodTextview = (TextView) findViewById(R.id.a_search_trans_period);
+
+		final int[] selectedOption = {ANY};
+
+		final String defaultText = "Any time period";
+		final String[] query = {"", defaultText};
+
+		AlertDialog alert = new AlertDialog.Builder(this)
+				.setSingleChoiceItems(options, 0, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						selectedOption[0] = ANY + which;
+
+						switch (selectedOption[0]) {
+
+							case GREATER:
+								query[0] = TTransactions.DATETIME + " > ";
+								break;
+							case LESS:
+								query[0] = TTransactions.DATETIME + " < ";
+								break;
+							case EQUALS:
+								query[0] = TTransactions.DATETIME + " = ";
+								break;
+							case BETWEEN:
+								query[0] = TTransactions.DATETIME + " BETWEEN ";
+								break;
+							default:
+								query[0] = "";
+								query[1] = defaultText;
+						}
+
+					}
+				})
+				.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+
+						periodTextview.setText(query[1]);
+
+						final View twoInputDialog = getLayoutInflater().inflate(R.layout.d_custom_period_picker, null);
+						final TextView fromtext = (TextView) twoInputDialog.findViewById(R.id.d_custom_period_from_text);
+						final TextView startDate = (TextView) twoInputDialog.findViewById(R.id.d_custom_period_starting_date);
+						startDate.setOnClickListener(new View.OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								final ASearch.DatePickerFragment datePickerFragment = new ASearch.DatePickerFragment();
+								datePickerFragment.setTextView(startDate);
+								datePickerFragment.show(getSupportFragmentManager(), "pick a date");
+							}
+						});
+						startDate.setText(MyCalendar.getNiceFormatedCompleteDateString(ASearch.startDate));
+						final TextView toText = (TextView) twoInputDialog.findViewById(R.id.d_custom_period_to_text);
+						final TextView endDate = (TextView) twoInputDialog.findViewById(R.id.d_custom_period_ending_date);
+						endDate.setOnClickListener(new View.OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								final ASearch.DatePickerFragment datePickerFragment = new ASearch.DatePickerFragment();
+								datePickerFragment.setTextView(endDate);
+								datePickerFragment.show(getSupportFragmentManager(), "pick a date");
+							}
+						});
+						endDate.setText(MyCalendar.getNiceFormatedCompleteDateString(ASearch.endDate));
+
+						query[1] = options[selectedOption[0] - ANY] + " ";
+
+						switch (selectedOption[0]) {
+							case ANY:
+								query[0] = "";
+								queries[PERIOD_QUETY_IDX] = query[0];
+								break;
+
+							case GREATER:
+							case LESS:
+							case EQUALS:
+
+								endDate.setVisibility(View.GONE);
+								fromtext.setVisibility(View.GONE);
+								toText.setVisibility(View.GONE);
+
+								AlertDialog secondDialog = new AlertDialog.Builder(ASearch.this)
+										.setView(twoInputDialog)
+										.setTitle(query[1])
+										.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog, int which) {
+												dialog.dismiss();
+												query[0] += "'" + MyCalendar.stringFormatOfDate(ASearch.startDate) + "'";
+												query[1] += MyCalendar.getNiceFormatedCompleteDateString(ASearch.startDate);
+												queries[PERIOD_QUETY_IDX] = query[0];
+												periodTextview.setText(query[1]);
+											}
+										})
+										.create();
+								secondDialog.show();
+								break;
+
+							case BETWEEN:
+
+								endDate.setVisibility(View.VISIBLE);
+								fromtext.setVisibility(View.VISIBLE);
+								toText.setVisibility(View.VISIBLE);
+
+								AlertDialog betweenDialog = new AlertDialog.Builder(ASearch.this)
+										.setView(twoInputDialog)
+										.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog, int which) {
+												dialog.dismiss();
+												query[0] += "'" + MyCalendar.stringFormatOfDate(ASearch.startDate) + "'" +
+														" AND " + "'" + MyCalendar.stringFormatOfDate(ASearch.endDate) + "'";
+												query[1] += "\n" + MyCalendar.getNiceFormatedCompleteDateString(ASearch.startDate) +
+														" and " + MyCalendar.getNiceFormatedCompleteDateString(ASearch.endDate);
+												queries[PERIOD_QUETY_IDX] = query[0];
+												periodTextview.setText(query[1]);
+											}
+										})
+										.create();
+								betweenDialog.show();
+								break;
+						}
+						dialog.dismiss();
+					}
+				})
+				.create();
+		alert.show();
+
+	}
+
+	public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+
+		TextView textView;
+
+		void setTextView(TextView textView) {
+			this.textView = textView;
+		}
+
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			final Calendar cal = Calendar.getInstance();
+			int y = cal.get(Calendar.YEAR);
+			int m = cal.get(Calendar.MONTH);
+			int d = cal.get(Calendar.DAY_OF_MONTH);
+
+			return new DatePickerDialog(getActivity(), this, y, m, d);
+		}
+
+		public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+
+			year -= 1900;//
+			Date newDate = new Date(year, month, dayOfMonth);
+
+			if (textView.getId() == R.id.d_custom_period_starting_date) {
+				startDate = newDate;
+			} else {
+				endDate = newDate;
+			}
+
+			textView.setText(MyCalendar.getNiceFormatedCompleteDateString(newDate));
+
+		}
+
+	}
+
 
 }

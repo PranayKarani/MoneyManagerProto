@@ -5,6 +5,7 @@ package com.moneymanager.repo;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import com.moneymanager.Common;
 import com.moneymanager.db.DBHelper;
 import com.moneymanager.entities.Account;
@@ -19,8 +20,7 @@ import com.moneymanager.utilities.MyCalendar;
 import java.text.ParseException;
 import java.util.Date;
 
-import static com.moneymanager.Common.EXPENSE;
-import static com.moneymanager.Common.INCOME;
+import static com.moneymanager.Common.*;
 
 public class TTransactions implements ITransaction {
 
@@ -458,6 +458,45 @@ public class TTransactions implements ITransaction {
 	@Override
 	public void removeTransactionsForAccount(int id) {
 		dbHelper.delete(TABLE_NAME, ACCOUNT + " = ?", new String[]{String.valueOf(id)});
+	}
+
+	@Override
+	public Transaction[] getsSearchedTransactions(String[] queries) {
+
+		if (queries.length == 0) {
+			return null;
+		} else {
+
+			String query = SELECT_TRANS_JOIN_CAT_AND_ACC + " WHERE ";
+			for (String q : queries) {
+
+				if (q.equals("")) {
+					continue;
+				}
+
+				query += " " + q + " AND ";
+
+			}
+			query += " '1'='1' ";
+			query += DEFAULT_ORDER_BY_TID;
+
+			Cursor c = dbHelper.select(query, null);
+
+			if (c.getCount() <= 0) {
+				return null;
+			}
+
+			Log.i(mylog, query);
+
+			Transaction[] transactions = new Transaction[c.getCount()];
+			while (c.moveToNext()) {
+				transactions[c.getPosition()] = extractTransactionFromCursor(c);
+			}
+
+			return transactions;
+
+		}
+
 	}
 
 	@Override

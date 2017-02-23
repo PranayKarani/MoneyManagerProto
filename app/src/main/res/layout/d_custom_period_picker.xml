@@ -6,6 +6,7 @@
               android:padding="8sp">
 
     <TextView
+        android:id="@+id/d_custom_period_from_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="From"
@@ -23,6 +24,7 @@
         android:textSize="32sp"/>
 
     <TextView
+        android:id="@+id/d_custom_period_to_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="To"

@@ -43,4 +43,6 @@ public interface ITransaction {
 	Transaction getTransaction(int selectedTransactionID);
 
 	void removeTransactionsForAccount(int id);
+
+	Transaction[] getsSearchedTransactions(String[] queries);
 }

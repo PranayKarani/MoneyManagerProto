@@ -17,7 +17,7 @@
         </activity>
         <activity android:name=".activities.accounts.AAccounts">
         </activity>
-        <activity android:name=".activities.ASearch">
+        <activity android:name=".activities.search.ASearch">
         </activity>
         <activity android:name=".activities.transaction.AAddTransaction">
         </activity>
@@ -44,6 +44,8 @@
         <activity android:name=".activities.debts.AEditDebt">
         </activity>
         <activity android:name=".activities.ASettings">
+        </activity>
+        <activity android:name=".activities.search.ASearchResults">
         </activity>
     </application>
 

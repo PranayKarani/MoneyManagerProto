@@ -92,8 +92,26 @@ public class ASettings extends MyBaseActivity {
 	public void onBackupClick(View view) {
 
 		backup = true;
-		googleApiClient.disconnect();
-		googleApiClient.connect();
+		new AlertDialog.Builder(this)
+				.setTitle("Create Backup?")
+				.setMessage("Older backups will be deleted")
+				.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						showShortToast("backup started");
+						googleApiClient.disconnect();
+						googleApiClient.connect();
+					}
+				})
+				.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				})
+				.create()
+				.show();
+
 	}
 
 	public void onRestoreClick(View view) {

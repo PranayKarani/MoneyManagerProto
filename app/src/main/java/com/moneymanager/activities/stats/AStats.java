@@ -348,8 +348,7 @@ public class AStats extends AppCompatActivity {
 			int m = cal.get(Calendar.MONTH);
 			int d = cal.get(Calendar.DAY_OF_MONTH);
 
-			DatePickerDialog dp = new DatePickerDialog(getActivity(), this, y, m, d);
-			return dp;
+			return new DatePickerDialog(getActivity(), this, y, m, d);
 		}
 
 		public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
