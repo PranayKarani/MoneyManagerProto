@@ -136,6 +136,11 @@ public class TCategories implements ICategory {
 	@Override
 	public void insertNewCategory(Category category) throws CategoryExistsException {
 
+		if (category.getName().toLowerCase().equals(Category.OTHER_EXPENSE.toLowerCase()) ||
+				category.getName().toLowerCase().equals(Category.OTHER_INCOME.toLowerCase())) {
+			throw new CategoryExistsException();
+		}
+
 		Cursor c = dbHelper.select(q_CHECK_CATEGORY(category.getName().toLowerCase(), category.getType()), null);
 
 		if (c.getCount() > 0) {
@@ -182,13 +187,13 @@ public class TCategories implements ICategory {
 	private void whenNoCategoryFound() {
 		// insert some categories before hand
 		final ContentValues cv = new ContentValues();
-		cv.put(NAME, "Other expense");
+		cv.put(NAME, Category.OTHER_EXPENSE);
 		cv.put(TYPE, EXPENSE);
 		cv.put(EXCLUDE, 0);
 		dbHelper.insert(TABLE_NAME, cv);
 
 		final ContentValues cv1 = new ContentValues();
-		cv1.put(NAME, "Other income");
+		cv1.put(NAME, Category.OTHER_INCOME);
 		cv1.put(TYPE, INCOME);
 		cv1.put(EXCLUDE, 0);
 		dbHelper.insert(TABLE_NAME, cv1);

@@ -4,6 +4,8 @@ package com.moneymanager.entities;
 
 public class Category {
 
+	public static final String OTHER_EXPENSE = "other expense";
+	public static final String OTHER_INCOME = "other income";
 	private int id;
 	private String name;
 	private int type; // 0- income, 1- expense
@@ -11,7 +13,8 @@ public class Category {
 
 	public Category(int id, String name, int type, boolean exclude) {
 		this.id = id;
-		this.name = name.toLowerCase().replaceFirst(String.valueOf(name.charAt(0)), String.valueOf(name.charAt(0)).toUpperCase());
+		name = name.toLowerCase();
+		this.name = name.replaceFirst(String.valueOf(name.charAt(0)), String.valueOf(name.charAt(0)).toUpperCase());
 		this.type = type;
 		this.exclude = exclude;
 	}

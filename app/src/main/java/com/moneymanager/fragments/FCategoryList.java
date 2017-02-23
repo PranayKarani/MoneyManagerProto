@@ -115,7 +115,6 @@ public class FCategoryList extends Fragment {
 							}
 
 
-
 						}
 
 
@@ -144,13 +143,16 @@ public class FCategoryList extends Fragment {
 				selectedCategoryIndex = position;
 				Category cat = myCategories[position];
 
-				if (cat.getId() > 2) {
-					cat_name_edittext.setText(cat.getName());
-					cat_type_toggle.setChecked(cat.getType() == EXPENSE);
-					dialog.show();
-				} else {
+				if (cat.getName().toLowerCase().equals(Category.OTHER_EXPENSE.toLowerCase()) ||
+						cat.getName().toLowerCase().equals(Category.OTHER_INCOME.toLowerCase())) {
 					Toast.makeText(getContext(), "Cannot modify this Category", Toast.LENGTH_LONG).show();
+					return;
 				}
+
+				cat_name_edittext.setText(cat.getName());
+				cat_type_toggle.setChecked(cat.getType() == EXPENSE);
+				dialog.show();
+
 
 			}
 		});
@@ -173,7 +175,6 @@ public class FCategoryList extends Fragment {
 				listView.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, myCategoriesNameArray));
 			}
 		}.execute();
-
 
 
 	}
