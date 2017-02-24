@@ -91,6 +91,12 @@ public class TTransactions implements ITransaction {
 				DEFAULT_ORDER_BY_TID;
 	}
 
+	private String q_SELECT_ACCOUNT_TRANSACTIONS(int accId) {
+		return SELECT_TRANS_JOIN_CAT_AND_ACC +
+				" WHERE " + ACCOUNT + " = " + accId +
+				DEFAULT_ORDER_BY_TID;
+	}
+
 	private String q_SELECT_ACCOUNT_TRANSACTIONS_FOR_DAY(int accId, Date date) {
 		// get Date
 		final String date_format = MyCalendar.getSimpleDateFormat().format(date);
@@ -223,6 +229,19 @@ public class TTransactions implements ITransaction {
 	public Transaction[] getTransactionsForDay(Date date) {
 
 		Cursor c = dbHelper.select(q_SELECT_ALL_TRANSACTIONS_FOR_DAY(date), null);
+
+		final Transaction[] t = new Transaction[c.getCount()];
+
+		while (c.moveToNext()) {
+			t[c.getPosition()] = extractTransactionFromCursor(c);
+		}
+
+		return t;
+	}
+
+	@Override
+	public Transaction[] getAccountSpecificTransactions(int accID) {
+		Cursor c = dbHelper.select(q_SELECT_ACCOUNT_TRANSACTIONS(accID), null);
 
 		final Transaction[] t = new Transaction[c.getCount()];
 

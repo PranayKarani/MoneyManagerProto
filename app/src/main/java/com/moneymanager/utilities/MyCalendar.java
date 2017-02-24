@@ -85,6 +85,16 @@ public class MyCalendar {
 
 	}
 
+	public static String getShortDateString(Date date) {
+
+		int d = date.getDate();
+		int m = date.getMonth() + 1;
+		int y = date.getYear() - 100;
+
+		return (d < 10 ? "0" + d : d) + "/" + (m < 10 ? "0" + m : m) + "/" + y;
+
+	}
+
 	public static Date dateBeforeDays(int noofDays) {
 		final Date dateToday = dateToday();
 

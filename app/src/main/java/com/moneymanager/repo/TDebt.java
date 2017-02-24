@@ -73,6 +73,12 @@ public class TDebt implements IDebt {
 
 	}
 
+	private String q_SELECT_ACCOUNT_DEBTS(int accId) {
+
+		return SELECT_DEBT_JOIN_USER_AND_ACCOUNT + " WHERE " + ACCOUNT + " = " + accId + " ORDER BY " + DATETIME + " DESC";
+
+	}
+
 	private String q_SELECT_VERY_SPECIFIC_DEBT(int useId, int accID, int type, String dateString) {
 		return SELECT_DEBT_JOIN_USER_AND_ACCOUNT +
 				" WHERE " + USER + " = " + useId +
@@ -193,6 +199,18 @@ public class TDebt implements IDebt {
 
 	}
 
+	@Override
+	public Debt[] getAccountSpecificDebts(int selectedAccountId) {
+		Cursor c = dbHelper.select(q_SELECT_ACCOUNT_DEBTS(selectedAccountId), null);
+
+		Debt[] debts = new Debt[c.getCount()];
+
+		while (c.moveToNext()) {
+			debts[c.getPosition()] = extractDebtFromCursor(c);
+		}
+
+		return debts;
+	}
 
 	public void updateDebt(Debt d) throws InsufficientBalanceException {
 

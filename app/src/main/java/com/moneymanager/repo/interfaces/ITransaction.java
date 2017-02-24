@@ -17,6 +17,8 @@ public interface ITransaction {
 
 	double getAccountSpecificSumOfTransactionTypeForDay(int acc, int type, Date date);
 
+	Transaction[] getAccountSpecificTransactions(int accID);
+
 	Transaction[] getAccountSpecificTransactionsForDay(int accId, Date date);
 
 	Transaction[] getTransactionsForWeek(Date date);

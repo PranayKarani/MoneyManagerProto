@@ -24,4 +24,6 @@ public interface IDebt {
 	Debt[] getAllDebtsForUser(int id);
 
 	void updateDebt(Debt updatedDebt) throws InsufficientBalanceException;
+
+	Debt[] getAccountSpecificDebts(int selectedAccountId);
 }
