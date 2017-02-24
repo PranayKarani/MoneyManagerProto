@@ -233,13 +233,6 @@ public class TAccounts implements IAccount {
 
 	}
 
-	@Override
-	public Object[] getAccountLedger(int accountID) {
-
-
-		return new Object[0];
-	}
-
 	private Account extractAccountFromCursor(Cursor c) {
 		final int id = c.getInt(c.getColumnIndex(ID));
 		final String name = c.getString(c.getColumnIndex(NAME));
