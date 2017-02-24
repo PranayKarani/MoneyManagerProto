@@ -188,23 +188,6 @@ public class TAccounts implements IAccount {
 	}
 
 	@Override
-	public void transferAmount(int fromAccount, int toAccount, double amt) throws InsufficientBalanceException {
-
-		Account fAccount = getAccount(fromAccount);
-
-		if (amt > fAccount.getBalance()) {
-			throw new InsufficientBalanceException();
-		} else {
-
-			updateAccountBalance(fromAccount, amt, false);
-			updateAccountBalance(toAccount, amt, true);
-
-
-		}
-
-	}
-
-	@Override
 	public double getSumOfBalanceOfAllAccounts() {
 		final Cursor c = dbHelper.select(q_SUM_BALANCE_FROM_ALL_ACCOUNTS(), null);
 		if (c.moveToNext()) {
@@ -248,6 +231,13 @@ public class TAccounts implements IAccount {
 		cv.put(BALANCE, new_bal);
 		dbHelper.update(TABLE_NAME, cv, ID + " = ?", new String[]{String.valueOf(id)});
 
+	}
+
+	@Override
+	public Object[] getAccountLedger(int accountID) {
+
+
+		return new Object[0];
 	}
 
 	private Account extractAccountFromCursor(Cursor c) {

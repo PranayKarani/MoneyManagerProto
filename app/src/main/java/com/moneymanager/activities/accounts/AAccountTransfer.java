@@ -12,9 +12,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.moneymanager.R;
 import com.moneymanager.entities.Account;
+import com.moneymanager.entities.Transfer;
 import com.moneymanager.exceptions.InsufficientBalanceException;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.TAccounts;
+import com.moneymanager.repo.TTransfers;
+import com.moneymanager.utilities.MyCalendar;
 
 import static com.moneymanager.Common.setupToolbar;
 
@@ -128,8 +131,15 @@ public class AAccountTransfer extends AppCompatActivity {
 
 	private void transferAmount(int fromAccount, int toAccount, double amt) throws InsufficientBalanceException {
 
-		TAccounts tAccounts = new TAccounts(this);
-		tAccounts.transferAmount(fromAccount, toAccount, amt);
+		final TAccounts tAccounts = new TAccounts(this);
+
+		final Account toAcc = tAccounts.getAccount(toAccount);
+		final Account fromAcc = tAccounts.getAccount(fromAccount);
+
+		final Transfer transfer = new Transfer(-1, toAcc, fromAcc, amt, MyCalendar.dateToday());
+
+		final TTransfers tTransfers = new TTransfers(this);
+		tTransfers.addTransfer(transfer);
 
 	}
 

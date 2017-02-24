@@ -15,7 +15,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
 	public static final String DB_NAME = "moneymanager.db";
-	private static final int DB_VERSION = 3;
+	private static final int DB_VERSION = 5;
 
 
 	public DBHelper(Context context) {
@@ -30,7 +30,8 @@ public class DBHelper extends SQLiteOpenHelper {
 				TTransactions.q_CREATE_TABLE(),
 				TUser.q_CREATE_TABLE(),
 				TDebt.q_CREATE_TABLE(),
-				TBudget.q_CREATE_TABLE()
+				TBudget.q_CREATE_TABLE(),
+				TTransfers.q_CREATE_TABLE()
 		};
 
 		for (String i : newTables) {
@@ -45,9 +46,9 @@ public class DBHelper extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
 
-		if (newVersion == 4) {
+		if (newVersion == 5) {
 			final String[] newTables = {
-					TBudget.q_CREATE_TABLE(),
+					TTransfers.q_CREATE_TABLE(),
 			};
 
 			for (String i : newTables) {

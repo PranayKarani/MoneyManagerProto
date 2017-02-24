@@ -15,6 +15,19 @@
         </library>
       </libraries>
     </data-source>
+    <data-source source="LOCAL" name="Android SQLite" uuid="079d69f6-a87e-45a3-a95f-3662e08e632a">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:$USER_HOME$/Library/Caches/IntelliJIdea2016.3/android/databases/SERIAL_NUMBER_57d1ee3e/com.moneymanager/internal/moneymanager.db</jdbc-url>
+      <libraries>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.8.11.2/sqlite-jdbc-3.8.11.2.jar</url>
+        </library>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.8.11.2/xerial-sqlite-license.txt</url>
+        </library>
+      </libraries>
+    </data-source>
   </component>
   <component name="GradleLocalSettings">
     <option name="modificationStamps">
@@ -46,6 +59,11 @@
     <profile version="1.0">
       <option name="myName" value="Project Default" />
       <inspection_tool class="Duplicates" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+      <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
+        <option name="processCode" value="true" />
+        <option name="processLiterals" value="true" />
+        <option name="processComments" value="true" />
+      </inspection_tool>
     </profile>
     <version value="1.0" />
   </component>
@@ -265,6 +283,10 @@
   </component>
   <component name="dataSourceStorageLocal">
     <data-source name="Android SQLite" uuid="abe2c44f-9245-4994-b71f-e2c70b8bbbbe">
+      <database-info product="SQLite" version="3.8.11" jdbc-version="2.1" driver-name="SQLiteJDBC" driver-version="native" />
+      <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed" />
+    </data-source>
+    <data-source name="Android SQLite" uuid="079d69f6-a87e-45a3-a95f-3662e08e632a">
       <database-info product="SQLite" version="3.8.11" jdbc-version="2.1" driver-name="SQLiteJDBC" driver-version="native" />
       <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed" />
     </data-source>

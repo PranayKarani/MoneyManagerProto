@@ -62,11 +62,12 @@ public class BackupManager {
 				TTransactions.TABLE_NAME,
 				TUser.TABLE_NAME,
 				TDebt.TABLE_NAME,
-				TBudget.TABLE_NAME
+				TBudget.TABLE_NAME,
+				TTransfers.TABLE_NAME
 		};
 
 		for (String s : tableNames) {
-			scriptBuilder.append("DELETE FROM ").append(s).append(";");
+			scriptBuilder.append("DROP TABLE ").append(s).append(";");
 		}
 
 		for (String s : newTables) {

@@ -35,7 +35,7 @@ public class MyCalendar {
 
 		hours = (hours > 12) ? hours - 12 : hours;
 
-		return hours + ":" + minutes + " " + am;
+		return hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + " " + am;
 
 	}
 

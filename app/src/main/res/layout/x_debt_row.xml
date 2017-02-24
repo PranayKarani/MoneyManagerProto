@@ -62,7 +62,7 @@
                     android:layout_marginRight="4sp"
                     android:layout_weight="1"
                     android:text="User"
-                    android:textSize="18sp"/>
+                    android:textSize="14sp"/>
 
                 <TextView
                     android:id="@+id/x_debt_amt"
@@ -70,8 +70,7 @@
                     android:layout_height="wrap_content"
                     android:text="Rs 1243"
                     android:textAlignment="viewStart"
-
-                    android:textSize="18sp"/>
+                    android:textSize="14sp"/>
             </LinearLayout>
 
             <LinearLayout

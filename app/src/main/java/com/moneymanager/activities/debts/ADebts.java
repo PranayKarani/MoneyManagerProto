@@ -10,8 +10,6 @@ import com.moneymanager.R;
 import com.moneymanager.activities.transaction.AAddTransaction;
 import com.moneymanager.adapters.DebtAdapter;
 
-import static com.moneymanager.Common.setupToolbar;
-
 public class ADebts extends AppCompatActivity {
 
 	@Override
@@ -19,7 +17,7 @@ public class ADebts extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a_debt);
 
-		setupToolbar(this, R.id.a_debt_toolbar, "Debts and Loans");
+//		setupToolbar(this, R.id.a_debt_toolbar, "Debts and Loans");
 
 		// View Pager Stuff
 		ViewPager viewPager = (ViewPager) findViewById(R.id.debt_viewpager);

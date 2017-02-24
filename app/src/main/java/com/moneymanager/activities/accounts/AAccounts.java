@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.*;
+import android.view.View.OnClickListener;
 import android.widget.*;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -40,7 +41,7 @@ public class AAccounts extends MyBaseActivity {
 
 		// setting up fab
 		final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add_account);
-		fab.setOnClickListener(new View.OnClickListener() {
+		fab.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(AAccounts.this, AAddAccount.class));
@@ -259,14 +260,14 @@ public class AAccounts extends MyBaseActivity {
 
 			// set click listener to edit button in each row
 			final ImageView button = (ImageView) rowView.findViewById(R.id.account_view_edit_button);
-			button.setOnClickListener(new View.OnClickListener() {
+			button.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 
 					final Snackbar sb = Snackbar.make(findViewById(R.id.a_accounts_coordinate_layout),
 							"Delete Account?",
 							Snackbar.LENGTH_SHORT)
-							.setAction("Yes", new View.OnClickListener() {
+							.setAction("Yes", new OnClickListener() {
 								@Override
 								public void onClick(View v) {
 
@@ -303,6 +304,18 @@ public class AAccounts extends MyBaseActivity {
 					sbv.setBackgroundColor(getMyColor(AAccounts.this, R.color.colorRed));
 					sb.setActionTextColor(getMyColor(AAccounts.this, R.color.colorPrimaryDark));
 					sb.show();
+
+				}
+			});
+
+			rowView.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+
+					Intent intent = new Intent(AAccounts.this, ALedger.class);
+					intent.putExtra("acc_id", acc.getId());
+					startActivity(intent);
 
 				}
 			});
