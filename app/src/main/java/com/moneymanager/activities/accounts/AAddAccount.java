@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.moneymanager.R;
 import com.moneymanager.entities.Account;
 import com.moneymanager.repo.TAccounts;
+import com.moneymanager.utilities.MyCalendar;
 import com.moneymanager.utilities.ShrPref;
 
 import static com.moneymanager.Common.setupToolbar;
@@ -55,7 +56,7 @@ public class AAddAccount extends AppCompatActivity {
 			acc_bal.setError("Enter starting balance");
 
 		} else {
-			long new_account_id = accountTable.insertNewAccount(new Account(-1, new_acc_name, Double.valueOf(new_acc_bal), false));
+			long new_account_id = accountTable.insertNewAccount(new Account(-1, new_acc_name, Double.valueOf(new_acc_bal), Double.valueOf(new_acc_bal), MyCalendar.dateToday(), false));
 			if (new_account_id >= 1) {
 				Toast.makeText(this, "New Account " + new_acc_name + " created!", Toast.LENGTH_LONG).show();
 				AAccounts.noAccounts = false;

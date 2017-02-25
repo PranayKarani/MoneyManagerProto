@@ -10,6 +10,10 @@ import com.moneymanager.entities.Account;
 import com.moneymanager.exceptions.InsufficientBalanceException;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.interfaces.IAccount;
+import com.moneymanager.utilities.MyCalendar;
+
+import java.text.ParseException;
+import java.util.Date;
 
 import static com.moneymanager.Common.DEBT;
 import static com.moneymanager.Common.LOAN;
@@ -20,6 +24,8 @@ public class TAccounts implements IAccount {
 	public static final String ID = "_ID";
 	public static final String NAME = "acc_name";
 	public static final String BALANCE = "acc_bal";
+	public static final String STARTING_BALANCE = "acc_start_bal";
+	public static final String DATE = "acc_date";
 	public static final String EXCLUDE = "acc_ex";
 
 	/* Query Strings */
@@ -39,6 +45,8 @@ public class TAccounts implements IAccount {
 						ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 						NAME + " TEXT, " +
 						BALANCE + " DOUBLE, " +
+						STARTING_BALANCE + " DOUBLE, " +
+						DATE + " DATETIME, " +
 						EXCLUDE + " INTEGER" +
 						")";
 	}
@@ -95,6 +103,8 @@ public class TAccounts implements IAccount {
 		final ContentValues cv = new ContentValues();
 		cv.put(NAME, account.getName());
 		cv.put(BALANCE, account.getBalance());
+		cv.put(STARTING_BALANCE, account.getStartingBalance());
+		cv.put(DATE, account.formatedDateTime());
 		cv.put(EXCLUDE, account.isExclude());
 
 		return dbHelper.insert(TABLE_NAME, cv);
@@ -237,9 +247,18 @@ public class TAccounts implements IAccount {
 		final int id = c.getInt(c.getColumnIndex(ID));
 		final String name = c.getString(c.getColumnIndex(NAME));
 		final double balance = c.getDouble(c.getColumnIndex(BALANCE));
+		final double start_bal = c.getDouble(c.getColumnIndex(STARTING_BALANCE));
+		String dateString = c.getString(c.getColumnIndex(DATE));
+		dateString = dateString == null || dateString.equals("") ? MyCalendar.stringFormatOfDate(MyCalendar.dateToday()) : dateString;
+		Date dateTime = null;
+		try {
+			dateTime = MyCalendar.getSimpleDateFormat().parse(dateString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 		final boolean exclude = c.getInt(c.getColumnIndex(EXCLUDE)) == 1;
 
-		return new Account(id, name, balance, exclude);
+		return new Account(id, name, balance, start_bal, dateTime, exclude);
 	}
 
 }

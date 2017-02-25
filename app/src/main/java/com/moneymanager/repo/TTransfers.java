@@ -42,7 +42,7 @@ public class TTransfers implements ITransfer {
 						FROM_ACCOUNT + " INTEGER," +
 						AMOUNT + " DOUBLE," +
 						DATE + " DATETIME," +
-						"FOREIGN KEY(" + TO_ACCOUNT + ") REFERENCES " + TAccounts.TABLE_NAME + "(" + TAccounts.ID + ") ON DELETE CASCADE " +
+						"FOREIGN KEY(" + TO_ACCOUNT + ") REFERENCES " + TAccounts.TABLE_NAME + "(" + TAccounts.ID + ") ON DELETE CASCADE, " +
 						"FOREIGN KEY(" + FROM_ACCOUNT + ") REFERENCES " + TAccounts.TABLE_NAME + "(" + TAccounts.ID + ") ON DELETE CASCADE " +
 						")";
 
@@ -128,12 +128,12 @@ public class TTransfers implements ITransfer {
 		// create to account
 		Account to_account = tAccounts.getAccount(to_account_id);
 		if (to_account == null) {
-			to_account = new Account(-1, "deleted account", -1, false);
+			to_account = new Account(-1, "deleted account", -1, -1, null, false);
 		}
 
 		Account from_account = tAccounts.getAccount(from_account_id);
 		if (from_account == null) {
-			from_account = new Account(-1, "deleted account", -1, false);
+			from_account = new Account(-1, "deleted account", -1, -1, null, false);
 		}
 
 		return new Transfer(id, to_account, from_account, amount, date);

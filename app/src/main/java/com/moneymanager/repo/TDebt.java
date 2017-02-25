@@ -95,19 +95,19 @@ public class TDebt implements IDebt {
 		// if debt does not exists, insert new else update existing one
 //		if (existingdebt == null) {
 
-			final ContentValues cv = new ContentValues();
-			cv.put(TYPE, debt.getType());
-			cv.put(USER, debt.getUser().getId());
-			cv.put(AMOUNT, debt.getAmount());
-			cv.put(ACCOUNT, debt.getAccount().getId());
-			cv.put(INFO, debt.getInfo());
-			cv.put(DATETIME, MyCalendar.getSimpleDateFormat().format(debt.getDate()));
-			dbHelper.insert(TABLE_NAME, cv);
+		final ContentValues cv = new ContentValues();
+		cv.put(TYPE, debt.getType());
+		cv.put(USER, debt.getUser().getId());
+		cv.put(AMOUNT, debt.getAmount());
+		cv.put(ACCOUNT, debt.getAccount().getId());
+		cv.put(INFO, debt.getInfo());
+		cv.put(DATETIME, MyCalendar.getSimpleDateFormat().format(debt.getDate()));
+		dbHelper.insert(TABLE_NAME, cv);
 
-			// update account balance if necessary
-			TAccounts tAccounts = new TAccounts(context);
-			final boolean add = debt.getType() == LOAN;
-			tAccounts.updateAccountBalance(debt.getAccount().getId(), debt.getAmount(), add);
+		// update account balance if necessary
+		TAccounts tAccounts = new TAccounts(context);
+		final boolean add = debt.getType() == LOAN;
+		tAccounts.updateAccountBalance(debt.getAccount().getId(), debt.getAmount(), add);
 
 //		} else {
 //
@@ -271,8 +271,15 @@ public class TDebt implements IDebt {
 		final int acc_id = c.getInt(c.getColumnIndex(ACCOUNT));
 		final String acc_name = c.getString(c.getColumnIndex(TAccounts.NAME));
 		final double acc_balance = c.getDouble(c.getColumnIndex(TAccounts.BALANCE));
+		final double acc_start_balance = c.getDouble(c.getColumnIndex(TAccounts.STARTING_BALANCE));
+		Date acc_date = null;
+		try {
+			acc_date = MyCalendar.getSimpleDateFormat().parse(c.getString(c.getColumnIndex(TAccounts.STARTING_BALANCE)));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 		final boolean acc_exclude = c.getInt(c.getColumnIndex(TAccounts.EXCLUDE)) == 1;
-		final Account account = new Account(acc_id, acc_name, acc_balance, acc_exclude);
+		final Account account = new Account(acc_id, acc_name, acc_balance, acc_start_balance, acc_date, acc_exclude);
 
 		final String info = c.getString(c.getColumnIndex(INFO));
 		Date date = null;

@@ -12,10 +12,14 @@ import android.widget.TextView;
 import com.moneymanager.Common;
 import com.moneymanager.R;
 import com.moneymanager.activities.MyBaseActivity;
+import com.moneymanager.entities.Account;
 import com.moneymanager.entities.Debt;
 import com.moneymanager.entities.Transaction;
+import com.moneymanager.entities.Transfer;
+import com.moneymanager.repo.TAccounts;
 import com.moneymanager.repo.TDebt;
 import com.moneymanager.repo.TTransactions;
+import com.moneymanager.repo.TTransfers;
 import com.moneymanager.utilities.MyCalendar;
 
 import static com.moneymanager.Common.EXPENSE;
@@ -45,6 +49,10 @@ public class ALedger extends MyBaseActivity {
 	private double netLoanAmount = 0;
 	private double netDebt = 0;
 
+	private double netTransferFrom = 0;
+	private double netTransferTo = 0;
+	private double netTransfer = 0;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -64,12 +72,14 @@ public class ALedger extends MyBaseActivity {
 
 		new TransactionsLedgerLoader().execute();
 		new DebtLedgerLoader().execute();
+		new TransferLedgerLoader().execute();
 
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.ledger_menu, menu);
 		type_text = menu.getItem(0);
+		type_text.setEnabled(false);
 		return true;
 	}
 
@@ -88,6 +98,10 @@ public class ALedger extends MyBaseActivity {
 		netLoanAmount = 0;
 		netDebt = 0;
 
+		netTransfer = 0;
+		netTransferTo = 0;
+		netTransferFrom = 0;
+
 		switch (item.getItemId()) {
 
 			case R.id.ledger_menu_trans:
@@ -103,12 +117,14 @@ public class ALedger extends MyBaseActivity {
 			case R.id.ledger_menu_transfers:
 				type_text.setTitle("Transfers");
 				selectedType = TRANSFER;
+				new TransferLedgerLoader().execute();
 				break;
 			default: // custom
 				type_text.setTitle("All");
 				selectedType = ALL;
 				new TransactionsLedgerLoader().execute();
 				new DebtLedgerLoader().execute();
+				new TransactionsLedgerLoader().execute();
 				break;
 		}
 
@@ -145,11 +161,6 @@ public class ALedger extends MyBaseActivity {
 			super.onPostExecute(transactions);
 
 			headerText.setVisibility(View.VISIBLE);
-
-			if (transactions.length == 0) {
-				headerText.setText("No Transactions found");
-				return;
-			}
 
 			listLayout.removeAllViews();
 
@@ -189,6 +200,26 @@ public class ALedger extends MyBaseActivity {
 
 			}
 
+			// add starting balance row
+			final View transRow = getLayoutInflater().inflate(R.layout.x_ledger_transaction, null);
+			final TextView stb_dateText = (TextView) transRow.findViewById(R.id.x_ledger_trans_date);
+			final TextView stb_catText = (TextView) transRow.findViewById(R.id.x_ledger_trans_cat);
+			final TextView stb_creText = (TextView) transRow.findViewById(R.id.x_ledger_trans_credit);
+			final TextView stb_debText = (TextView) transRow.findViewById(R.id.x_ledger_trans_debit);
+
+			TAccounts tAccounts = new TAccounts(ALedger.this);
+			Account thisAccount = tAccounts.getAccount(selectedAccountId);
+			log_i("debug: " + selectedAccountId);
+			log_i("debug: " + thisAccount.getId());
+			log_i("debug: " + thisAccount.getName());
+			log_i("debug: " + thisAccount.getCreateDate());
+
+			stb_dateText.setText((thisAccount.getCreateDate() == null ? "-" : MyCalendar.getShortDateString(thisAccount.getCreateDate())));
+			stb_catText.setText("Starting balance");
+			stb_debText.setText("");
+			stb_creText.setText(String.valueOf(thisAccount.getStartingBalance()));
+			netTransIncome += thisAccount.getStartingBalance();
+			listLayout.addView(transRow);
 
 			// Show Total
 			final View totalRow = getLayoutInflater().inflate(R.layout.x_ledger_transaction, null);
@@ -353,6 +384,134 @@ public class ALedger extends MyBaseActivity {
 			final TextView netDebText = (TextView) netRow.findViewById(R.id.x_ledger_debt_debit);
 			netDebText.setTypeface(date_text.getTypeface(), Typeface.BOLD);
 			netDebText.setText(String.valueOf(netDebt));
+			netDebText.setTextColor(Common.getMyColor(ALedger.this, R.color.colorBlue));
+			listLayout.addView(netRow);
+
+			helperText.setVisibility(View.GONE);
+			listLayout.setVisibility(View.VISIBLE);
+
+		}
+	}
+
+	class TransferLedgerLoader extends AsyncTask<Void, Void, Transfer[]> {
+
+		TextView headerText, helperText;
+		LinearLayout listLayout;
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			transfers_container.setVisibility(View.VISIBLE);
+			headerText = (TextView) transfers_container.findViewById(R.id.a_ledger_transfer_header);
+			headerText.setVisibility(View.GONE);
+			helperText = (TextView) transfers_container.findViewById(R.id.a_ledger_transfer_helper_text);
+			helperText.setVisibility(View.VISIBLE);
+			listLayout = (LinearLayout) transfers_container.findViewById(R.id.a_ledger_transfer_list);
+			listLayout.setVisibility(View.GONE);
+		}
+
+		@Override
+		protected Transfer[] doInBackground(Void... params) {
+
+			TTransfers tTransfer = new TTransfers(ALedger.this);
+			return tTransfer.getAccountTransfers(selectedAccountId);
+
+		}
+
+		@Override
+		protected void onPostExecute(Transfer[] transfers) {
+			super.onPostExecute(transfers);
+
+			headerText.setVisibility(View.VISIBLE);
+
+			if (transfers.length == 0) {
+				headerText.setText("No Transfers found");
+				helperText.setVisibility(View.GONE);
+				return;
+			}
+
+			listLayout.removeAllViews();
+
+			final View row = getLayoutInflater().inflate(R.layout.x_ledger_transfer, null);
+			final TextView date_text = (TextView) row.findViewById(R.id.x_ledger_transfer_date);
+			date_text.setTypeface(date_text.getTypeface(), Typeface.BOLD);
+			final TextView from_Text = (TextView) row.findViewById(R.id.x_ledger_transfer_from);
+			from_Text.setTypeface(date_text.getTypeface(), Typeface.BOLD);
+			final TextView to_Text = (TextView) row.findViewById(R.id.x_ledger_transfer_to);
+			to_Text.setTypeface(date_text.getTypeface(), Typeface.BOLD);
+			final TextView cre_text = (TextView) row.findViewById(R.id.x_ledger_transfer_credit);
+			cre_text.setTypeface(date_text.getTypeface(), Typeface.BOLD);
+			cre_text.setTextColor(Common.getMyColor(ALedger.this, R.color.colorGreen));
+			final TextView deb_text = (TextView) row.findViewById(R.id.x_ledger_transfer_debit);
+			deb_text.setTypeface(date_text.getTypeface(), Typeface.BOLD);
+			deb_text.setTextColor(Common.getMyColor(ALedger.this, R.color.colorRed));
+			listLayout.addView(row);
+
+			for (Transfer transfer : transfers) {
+
+				final View transRow = getLayoutInflater().inflate(R.layout.x_ledger_transfer, null);
+				final TextView dateText = (TextView) transRow.findViewById(R.id.x_ledger_transfer_date);
+				final TextView fromText = (TextView) transRow.findViewById(R.id.x_ledger_transfer_from);
+				final TextView toText = (TextView) transRow.findViewById(R.id.x_ledger_transfer_to);
+				final TextView creText = (TextView) transRow.findViewById(R.id.x_ledger_transfer_credit);
+				final TextView debText = (TextView) transRow.findViewById(R.id.x_ledger_transfer_debit);
+
+				dateText.setText(MyCalendar.getShortDateString(transfer.getDate()));
+				fromText.setText(transfer.getFromAccount().getName());
+				toText.setText(transfer.getToAccount().getName());
+
+				if (transfer.getFromAccount().getId() == selectedAccountId) {
+					creText.setText("");
+					debText.setText(String.valueOf(transfer.getAmount()));
+					netTransferFrom += transfer.getAmount();
+				} else {
+					debText.setText("");
+					creText.setText(String.valueOf(transfer.getAmount()));
+					netTransferTo += transfer.getAmount();
+				}
+				listLayout.addView(transRow);
+
+			}
+
+
+			// Show Total
+			final View totalRow = getLayoutInflater().inflate(R.layout.x_ledger_transfer, null);
+			final TextView dateText = (TextView) totalRow.findViewById(R.id.x_ledger_transfer_date);
+			dateText.setVisibility(View.INVISIBLE);
+			final TextView fromText = (TextView) totalRow.findViewById(R.id.x_ledger_transfer_from);
+			fromText.setTypeface(date_text.getTypeface(), Typeface.BOLD);
+			fromText.setText("Total");
+			final TextView toText = (TextView) totalRow.findViewById(R.id.x_ledger_transfer_to);
+			toText.setVisibility(View.INVISIBLE);
+			final TextView creText = (TextView) totalRow.findViewById(R.id.x_ledger_transfer_credit);
+			creText.setTypeface(date_text.getTypeface(), Typeface.BOLD);
+			creText.setTextColor(Common.getMyColor(ALedger.this, R.color.colorGreen));
+			creText.setText(String.valueOf(netTransferTo));
+			final TextView debText = (TextView) totalRow.findViewById(R.id.x_ledger_transfer_debit);
+			debText.setTypeface(date_text.getTypeface(), Typeface.BOLD);
+			debText.setTextColor(Common.getMyColor(ALedger.this, R.color.colorRed));
+			debText.setText(String.valueOf(netTransferFrom));
+			listLayout.addView(totalRow);
+
+			// Show Net
+			netTransfer = netTransferTo - netTransferFrom;
+
+			final View netRow = getLayoutInflater().inflate(R.layout.x_ledger_transfer, null);
+			final TextView netDateText = (TextView) netRow.findViewById(R.id.x_ledger_transfer_date);
+			netDateText.setVisibility(View.INVISIBLE);
+			final TextView netFromText = (TextView) netRow.findViewById(R.id.x_ledger_transfer_from);
+			netFromText.setTypeface(date_text.getTypeface(), Typeface.BOLD);
+			netFromText.setText("Net Transfer");
+			netFromText.setTextColor(Common.getMyColor(ALedger.this, R.color.colorBlue));
+			final TextView netCatText = (TextView) netRow.findViewById(R.id.x_ledger_transfer_to);
+			netCatText.setVisibility(View.INVISIBLE);
+			final TextView netCreText = (TextView) netRow.findViewById(R.id.x_ledger_transfer_credit);
+			netCreText.setTypeface(date_text.getTypeface(), Typeface.BOLD);
+			netCreText.setTextColor(Common.getMyColor(ALedger.this, R.color.colorBlue));
+			netCreText.setText("=");
+			final TextView netDebText = (TextView) netRow.findViewById(R.id.x_ledger_transfer_debit);
+			netDebText.setTypeface(date_text.getTypeface(), Typeface.BOLD);
+			netDebText.setText(String.valueOf(netTransfer));
 			netDebText.setTextColor(Common.getMyColor(ALedger.this, R.color.colorBlue));
 			listLayout.addView(netRow);
 

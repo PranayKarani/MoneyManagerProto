@@ -53,7 +53,8 @@ public class BackupManager {
 				TTransactions.q_CREATE_TABLE(),
 				TUser.q_CREATE_TABLE(),
 				TDebt.q_CREATE_TABLE(),
-				TBudget.q_CREATE_TABLE()
+				TBudget.q_CREATE_TABLE(),
+				TTransfers.q_CREATE_TABLE()
 		};
 
 		final String[] tableNames = {

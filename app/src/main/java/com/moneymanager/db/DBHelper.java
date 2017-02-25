@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.moneymanager.repo.*;
 
@@ -15,7 +16,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
 	public static final String DB_NAME = "moneymanager.db";
-	private static final int DB_VERSION = 5;
+	private static final int DB_VERSION = 9;
 
 
 	public DBHelper(Context context) {
@@ -46,14 +47,10 @@ public class DBHelper extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
 
-		if (newVersion == 5) {
-			final String[] newTables = {
-					TTransfers.q_CREATE_TABLE(),
-			};
-
-			for (String i : newTables) {
-				db.execSQL(i);
-			}
+		if (newVersion > oldVersion) {
+			db.execSQL(
+					"ALTER TABLE " + TAccounts.TABLE_NAME + " " +
+							"ADD COLUMN " + TAccounts.DATE + " DATETIME;");
 		}
 
 	}
@@ -73,7 +70,12 @@ public class DBHelper extends SQLiteOpenHelper {
 	 * select("SELECT * FROM student WHERE ID = ?", arrayOf("1"))
 	 */
 	public Cursor select(String query, String[] clauses) {
-		return getReadableDatabase().rawQuery(query, clauses);
+		try {
+			return getReadableDatabase().rawQuery(query, clauses);
+		} catch (SQLiteException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 

@@ -59,6 +59,7 @@
                         android:id="@+id/a_ledger_transactions_list"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="9dp"
                         android:orientation="vertical">
 
                     </LinearLayout>
@@ -102,6 +103,7 @@
                         android:id="@+id/a_ledger_debt_list"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="9dp"
                         android:orientation="vertical">
 
                     </LinearLayout>
@@ -114,12 +116,43 @@
                 android:id="@+id/a_ledger_transfers_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/a_ledger_transfer_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Transfers"/>
+                    android:text="Transfers"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/a_ledger_transfer_helper_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="Getting Debts and Loans"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimaryMedium"
+                    android:textSize="20dp"
+                    android:textStyle="italic"/>
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/a_ledger_transfer_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="9dp"
+                        android:orientation="vertical">
+
+                    </LinearLayout>
+
+                </HorizontalScrollView>
 
             </LinearLayout>
         </LinearLayout>
