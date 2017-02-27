@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -58,9 +59,15 @@ public class ALedger extends MyBaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.a_ledger);
 
-		setupToolbar(this, R.id.a_ledger_toolbar, "Ledger");
-
 		selectedAccountId = getIntent().getIntExtra("acc_id", -1);
+
+		if (selectedAccountId <= 0) {
+			setupToolbar(this, R.id.a_ledger_toolbar, "Ledger");
+		} else {
+			final Account acc = new TAccounts(this).getAccount(selectedAccountId);
+			setupToolbar(this, R.id.a_ledger_toolbar, acc.getName());
+		}
+
 
 		trans_container = (LinearLayout) findViewById(R.id.a_ledger_transactions_container);
 		debts_container = (LinearLayout) findViewById(R.id.a_ledger_debts_container);
@@ -209,15 +216,15 @@ public class ALedger extends MyBaseActivity {
 
 			TAccounts tAccounts = new TAccounts(ALedger.this);
 			Account thisAccount = tAccounts.getAccount(selectedAccountId);
-			log_i("debug: " + selectedAccountId);
-			log_i("debug: " + thisAccount.getId());
-			log_i("debug: " + thisAccount.getName());
-			log_i("debug: " + thisAccount.getCreateDate());
 
 			stb_dateText.setText((thisAccount.getCreateDate() == null ? "-" : MyCalendar.getShortDateString(thisAccount.getCreateDate())));
+			stb_dateText.setTextColor(Common.getMyColor(ALedger.this, R.color.colorPrimary));
 			stb_catText.setText("Starting balance");
+			stb_catText.setTypeface(stb_dateText.getTypeface(), Typeface.ITALIC);
+			stb_catText.setTextColor(Common.getMyColor(ALedger.this, R.color.colorPrimary));
 			stb_debText.setText("");
 			stb_creText.setText(String.valueOf(thisAccount.getStartingBalance()));
+			stb_creText.setTypeface(stb_dateText.getTypeface(), Typeface.ITALIC);
 			netTransIncome += thisAccount.getStartingBalance();
 			listLayout.addView(transRow);
 
@@ -260,6 +267,14 @@ public class ALedger extends MyBaseActivity {
 
 			helperText.setVisibility(View.GONE);
 			listLayout.setVisibility(View.VISIBLE);
+
+			final HorizontalScrollView scrollView = (HorizontalScrollView) trans_container.findViewById(R.id.a_ledger_transactions_scroll);
+			scrollView.setSmoothScrollingEnabled(true);
+			scrollView.postDelayed(new Runnable() {
+				public void run() {
+					scrollView.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
+				}
+			}, 1000L);
 
 		}
 	}
@@ -390,6 +405,14 @@ public class ALedger extends MyBaseActivity {
 			helperText.setVisibility(View.GONE);
 			listLayout.setVisibility(View.VISIBLE);
 
+			final HorizontalScrollView scrollView = (HorizontalScrollView) debts_container.findViewById(R.id.a_ledger_debt_scroll);
+			scrollView.setSmoothScrollingEnabled(true);
+			scrollView.postDelayed(new Runnable() {
+				public void run() {
+					scrollView.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
+				}
+			}, 1000L);
+
 		}
 	}
 
@@ -517,6 +540,14 @@ public class ALedger extends MyBaseActivity {
 
 			helperText.setVisibility(View.GONE);
 			listLayout.setVisibility(View.VISIBLE);
+
+			final HorizontalScrollView scrollView = (HorizontalScrollView) transfers_container.findViewById(R.id.a_ledger_transfer_scroll);
+			scrollView.setSmoothScrollingEnabled(true);
+			scrollView.postDelayed(new Runnable() {
+				public void run() {
+					scrollView.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
+				}
+			}, 1000L);
 
 		}
 	}

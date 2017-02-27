@@ -240,7 +240,6 @@ public class AAccounts extends MyBaseActivity {
 
 			// fill up the layout elements
 			final TextView nametv = (TextView) rowView.findViewById(R.id.account_view_name);
-//			nametv.setText(name + " (" + id + ")");
 			nametv.setText(name);
 			final TextView baltv = (TextView) rowView.findViewById(R.id.account_view_bal);
 			baltv.setText("Rs " + String.valueOf(bal));
@@ -253,10 +252,15 @@ public class AAccounts extends MyBaseActivity {
 			final int cC = tAccounts.countDebt(id);
 			final int lC = tAccounts.countLoan(id);
 
-			transactionSum = tC <= 0 ? "" : "transactions: " + tC;
-			debtSum = cC <= 0 ? "" : "\ndebt: " + cC;
-			loanSum = lC <= 0 ? "" : "\nloan: " + lC;
-			infotv.setText(transactionSum + "" + debtSum + "" + loanSum);
+			if (tC <= 0 && cC <= 0 && lC <= 0) {
+				infotv.setVisibility(View.GONE);
+			} else {
+				transactionSum = tC <= 0 ? "" : "transactions: " + tC;
+				debtSum = cC <= 0 ? "" : "\ndebt: " + cC;
+				loanSum = lC <= 0 ? "" : "\nloan: " + lC;
+				infotv.setVisibility(View.VISIBLE);
+				infotv.setText(transactionSum + "" + debtSum + "" + loanSum);
+			}
 
 			// set click listener to edit button in each row
 			final ImageView button = (ImageView) rowView.findViewById(R.id.account_view_edit_button);

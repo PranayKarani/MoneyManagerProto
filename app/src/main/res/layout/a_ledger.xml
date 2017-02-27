@@ -52,6 +52,7 @@
                     android:textStyle="italic"/>
 
                 <HorizontalScrollView
+                    android:id="@+id/a_ledger_transactions_scroll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -96,6 +97,7 @@
                     android:textStyle="italic"/>
 
                 <HorizontalScrollView
+                    android:id="@+id/a_ledger_debt_scroll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -140,6 +142,7 @@
                     android:textStyle="italic"/>
 
                 <HorizontalScrollView
+                    android:id="@+id/a_ledger_transfer_scroll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 

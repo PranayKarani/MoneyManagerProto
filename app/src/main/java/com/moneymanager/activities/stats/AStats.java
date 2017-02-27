@@ -507,7 +507,7 @@ public class AStats extends AppCompatActivity {
 			expense_trans_container.removeAllViews();
 
 			if (transactions.length > 0) {
-				fillTransList(R.layout.x_home_trans_row, null, transactions, true);
+				fillTransList(R.layout.x_stats_row, null, transactions, true);
 			}
 
 			income_trans_container_card.setVisibility((countIncomeTrans == 0) ? View.GONE : View.VISIBLE);
@@ -587,6 +587,7 @@ public class AStats extends AppCompatActivity {
 
 			piechart_dialog = new AlertDialog.Builder(AStats.this)
 					.setView(R.layout.d_stats_piechart)
+					.setCancelable(true)
 					.create();
 
 			main_piechart.setVisibility(View.VISIBLE);
@@ -607,7 +608,9 @@ public class AStats extends AppCompatActivity {
 						public void onShow(DialogInterface dialog) {
 
 							final LinearLayout container_layout = (LinearLayout) piechart_dialog.findViewById(R.id.d_stats_piechart_list_container);
-							container_layout.removeAllViews();
+							if (container_layout != null) {
+								container_layout.removeAllViews();
+							}
 
 							String period;
 							final int color = Common.getMyColor(AStats.this, type == INCOME ? R.color.colorGreen : R.color.colorRed);
@@ -698,7 +701,7 @@ public class AStats extends AppCompatActivity {
 										ttt[i] = req_trans.get(i);
 									}
 
-									fillTransList(R.layout.x_home_trans_row, container_layout, ttt, false);
+									fillTransList(R.layout.x_stats_row, container_layout, ttt, false);
 								}
 
 								@Override
@@ -897,7 +900,7 @@ public class AStats extends AppCompatActivity {
 								ttt[i] = req_trans.get(i);
 							}
 
-							fillTransList(R.layout.x_home_trans_row, container_layout, ttt, false);
+							fillTransList(R.layout.x_stats_row, container_layout, ttt, false);
 
 						}
 					});
@@ -922,7 +925,7 @@ public class AStats extends AppCompatActivity {
 				container_layout.removeAllViews();
 			}
 
-			Date previousDate = trans.length > 0 ? trans[0].getDateTime() : null; // used in other lists like in piechart dialog
+			Date previousDate = trans.length > 0 ? MyCalendar.dateBeforeDays(trans[0].getDateTime(), 1) : null; // used in other lists like in piechart dialog
 			Date previousExpenseDate = null;
 
 			switch (selectedPeriod) {
@@ -962,8 +965,9 @@ public class AStats extends AppCompatActivity {
 
 			int currentWeekDayIndexForIncome = 0;
 			int currentWeekDayIndexForExpense = 0;
-			for (final Transaction t : trans) {
+			for (int i = 0; i < trans.length; i++) {
 
+				final Transaction t = trans[i];
 				View rowView = getLayoutInflater().inflate(row_layout, null);
 
 				rowView.setOnClickListener(new View.OnClickListener() {
@@ -989,10 +993,14 @@ public class AStats extends AppCompatActivity {
 					}
 				});
 
-				final TextView tCat = (TextView) rowView.findViewById(R.id.x_home_trans_row_cat);
-				final TextView tAmt = (TextView) rowView.findViewById(R.id.x_home_trans_row_amt);
-				final TextView tAcc = (TextView) rowView.findViewById(R.id.x_home_trans_row_acc);
-				final TextView tInfo = (TextView) rowView.findViewById(R.id.x_home_trans_row_info);
+				final TextView tCat = (TextView) rowView.findViewById(R.id.x_stats_row_cat);
+				final TextView tAmt = (TextView) rowView.findViewById(R.id.x_stats_row_amt);
+				final TextView tAcc = (TextView) rowView.findViewById(R.id.x_stats_row_acc);
+				final TextView tDate = (TextView) rowView.findViewById(R.id.x_stats_row_date);
+				final TextView tInfo = (TextView) rowView.findViewById(R.id.x_stats_row_info);
+				tInfo.setText(t.getShortInfo());
+				tDate.setVisibility(View.INVISIBLE);
+				final String dateText = MyCalendar.dateToString(t.getDateTime()) + "\n" + MyCalendar.monthToString(t.getDateTime());
 
 				if (selectedAccountID == ALL_ACCOUNT_ID) {
 					tAcc.setVisibility(View.VISIBLE);
@@ -1003,8 +1011,6 @@ public class AStats extends AppCompatActivity {
 
 				tCat.setText(t.getCategory().getName());
 				tAmt.setText(t.getAmountString());
-				tInfo.setText(MyCalendar.getNiceFormatedCompleteDateString(t.getDateTime()));
-				tInfo.setTextColor(colorWhite);
 
 				if (loadForMainScreen) {
 
@@ -1022,6 +1028,8 @@ public class AStats extends AppCompatActivity {
 							if (!firstIncomeDateOfWeek.equals(t.getDateTime())) {
 								container.addView(getLayoutInflater().inflate(R.layout.x_line, null));
 							}
+							tDate.setVisibility(View.VISIBLE);
+							tDate.setText(dateText);
 							currentWeekDayIndexForIncome += MyCalendar.daysBetween(previousIncomeDate, t.getDateTime());
 						}
 
@@ -1053,6 +1061,8 @@ public class AStats extends AppCompatActivity {
 							if (!firstExpenseDayOfWeek.equals(t.getDateTime())) {
 								container.addView(getLayoutInflater().inflate(R.layout.x_line, null));
 							}
+							tDate.setVisibility(View.VISIBLE);
+							tDate.setText(dateText);
 							currentWeekDayIndexForExpense += MyCalendar.daysBetween(previousExpenseDate, t.getDateTime());
 						}
 
@@ -1075,7 +1085,11 @@ public class AStats extends AppCompatActivity {
 					if (container_layout != null) {
 
 						if (!t.getDateTime().equals(previousDate)) {
-							container_layout.addView(getLayoutInflater().inflate(R.layout.x_line, null));
+							tDate.setVisibility(View.VISIBLE);
+							tDate.setText(dateText);
+							if (i > 0) {
+								container_layout.addView(getLayoutInflater().inflate(R.layout.x_line, null));
+							}
 							previousDate = t.getDateTime();
 						}
 
