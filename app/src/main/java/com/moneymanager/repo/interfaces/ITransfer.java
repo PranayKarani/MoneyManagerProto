@@ -13,4 +13,5 @@ public interface ITransfer {
 
 	Transfer[] getAccountTransfers(int accountID);
 
+	void removeTransfersForAccount(int id);
 }

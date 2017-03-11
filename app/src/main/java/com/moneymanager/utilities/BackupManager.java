@@ -112,7 +112,7 @@ public class BackupManager {
 							scriptBuilder.append(c.getFloat(i));
 							break;
 						default:
-							scriptBuilder.append("'").append(c.getString(i)).append("'");
+							scriptBuilder.append("'").append(c.getString(i).replace("'", "''")).append("'");
 							break;
 
 					}
@@ -252,6 +252,8 @@ public class BackupManager {
 			// first get the backup script
 			final String script = createBackupScript();
 			OutputStream outputStream = contents.getOutputStream();
+
+			activity.log_i("backup script:\n" + script);
 
 			// write the contents to the DriveContent
 			writeToFile(script, outputStream);

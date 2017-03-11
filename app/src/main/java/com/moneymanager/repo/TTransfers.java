@@ -110,6 +110,32 @@ public class TTransfers implements ITransfer {
 		return transfers;
 	}
 
+	@Override
+	public void removeTransfersForAccount(int id) {
+
+		Cursor c = dbHelper.select(q_SELECT_ACCOUNT_TRANSFERS(id), null);
+
+		String delTransferIds = "";
+
+		while (c.moveToNext()) {
+
+			Transfer transfer = extractTransferFromCursor(c);
+			if (transfer.getFromAccount().getId() == -1 || transfer.getToAccount().getId() == -1) {
+				delTransferIds += transfer.getId();
+			}
+
+			if (!c.isLast()) {
+				delTransferIds += ",";
+			}
+
+		}
+
+		if (!delTransferIds.equals("")) {
+			dbHelper.delete(TABLE_NAME, ID + " IN (?)", new String[]{delTransferIds});
+		}
+
+	}
+
 	private Transfer extractTransferFromCursor(Cursor c) {
 
 		final int id = c.getInt(c.getColumnIndex(ID));

@@ -56,7 +56,7 @@ public class TBudget implements IBudget {
 				PERIOD + " INTEGER," +
 				NOTIFY + " INTEGER," +
 				"FOREIGN KEY(" + CATEGORY + ") REFERENCES " + TCategories.TABLE_NAME + "(" + TCategories.ID + ")," +
-				"FOREIGN KEY(" + ACCOUNT + ") REFERENCES " + TAccounts.TABLE_NAME + "(" + TAccounts.ID + ")" +
+				"FOREIGN KEY(" + ACCOUNT + ") REFERENCES " + TAccounts.TABLE_NAME + "(" + TAccounts.ID + ") ON DELETE CASCADE " +
 				");";
 	}
 
@@ -99,6 +99,11 @@ public class TBudget implements IBudget {
 	@Override
 	public void removeBudget(int id) {
 		dbHelper.delete(TABLE_NAME, ID + " = ?", new String[]{String.valueOf(id)});
+	}
+
+	@Override
+	public void removeBudgetsForAccount(int id) {
+		dbHelper.delete(TABLE_NAME, ACCOUNT + " = ?", new String[]{String.valueOf(id)});
 	}
 
 	private Budget extractBudgetFromCursor(Cursor c) {

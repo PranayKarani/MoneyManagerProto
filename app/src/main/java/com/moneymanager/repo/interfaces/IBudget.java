@@ -12,4 +12,6 @@ public interface IBudget {
 	Budget[] getAllBudgets();
 
 	void removeBudget(int id);
+
+	void removeBudgetsForAccount(int id);
 }

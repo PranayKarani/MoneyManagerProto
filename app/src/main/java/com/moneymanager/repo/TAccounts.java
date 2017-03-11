@@ -189,11 +189,23 @@ public class TAccounts implements IAccount {
 	@Override
 	public void removeAccount(int id) {
 
-		dbHelper.delete(TABLE_NAME, ID + " = ?", new String[]{String.valueOf(id)});
-
 		// TODO do something about transactions in this Account
 		TTransactions tTransaction = new TTransactions(context);
 		tTransaction.removeTransactionsForAccount(id);
+
+		// remove budgets
+		TBudget tBudget = new TBudget(context);
+		tBudget.removeBudgetsForAccount(id);
+
+		// remove debts
+		TDebt tDebt = new TDebt(context);
+		tDebt.removeDebtsForAccount(id);
+
+		// remove transfers
+		TTransfers tTransfers = new TTransfers(context);
+		tTransfers.removeTransfersForAccount(id);
+
+		dbHelper.delete(TABLE_NAME, ID + " = ?", new String[]{String.valueOf(id)});
 
 	}
 

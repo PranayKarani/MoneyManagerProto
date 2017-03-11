@@ -53,7 +53,7 @@ public class TDebt implements IDebt {
 				INFO + " TEXT," +
 				DATETIME + " DATETIME," +
 				"FOREIGN KEY(" + USER + ") REFERENCES " + TUser.TABLE_NAME + "(" + TUser.ID + ")," +
-				"FOREIGN KEY(" + ACCOUNT + ") REFERENCES " + TAccounts.TABLE_NAME + "(" + TAccounts.ID + ")" +
+				"FOREIGN KEY(" + ACCOUNT + ") REFERENCES " + TAccounts.TABLE_NAME + "(" + TAccounts.ID + ") ON DELETE CASCADE " +
 				");";
 	}
 
@@ -253,6 +253,11 @@ public class TDebt implements IDebt {
 
 		dbHelper.delete(TABLE_NAME, ID + " = ?", new String[]{String.valueOf(debt.getId())});
 
+	}
+
+	@Override
+	public void removeDebtsForAccount(int id) {
+		dbHelper.delete(TABLE_NAME, ACCOUNT + " = ?", new String[]{String.valueOf(id)});
 	}
 
 	private Debt extractDebtFromCursor(Cursor c) {

@@ -249,17 +249,21 @@ public class AAccounts extends MyBaseActivity {
 			String transactionSum, debtSum, loanSum;
 
 			final int tC = tAccounts.countTransactions(id);
-			final int cC = tAccounts.countDebt(id);
+			final int dC = tAccounts.countDebt(id);
 			final int lC = tAccounts.countLoan(id);
 
-			if (tC <= 0 && cC <= 0 && lC <= 0) {
+			if (tC <= 0 && dC <= 0 && lC <= 0) {
 				infotv.setVisibility(View.GONE);
 			} else {
-				transactionSum = tC <= 0 ? "" : "transactions: " + tC;
-				debtSum = cC <= 0 ? "" : "\ndebt: " + cC;
-				loanSum = lC <= 0 ? "" : "\nloan: " + lC;
+				transactionSum = tC <= 0 ? "" : "transactions: " + tC + "\n";
+				debtSum = dC <= 0 ? "" : "debt: " + dC + "\n";
+				loanSum = lC <= 0 ? "" : "loan: " + lC + "\n";
 				infotv.setVisibility(View.VISIBLE);
-				infotv.setText(transactionSum + "" + debtSum + "" + loanSum);
+				String infoString = transactionSum + debtSum + loanSum;
+				while (infoString.endsWith("\n")) {
+					infoString = infoString.substring(0, infoString.length() - 1);
+				}
+				infotv.setText(infoString);
 			}
 
 			// set click listener to edit button in each row
