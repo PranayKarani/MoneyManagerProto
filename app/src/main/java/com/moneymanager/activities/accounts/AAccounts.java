@@ -242,7 +242,7 @@ public class AAccounts extends MyBaseActivity {
 			final TextView nametv = (TextView) rowView.findViewById(R.id.account_view_name);
 			nametv.setText(name);
 			final TextView baltv = (TextView) rowView.findViewById(R.id.account_view_bal);
-			baltv.setText("Rs " + String.valueOf(bal));
+			baltv.setText(formatAmt(bal));
 			final TextView infotv = (TextView) rowView.findViewById(R.id.account_view_info);
 
 			TAccounts tAccounts = new TAccounts(myContext);

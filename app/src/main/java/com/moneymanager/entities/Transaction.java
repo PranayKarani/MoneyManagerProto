@@ -2,6 +2,7 @@
 
 package com.moneymanager.entities;
 
+import com.moneymanager.Common;
 import com.moneymanager.utilities.MyCalendar;
 
 import java.util.Date;
@@ -43,7 +44,7 @@ public class Transaction {
 	}
 
 	public String getAmountString() {
-		return "Rs " + amount;
+		return Common.formatAmt(amount);
 	}
 
 	public Category getCategory() {

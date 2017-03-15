@@ -145,7 +145,7 @@ public class ASearch extends MyBaseActivity {
 												dialog.dismiss();
 												selectedAmount[0] = Double.parseDouble(amtText.getText().toString());
 												query[0] += selectedAmount[0];
-												query[1] += "Rs " + selectedAmount[0];
+												query[1] += formatAmt(selectedAmount[0]);
 												queries[AMT_QUETY_IDX] = query[0];
 												amtTextview.setText(query[1]);
 											}
@@ -186,7 +186,7 @@ public class ASearch extends MyBaseActivity {
 												dialog.dismiss();
 
 												query[0] += selectedAmount[0] + " AND " + selectedAmount[1];
-												query[1] += "Rs " + selectedAmount[0] + " and Rs " + selectedAmount[1];
+												query[1] += formatAmt(selectedAmount[0]) + " and " + formatAmt(selectedAmount[1]);
 												queries[AMT_QUETY_IDX] = query[0];
 												amtTextview.setText(query[1]);
 											}

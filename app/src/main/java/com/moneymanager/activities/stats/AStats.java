@@ -589,9 +589,9 @@ public class AStats extends MyBaseActivity {
 					break;
 
 			}
-			cardExpenseTextView.setText("Rs " + expenseSum);
-			cardIncomeTextView.setText("Rs " + incomeSum);
-			cardTotalTextView.setText("Rs " + (incomeSum - expenseSum));
+			cardExpenseTextView.setText(formatAmt(expenseSum));
+			cardIncomeTextView.setText(formatAmt(incomeSum));
+			cardTotalTextView.setText(formatAmt((incomeSum - expenseSum)));
 
 
 			if (transactions.length == 0) {

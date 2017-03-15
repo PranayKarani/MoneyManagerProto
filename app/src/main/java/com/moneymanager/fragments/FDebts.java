@@ -20,8 +20,7 @@ import com.moneymanager.utilities.MyCalendar;
 
 import java.util.Date;
 
-import static com.moneymanager.Common.DEBT;
-import static com.moneymanager.Common.LOAN;
+import static com.moneymanager.Common.*;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -170,7 +169,7 @@ public class FDebts extends Fragment {
 
 			userText.setText(debt.getUser().getName());
 			typeText.setText(debt.getType() == DEBT ? "owes you" : "you owe");
-			amtText.setText("Rs " + debt.getAmount());
+			amtText.setText(formatAmt(debt.getAmount()));
 			accText.setText(debt.getAccount().getName());
 			infoText.setText(debt.getShortInfo());
 

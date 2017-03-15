@@ -158,10 +158,10 @@ public class ABudgets extends AppCompatActivity {
 			pb.setProgress((int) spent);
 
 			catText.setText(budget.getCategory().getName());
-			setAmtText.setText("Rs " + set);
+			setAmtText.setText(formatAmt(set));
 
-			spentAmtText.setText("Rs " + spent);
-			remAmtText.setText("Rs " + rem);
+			spentAmtText.setText(formatAmt(spent));
+			remAmtText.setText(formatAmt(rem));
 
 			if (aboutToOverpsend) {
 				remText.setTextColor(Common.getMyColor(ABudgets.this, R.color.colorOrange));
@@ -172,7 +172,7 @@ public class ABudgets extends AppCompatActivity {
 				remText.setTextColor(Common.getMyColor(ABudgets.this, R.color.colorRed));
 				remText.setText("Overspent");
 				remAmtText.setTextColor(Common.getMyColor(ABudgets.this, R.color.colorRed));
-				remAmtText.setText("by Rs " + Math.abs(rem));
+				remAmtText.setText("by " + formatAmt(Math.abs(rem)));
 			}
 
 			if (aboutToOverpsend) {

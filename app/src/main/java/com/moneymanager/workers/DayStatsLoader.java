@@ -208,9 +208,9 @@ public class DayStatsLoader extends AsyncTask<Bundle, Void, TransStats> {
 
 		TextView title = (TextView) activity.findViewById(R.id.a_stats_overview_card_title);
 		title.setText(MyCalendar.dateToString(myDate) + " " + MyCalendar.monthToFullString(myDate) + "'s Overview");
-		cardExpenseTextView.setText("Rs " + stats.expenseTransSum);
-		cardIncomeTextView.setText("Rs " + stats.incomeTransSum);
-		cardTotalTextView.setText("Rs " + stats.netSum);
+		cardExpenseTextView.setText(formatAmt(stats.expenseTransSum));
+		cardIncomeTextView.setText(formatAmt(stats.incomeTransSum));
+		cardTotalTextView.setText(formatAmt(stats.netSum));
 
 		// setup main piechart
 		setupMainPieChart(stats);

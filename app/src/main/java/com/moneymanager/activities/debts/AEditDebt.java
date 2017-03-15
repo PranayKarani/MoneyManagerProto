@@ -307,7 +307,7 @@ public class AEditDebt extends AppCompatActivity {
 			amt_edittext.setError("Amount cannot be empty");
 			return null;
 		} else if (Double.valueOf(amt) > selectedAccountBalance && debt.getType() == DEBT && selectedAccountID != debt.getAccount().getId()) {
-			amt_edittext.setError("Expense should not exceed Account Balance: (Rs " + selectedAccountBalance + ")");
+			amt_edittext.setError("Expense should not exceed Account Balance: (" + formatAmt(selectedAccountBalance) + ")");
 			return null;
 		}
 

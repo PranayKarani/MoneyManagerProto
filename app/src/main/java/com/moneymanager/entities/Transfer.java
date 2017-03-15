@@ -6,6 +6,8 @@ import com.moneymanager.utilities.MyCalendar;
 
 import java.util.Date;
 
+import static com.moneymanager.Common.formatAmt;
+
 public class Transfer {
 
 	private int id;
@@ -54,7 +56,7 @@ public class Transfer {
 	}
 
 	public String getAmountString() {
-		return "Rs " + amount;
+		return formatAmt(amount);
 	}
 
 	public Date getDate() {

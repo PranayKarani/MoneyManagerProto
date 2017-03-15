@@ -116,7 +116,7 @@ public class AAddTransaction extends AppCompatActivity implements
 			add_trans_amt.setError(errorMessage);
 			return null;
 		} else if (Double.valueOf(amt) > selectedTransactionAccountBalance && cat.getType() == EXPENSE) {
-			add_trans_amt.setError("Expense should not exceed Account Balance: (Rs " + selectedTransactionAccountBalance + ")");
+			add_trans_amt.setError("Expense should not exceed Account Balance: (" + formatAmt(selectedTransactionAccountBalance) + ")");
 			return null;
 		}
 

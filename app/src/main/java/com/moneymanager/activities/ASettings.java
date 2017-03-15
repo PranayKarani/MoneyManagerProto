@@ -14,12 +14,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
+import com.moneymanager.Common;
 import com.moneymanager.R;
 import com.moneymanager.utilities.BackupManager;
 import com.moneymanager.utilities.ShrPref;
 
-import static com.moneymanager.Common.setupToolbar;
-import static com.moneymanager.Common.spBUDGET_LIMIT;
+import static com.moneymanager.Common.*;
 
 public class ASettings extends MyBaseActivity {
 
@@ -27,6 +27,7 @@ public class ASettings extends MyBaseActivity {
 	private GoogleApiClient googleApiClient;
 	private boolean backup = true;
 	private ProgressDialog progressDialog;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -94,12 +95,18 @@ public class ASettings extends MyBaseActivity {
 				})
 				.build();
 
+		// budget limit stuff
 		final int currentLimit = ShrPref.readData(this, spBUDGET_LIMIT, 10);
 		final StringBuilder sb = new StringBuilder();
 		sb.append(currentLimit).append("% of the set budget");
 
 		final TextView budgetLimitText = (TextView) findViewById(R.id.a_setting_budget_limit_text);
 		budgetLimitText.setText(sb.toString());
+
+		// currency Symbol stuff
+		final int currentSymbol = ShrPref.readData(this, spCURRENCY_SYMBOL, 0);
+		final TextView currenySymbolText = (TextView) findViewById(R.id.a_setting_curreny_format_text);
+		currenySymbolText.setText(currenySymbols[currentSymbol]);
 
 	}
 
@@ -174,6 +181,44 @@ public class ASettings extends MyBaseActivity {
 
 						ShrPref.writeData(ASettings.this, spBUDGET_LIMIT, newLimit[0]);
 						budgetLimitText.setText(newLimit[0] + "% of the set budget");
+						dialog.dismiss();
+					}
+				})
+				.create();
+		alertDialog.show();
+
+	}
+
+	public void onCurrenyFormatClick(View view) {
+
+
+		final TextView currencyFormatText = (TextView) findViewById(R.id.a_setting_curreny_format_text);
+
+		final int currentSymbolIdx = ShrPref.readData(this, spCURRENCY_SYMBOL, 0);
+		currencyFormatText.setText(currenySymbols[currentSymbolIdx]);
+
+		final int[] new_idx = {0};
+
+		final AlertDialog alertDialog = new AlertDialog.Builder(this)
+				.setTitle("Select Curreny Symbol")
+				.setSingleChoiceItems(currenySymbols, currentSymbolIdx, new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+
+						new_idx[0] = which;
+
+					}
+				})
+				.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+
+						final int new_i = new_idx[0];
+
+						ShrPref.writeData(ASettings.this, spCURRENCY_SYMBOL, new_i);
+						currencyFormatText.setText(currenySymbols[new_i]);
+						Common.CURRENCY_FORMAT = String.valueOf(currenySymbols[new_i].charAt(0));
 						dialog.dismiss();
 					}
 				})

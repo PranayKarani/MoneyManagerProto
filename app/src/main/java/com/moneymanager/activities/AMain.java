@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.moneymanager.Common;
 import com.moneymanager.R;
 import com.moneymanager.activities.accounts.AAccounts;
 import com.moneymanager.activities.budget.ABudgets;
@@ -140,6 +141,10 @@ public class AMain extends MyBaseActivity {
 		viewPager = (ViewPager) findViewById(R.id.home_viewpager);
 		viewPager.setAdapter(hmp);
 		viewPager.setCurrentItem(6);
+
+		// setup curreny symbol
+		final int currentSymbolIdx = ShrPref.readData(this, spCURRENCY_SYMBOL, 0);
+		Common.CURRENCY_FORMAT = String.valueOf(currenySymbols[currentSymbolIdx].charAt(0));
 
 	}
 
@@ -375,7 +380,7 @@ public class AMain extends MyBaseActivity {
 						if (CURRENT_ACCOUNT_ID == ALL_ACCOUNT_ID) {
 							new ToolbarRefresherThread(balText).execute();
 						} else {
-							balText.setText("Rs " + acc_bals[i]);
+							balText.setText(formatAmt(acc_bals[i]));
 						}
 
 						for (Fragment f : getSupportFragmentManager().getFragments()) {
@@ -421,7 +426,7 @@ public class AMain extends MyBaseActivity {
 		protected void onPostExecute(Double aDouble) {
 			super.onPostExecute(aDouble);
 
-			balText.setText("Rs " + aDouble);
+			balText.setText(formatAmt(aDouble));
 
 		}
 	}

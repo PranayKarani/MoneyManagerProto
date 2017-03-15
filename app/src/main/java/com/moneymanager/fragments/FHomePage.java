@@ -183,9 +183,9 @@ public class FHomePage extends Fragment {
 
 		final double totalAmt = incomeAmt - expenseAmt;
 
-		cardIncomeTextView.setText("Rs " + incomeAmt);
-		cardExpenseTextView.setText("Rs " + expenseAmt);
-		cardTotalTextView.setText("Rs " + totalAmt);
+		cardIncomeTextView.setText(formatAmt(incomeAmt));
+		cardExpenseTextView.setText(formatAmt(expenseAmt));
+		cardTotalTextView.setText(formatAmt(totalAmt));
 
 	}
 

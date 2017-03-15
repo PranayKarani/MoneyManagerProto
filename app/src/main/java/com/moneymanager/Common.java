@@ -11,10 +11,15 @@ public class Common {
 
 	public static final String mylog = "mylog";
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
-
+	public static final String[] currenySymbols = {
+			"\u0024 USD",
+			"\u20B9 INR",
+			"\u00A3 GBP",
+			"\u20AC EUR",
+			"\u00A5 YEN"
+	};
 	public static final int INCOME = 0;
 	public static final int EXPENSE = 1;
-
 	/**
 	 * i have given
 	 */
@@ -31,14 +36,15 @@ public class Common {
 	 * i am repaying
 	 */
 	public static final int LOAN_REPAY = 8;
-
 	// SharedPreferences Constants
 	public static final String spFILE_NAME = "mm_sp_file";
 	public static final String spCURRENT_ACCOUNT_ID = "account_id";
 	public static final String spBUDGET_LIMIT = "budget_limit";
+	public static final String spCURRENCY_SYMBOL = "currency_symbol";
 	// pie chart contants
 	public static final int HOLE_RADIUS = 50;
 	public static final int SLICE_SPACE = 0;
+	public static String CURRENCY_FORMAT = "$";// default is $
 	public static int ALL_ACCOUNT_ID = -9837; // Used to get info of all accounts
 	public static int CURRENT_ACCOUNT_ID = ALL_ACCOUNT_ID;
 	public static String CURRENT_ACCOUNT_NAME;
@@ -54,4 +60,13 @@ public class Common {
 	public static int getMyColor(Context context, int color) {
 		return ContextCompat.getColor(context, color);
 	}
+
+	public static String formatAmt(double amt) {
+		if (amt % 1 == 0) {
+			return String.format("%.0f " + CURRENCY_FORMAT, amt);
+		} else {
+			return String.format("%.2f " + CURRENCY_FORMAT, amt);
+		}
+	}
+
 }
