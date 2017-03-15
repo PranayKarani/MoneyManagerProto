@@ -1,5 +1,6 @@
 package com.moneymanager.activities;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -25,6 +26,7 @@ public class ASettings extends MyBaseActivity {
 	private final int RESOLVE_CONNECTION_REQUEST_CODE = 234;
 	private GoogleApiClient googleApiClient;
 	private boolean backup = true;
+	private ProgressDialog progressDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,10 @@ public class ASettings extends MyBaseActivity {
 		setContentView(R.layout.a_settings);
 
 		setupToolbar(this, R.id.settings_toolbar, "Settings");
+
+		progressDialog = new ProgressDialog(this);
+		progressDialog.setMessage("Connecting to Google Drive...");
+		progressDialog.setCancelable(false);
 
 		googleApiClient = new GoogleApiClient.Builder(this)
 				.addApi(Drive.API)
@@ -41,6 +47,9 @@ public class ASettings extends MyBaseActivity {
 					@Override
 					public void onConnected(@Nullable Bundle bundle) {
 
+						if (progressDialog.isShowing()) {
+							progressDialog.dismiss();
+						}
 
 						BackupManager backupManager = new BackupManager(ASettings.this, googleApiClient);
 						if (backup) {
@@ -53,13 +62,18 @@ public class ASettings extends MyBaseActivity {
 
 					@Override
 					public void onConnectionSuspended(int i) {
-
+						if (progressDialog.isShowing()) {
+							progressDialog.dismiss();
+						}
 					}
 				})
 				.addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
 					@Override
 					public void onConnectionFailed(@NonNull ConnectionResult result) {
 
+						if (progressDialog.isShowing()) {
+							progressDialog.dismiss();
+						}
 						log_i("GoogleApiClient connection failed: " + result.getErrorMessage());
 
 						if (!result.hasResolution()) {
@@ -99,6 +113,7 @@ public class ASettings extends MyBaseActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						showShortToast("backup started");
+						progressDialog.show();
 						googleApiClient.disconnect();
 						googleApiClient.connect();
 					}
@@ -117,6 +132,7 @@ public class ASettings extends MyBaseActivity {
 	public void onRestoreClick(View view) {
 
 		backup = false;
+		progressDialog.show();
 		googleApiClient.disconnect();
 		googleApiClient.connect();
 

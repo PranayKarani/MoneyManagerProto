@@ -7,6 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 import com.moneymanager.Common;
+import com.moneymanager.activities.stats.AStats;
 import com.moneymanager.db.DBHelper;
 import com.moneymanager.entities.Account;
 import com.moneymanager.entities.Budget;
@@ -163,6 +164,73 @@ public class TTransactions implements ITransaction {
 				" AND strftime('%Y'," + DATETIME + ") = '" + yearDigits + "' " +
 				" AND " + ACCOUNT + " = " + accID +
 				DEFAULT_ORDER_BY_TID;
+	}
+
+	private String q_SELECT_ALL_TRANSACTIONS_FOR_YEAR(String yearDigits) {
+		return SELECT_TRANS_JOIN_CAT_AND_ACC +
+				" WHERE strftime('%Y'," + DATETIME + ") = '" + yearDigits + "' " +
+				DEFAULT_ORDER_BY_TID;
+	}
+
+	private String q_SELECT_ACCOUNT_TRANSACTIONS_FOR_YEAR(int accID, String yearDigits) {
+		return SELECT_TRANS_JOIN_CAT_AND_ACC +
+				" WHERE strftime('%Y'," + DATETIME + ") = '" + yearDigits + "' " +
+				" AND " + ACCOUNT + " = " + accID +
+				DEFAULT_ORDER_BY_TID;
+	}
+
+	private String q_SELECT_DAILY_SUM(int type, String monthDigits, String yearDigits) {
+
+		return "SELECT SUM(" + AMOUNT + ") AS sum," +
+				" 0 AS period" +
+				" FROM " + TABLE_NAME +
+				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
+				" WHERE strftime('%Y'," + DATETIME + ") = '" + yearDigits + "' " +
+				" AND  strftime('%m'," + DATETIME + ") = '" + monthDigits + "' " +
+				" AND " + TCategories.TYPE + " = " + type +
+				" GROUP BY period ORDER BY period ASC";
+
+	}
+
+	private String q_SELECT_DAILY_SUM_FOR_ACCOUNT(int type, String monthDigits, String yearDigits, int accId) {
+
+		return "SELECT SUM(" + AMOUNT + ") AS sum," +
+				" 0 AS period" +
+				" FROM " + TABLE_NAME +
+				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
+				" WHERE strftime('%Y'," + DATETIME + ") = '" + yearDigits + "' " +
+				" AND  strftime('%m'," + DATETIME + ") = '" + monthDigits + "' " +
+				" AND " + TCategories.TYPE + " = " + type +
+				" AND " + ACCOUNT + " = " + accId +
+				" GROUP BY period ORDER BY period ASC";
+
+	}
+
+	// TODO to be worked on later
+	private String q_SELECT_WEEKLY_SUM(int type, String weekStart, String weekEnd) {
+		return "SELECT SUM(" + AMOUNT + ") AS SUM, " +
+				"";
+	}
+
+	private String q_SELECT_MONTHLY_SUM(int type, String yearDigits) {
+		return "SELECT SUM(" + AMOUNT + ") AS sum, strftime('%m', " + DATETIME + ") AS period" +
+				" FROM " + TABLE_NAME +
+				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
+				" WHERE strftime('%Y'," + DATETIME + ") = '" + yearDigits + "' " +
+				" AND " + TCategories.TYPE + " = " + type +
+				" GROUP BY period ORDER BY period ASC";
+
+	}
+
+	private String q_SELECT_MONTHLY_SUM_FOR_ACCOUNT(int type, String yearDigits, int accId) {
+		return "SELECT SUM(" + AMOUNT + ") AS sum, strftime('%m', " + DATETIME + ") AS period" +
+				" FROM " + TABLE_NAME +
+				" JOIN " + TCategories.TABLE_NAME + " ON " + CATEGORY + " = " + TCategories.TABLE_NAME + "." + TCategories.ID +
+				" WHERE strftime('%Y'," + DATETIME + ") = '" + yearDigits + "' " +
+				" AND " + TCategories.TYPE + " = " + type +
+				" AND " + ACCOUNT + " = " + accId +
+				" GROUP BY period ORDER BY period ASC";
+
 	}
 
 	private String q_SELECT_TRANSACTION_FOR_BUDGET(int acc, int cat, String startDate, String endDate) {
@@ -366,6 +434,47 @@ public class TTransactions implements ITransaction {
 	}
 
 
+	/* Year Transactions */
+	@Override
+	public Transaction[] getTransactionsForYear(Date date) {
+
+		String yearDigi = MyCalendar.yearToString(date);
+
+		final Cursor c = dbHelper.select(q_SELECT_ALL_TRANSACTIONS_FOR_YEAR(yearDigi), null);
+
+		final Transaction[] transactions = new Transaction[c.getCount()];
+
+		while (c.moveToNext()) {
+
+			final int pos = c.getPosition();
+			transactions[pos] = extractTransactionFromCursor(c);
+
+		}
+
+		return transactions;
+
+	}
+
+	@Override
+	public Transaction[] getAccountSpecificTransactionsForYear(int selectedAccountID, Date date) {
+
+		String yearDigi = MyCalendar.yearToString(date);
+
+		final Cursor c = dbHelper.select(q_SELECT_ACCOUNT_TRANSACTIONS_FOR_YEAR(selectedAccountID, yearDigi), null);
+
+		final Transaction[] transactions = new Transaction[c.getCount()];
+
+		while (c.moveToNext()) {
+
+			final int pos = c.getPosition();
+			transactions[pos] = extractTransactionFromCursor(c);
+
+		}
+
+		return transactions;
+
+	}
+
 	/* Custom Period Transactions */
 	@Override
 	public Transaction[] getTransactionsForCustomPeriod(Date startingDate, Date endingDate) {
@@ -399,6 +508,102 @@ public class TTransactions implements ITransaction {
 
 		return t;
 
+	}
+
+	@Override
+	public double[] getPeriodSums(int period, int type, Date date) {
+
+		String yearDigi = MyCalendar.yearToString(date);
+		String monthDigi = MyCalendar.monthToStringDigits(date);
+		String query = "";
+		int arr_size = 0;
+		switch (period) {
+			case AStats.DAY:
+				arr_size = 1;
+				query = q_SELECT_DAILY_SUM(type, monthDigi, yearDigi);
+				break;
+			case AStats.WEEK:
+				arr_size = 7;
+				Date[] dates = MyCalendar.weekEndandStartDatesforDate(date);
+				String weekStart = MyCalendar.stringFormatOfDate(dates[0]);
+				String weekEnd = MyCalendar.stringFormatOfDate(dates[1]);
+				query = q_SELECT_WEEKLY_SUM(type, weekStart, weekEnd);
+				break;
+			case AStats.MONTH:
+				break;
+			case AStats.YEAR:
+				arr_size = 14;
+				query = q_SELECT_MONTHLY_SUM(type, yearDigi);
+				break;
+			default:
+				query = "soon";
+				break;
+
+		}
+		Cursor c = dbHelper.select(query, null);
+
+		final double[] amts = new double[arr_size];
+
+		if (!c.moveToFirst()) {
+			return amts;
+		}
+		for (int i = 0; i < arr_size; i++) {
+
+			if (c.getInt(c.getColumnIndex("period")) == i) {
+				amts[i] = c.getDouble(c.getColumnIndex("sum"));
+				if (!c.isLast()) {
+					c.moveToNext();
+				}
+			} else {
+				amts[i] = 0;
+			}
+		}
+
+		return amts;
+	}
+
+	@Override
+	public double[] getPeriodSumsForAccount(int period, int type, Date date, int accId) {
+
+		String yearDigi = MyCalendar.yearToString(date);
+		String monthDigi = MyCalendar.monthToStringDigits(date);
+		String query = "";
+		switch (period) {
+			case AStats.DAY:
+				query = q_SELECT_DAILY_SUM_FOR_ACCOUNT(type, monthDigi, yearDigi, accId);
+				break;
+			case AStats.WEEK:
+				break;
+			case AStats.MONTH:
+				break;
+			case AStats.YEAR:
+				query = q_SELECT_MONTHLY_SUM_FOR_ACCOUNT(type, yearDigi, accId);
+				break;
+			default:
+				query = "soon";
+				break;
+
+		}
+		Cursor c = dbHelper.select(query, null);
+		final double[] amts = new double[14];
+
+		if (!c.moveToFirst()) {
+			return amts;
+		}
+		for (int i = 0; i < amts.length; i++) {
+
+			if (c.getInt(c.getColumnIndex("period")) == i) {
+				amts[i] = c.getDouble(c.getColumnIndex("sum"));
+				if (!c.isLast()) {
+					c.moveToNext();
+				}
+
+			} else {
+				amts[i] = 0;
+			}
+		}
+
+		return amts;
 	}
 
 

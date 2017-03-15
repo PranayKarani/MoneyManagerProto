@@ -9,14 +9,22 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/d_stats_piechart"
-            android:layout_width="240sp"
-            android:layout_height="240sp"
-            android:layout_gravity="center"
-            android:padding="8dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:orientation="vertical"
+            >
 
-        </com.github.mikephil.charting.charts.PieChart>
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/d_stats_piechart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                >
+
+            </com.github.mikephil.charting.charts.PieChart>
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/d_stats_piechart_list_container"

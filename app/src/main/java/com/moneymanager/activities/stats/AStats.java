@@ -4,11 +4,11 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Menu;
@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
@@ -25,6 +26,7 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.moneymanager.Common;
 import com.moneymanager.R;
+import com.moneymanager.activities.MyBaseActivity;
 import com.moneymanager.activities.transaction.AEditTransaction;
 import com.moneymanager.entities.Account;
 import com.moneymanager.entities.Transaction;
@@ -32,6 +34,8 @@ import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.TAccounts;
 import com.moneymanager.repo.TTransactions;
 import com.moneymanager.utilities.MyCalendar;
+import com.moneymanager.workers.DayStatsLoader;
+import com.moneymanager.workers.YearStatsLoader;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,20 +43,27 @@ import java.util.*;
 
 import static com.moneymanager.Common.*;
 
-public class AStats extends AppCompatActivity {
+public class AStats extends MyBaseActivity {
 
+	public static final int DAY = 324;
+	public static final int WEEK = 244;
+	public static final int MONTH = 824;
+	public static final int YEAR = 944;
+	public static final int CUSTOM = 31;
 	private static boolean startDateSelected;
 	private static Date customStartDate;
 	private static Date customEndDate;
 	private static AlertDialog customDatePickerDialog;
-	private final int DAY = 324;
-	private final int WEEK = 244;
-	private final int MONTH = 824;
-	private final int YEAR = 944;
-	private final int CUSTOM = 31;
-	private Date myDate;
+	public Date myDate;
+	public int selectedAccountID = CURRENT_ACCOUNT_ID;
+	public LinearLayout bargraphCard, linechartCard;
+	public CardView income_trans_container_card, expense_trans_container_card;
+	public LinearLayout income_trans_container, expense_trans_container;
+	// Views
+	public PieChart mainPieChart;
+	public BarChart weekBarChart, monthBarChart;
+	public LineChart yearLineChart;
 	private SimpleDateFormat sdf;
-	private int selectedAccountID = CURRENT_ACCOUNT_ID;
 	private int selectedPeriod = DAY;
 	private Account[] accounts;
 	private String[] acc_names;
@@ -60,16 +71,12 @@ public class AStats extends AppCompatActivity {
 	// Views
 	private MenuItem period_text;
 	private TextView cardIncomeTextView, cardExpenseTextView, cardTotalTextView;
-
-	private LinearLayout bargraphCard;
-	private CardView income_trans_container_card, expense_trans_container_card;
-	private LinearLayout income_trans_container, expense_trans_container;
-
-
 	// Colors
 	private int colorGreen;
+	private int colorLightGreen;
 	private int colorFaintGreen;
 	private int colorRed;
+	private int colorLightRed;
 	private int colorFaintRed;
 	private int colorTransparent;
 	private int colorWhite;
@@ -87,6 +94,7 @@ public class AStats extends AppCompatActivity {
 		refreshToolbar();
 
 		bargraphCard = (LinearLayout) findViewById(R.id.a_stats_overview_bargraph);
+		linechartCard = (LinearLayout) findViewById(R.id.a_stats_overview_linegraph);
 
 		refreshDataLayouts();
 
@@ -102,6 +110,16 @@ public class AStats extends AppCompatActivity {
 
 		Calendar c = Calendar.getInstance();
 
+		//setting up Piechart
+		mainPieChart = (PieChart) findViewById(R.id.a_stats_piechart);
+
+		// setting up bar chart
+		weekBarChart = (BarChart) findViewById(R.id.a_stats_week_barchart);
+		monthBarChart = (BarChart) findViewById(R.id.a_stats_month_barchart);
+
+		// setting up line graph
+		yearLineChart = (LineChart) findViewById(R.id.a_stats_year_linechart);
+
 	}
 
 	@Override
@@ -111,7 +129,23 @@ public class AStats extends AppCompatActivity {
 		b.putString("date", sdf.format(myDate));
 		b.putString("cus_end_date", sdf.format(customEndDate));
 		b.putString("cus_start_date", sdf.format(customStartDate));
-		new TransListLoader().execute(b);
+		switch (selectedPeriod) {
+			case DAY:
+				new DayStatsLoader(this).execute(b);
+				break;
+			case WEEK:
+				new TransListLoader().execute(b);
+				break;
+			case MONTH:
+				new TransListLoader().execute(b);
+				break;
+			case YEAR:
+				new YearStatsLoader(this).execute(b);
+				break;
+			default:
+				new TransListLoader().execute(b);
+				break;
+		}
 	}
 
 	private void init() {
@@ -125,8 +159,6 @@ public class AStats extends AppCompatActivity {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-
-//		Toast.makeText(this, "stats for " + MyCalendar.dateToString(myDate), Toast.LENGTH_SHORT).show();
 
 		// setup Account related Arrays
 		TAccounts accTable = new TAccounts(this);
@@ -149,8 +181,10 @@ public class AStats extends AppCompatActivity {
 
 		// setup COlotrs
 		colorGreen = getMyColor(this, R.color.colorGreen);
+		colorLightGreen = getMyColor(this, R.color.colorLightGreen);
 		colorFaintGreen = getMyColor(this, R.color.colorFaintGreen);
 		colorRed = getMyColor(this, R.color.colorRed);
+		colorLightRed = getMyColor(this, R.color.colorLightRed);
 		colorFaintRed = getMyColor(this, R.color.colorFaintRed);
 		colorWhite = getMyColor(this, R.color.colorWhite);
 		colorTransparent = getMyColor(this, R.color.transparent);
@@ -176,19 +210,23 @@ public class AStats extends AppCompatActivity {
 
 			case DAY:
 				bargraphCard.setVisibility(View.GONE);
+				linechartCard.setVisibility(View.GONE);
 				break;
 			case WEEK:
 				bargraphCard.setVisibility(View.VISIBLE);
+				linechartCard.setVisibility(View.GONE);
 				break;
 			case MONTH:
 				bargraphCard.setVisibility(View.VISIBLE);
-//				calenderCard.setVisibility(View.VISIBLE);
+				linechartCard.setVisibility(View.GONE);
 				break;
 			case YEAR:
-				bargraphCard.setVisibility(View.VISIBLE);
+				bargraphCard.setVisibility(View.GONE);
+				linechartCard.setVisibility(View.VISIBLE);
 				break;
 			default:
 				bargraphCard.setVisibility(View.GONE);
+				linechartCard.setVisibility(View.GONE);
 				break;
 
 		}
@@ -206,7 +244,7 @@ public class AStats extends AppCompatActivity {
 		period_text.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				Toast.makeText(AStats.this, "show particular " + period_text.getTitle() + " picker", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(AStats.this, "show particular " + period_text.getTitle() + " picker", Toast.LENGTH_SHORT).show();
 				return false;
 			}
 		});
@@ -222,43 +260,35 @@ public class AStats extends AppCompatActivity {
 		b.putString("cus_start_date", sdf.format(customStartDate));
 
 		switch (item.getItemId()) {
-			case R.id.stats_menu_period_text:
-				// show selector for selected period
-				// e.g. if month is selected and this is tapped, show dialog for selecting other month
-				break;
 			case R.id.stats_menu_period_day:
 				period_text.setTitle("Day");
-
 				selectedPeriod = DAY;
-				refreshDataLayouts();
-				new TransListLoader().execute(b);
+				new DayStatsLoader(this).execute(b);
 
+				refreshDataLayouts();
 				break;
 			case R.id.stats_menu_period_week:
 				period_text.setTitle("Week");
-
 				selectedPeriod = WEEK;
-				refreshDataLayouts();
-
 				new TransListLoader().execute(b);
 
+				refreshDataLayouts();
 				break;
 			case R.id.stats_menu_period_month:
 				period_text.setTitle("Month");
-
 				selectedPeriod = MONTH;
-				refreshDataLayouts();
-
 				new TransListLoader().execute(b);
+
+				refreshDataLayouts();
 				break;
 			case R.id.stats_menu_period_year:
 				period_text.setTitle("Year");
-
 				selectedPeriod = YEAR;
+				new YearStatsLoader(this).execute(b);
 
+				refreshDataLayouts();
 				break;
-			default: // custom
-
+			case R.id.stats_menu_period_custom:
 				selectedPeriod = CUSTOM;
 				customDatePickerDialog = new AlertDialog.Builder(this)
 						.setView(R.layout.d_custom_period_picker)
@@ -300,6 +330,8 @@ public class AStats extends AppCompatActivity {
 				});
 				customDatePickerDialog.show();
 				break;
+			default:
+				return true;
 		}
 
 
@@ -331,7 +363,18 @@ public class AStats extends AppCompatActivity {
 						b.putString("date", sdf.format(myDate));
 						b.putString("cus_start_date", sdf.format(customStartDate));
 						b.putString("cus_end_date", sdf.format(customEndDate));
-						new TransListLoader().execute(b);
+
+						switch (selectedPeriod) {
+							case DAY:
+								new DayStatsLoader(AStats.this).execute(b);
+								break;
+							case YEAR:
+								new YearStatsLoader(AStats.this).execute(b);
+								break;
+							default:
+								new TransListLoader().execute(b);
+								break;
+						}
 
 					}
 				});
@@ -388,10 +431,6 @@ public class AStats extends AppCompatActivity {
 		String weekStartDateString, weekEndDateString;
 
 		// Views
-		PieChart main_piechart;
-		TextView pchart_text;
-		BarChart weekBarChart, monthBarChart;
-		TextView bchart_text;
 
 		AlertDialog piechart_dialog;
 		AlertDialog barchart_dialog;
@@ -408,14 +447,6 @@ public class AStats extends AppCompatActivity {
 				monthlyExpenseSums[i] = 0;
 			}
 
-			//setting up Piechart
-			main_piechart = (PieChart) findViewById(R.id.a_stats_piechart);
-			pchart_text = (TextView) findViewById(R.id.a_stats_overview_piechart_text);
-
-			// setting up bar chart
-			weekBarChart = (BarChart) findViewById(R.id.a_stats_week_barchart);
-			monthBarChart = (BarChart) findViewById(R.id.a_stats_month_barchart);
-			bchart_text = (TextView) findViewById(R.id.a_stats_overview_barchart_text);
 
 		}
 
@@ -472,6 +503,19 @@ public class AStats extends AppCompatActivity {
 						e.printStackTrace();
 					}
 					break;
+				case YEAR:
+					try {
+						Date date = sdf.parse(bundle.getString("date"));
+
+						if (selectedAccountID == ALL_ACCOUNT_ID) {
+							transactions = tTransactions.getTransactionsForYear(date);
+						} else {
+							transactions = tTransactions.getAccountSpecificTransactionsForYear(selectedAccountID, date);
+						}
+
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
 				default:
 					try {
 						Date startdate = sdf.parse(bundle.getString("cus_start_date"));
@@ -531,6 +575,7 @@ public class AStats extends AppCompatActivity {
 					title.setText(text);
 					break;
 				case YEAR:
+					title.setText(MyCalendar.yearToString(myDate) + "'s Overview");
 					break;
 				default:// Custom
 					if (customStartDate.equals(customEndDate)) {
@@ -550,30 +595,27 @@ public class AStats extends AppCompatActivity {
 
 
 			if (transactions.length == 0) {
-				pchart_text.setVisibility(View.VISIBLE);
-				main_piechart.setVisibility(View.GONE);
+				mainPieChart.setVisibility(View.GONE);
 
-				bchart_text.setVisibility(View.VISIBLE);
 				weekBarChart.setVisibility(View.GONE);
 				monthBarChart.setVisibility(View.GONE);
 
 			} else {
-				pchart_text.setVisibility(View.GONE);
-				main_piechart.setVisibility(View.VISIBLE);
+				mainPieChart.setVisibility(View.VISIBLE);
 				setUpPieChart();
-
-				bchart_text.setVisibility(View.GONE);
 
 				switch (selectedPeriod) {
 					case WEEK:
 						setUpWeekBarGarph();
 						monthBarChart.setVisibility(View.GONE);
 						weekBarChart.setVisibility(View.VISIBLE);
+						yearLineChart.setVisibility(View.GONE);
 						break;
 					case MONTH:
 						setUpMonthBarGraph();
 						weekBarChart.setVisibility(View.GONE);
 						monthBarChart.setVisibility(View.VISIBLE);
+						yearLineChart.setVisibility(View.GONE);
 						break;
 					default:
 						break;
@@ -590,14 +632,14 @@ public class AStats extends AppCompatActivity {
 					.setCancelable(true)
 					.create();
 
-			main_piechart.setVisibility(View.VISIBLE);
-			main_piechart.setHoleColor(colorTransparent);
-			main_piechart.setHoleRadius(50);
-			main_piechart.setDrawCenterText(false);
-			main_piechart.setRotationEnabled(false);
-			main_piechart.getLegend().setEnabled(false);
-			main_piechart.getDescription().setEnabled(false);
-			main_piechart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+			mainPieChart.setVisibility(View.VISIBLE);
+			mainPieChart.setHoleColor(colorTransparent);
+			mainPieChart.setHoleRadius(Common.HOLE_RADIUS);
+			mainPieChart.setDrawCenterText(false);
+			mainPieChart.setRotationEnabled(false);
+			mainPieChart.getLegend().setEnabled(false);
+			mainPieChart.getDescription().setEnabled(false);
+			mainPieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
 				@Override
 				public void onValueSelected(Entry e, Highlight h) {
 					final String entryText = ((PieEntry) e).getLabel();
@@ -642,6 +684,15 @@ public class AStats extends AppCompatActivity {
 							final PieChart dialog_piechart = (PieChart) piechart_dialog.findViewById(R.id.d_stats_piechart);
 							dialog_piechart.setHoleColor(Common.getMyColor(AStats.this, R.color.transparent));
 							dialog_piechart.setHoleRadius(60);
+							dialog_piechart.setTransparentCircleRadius(0);
+							final int top_bottom_offset = 0;
+							final int right_left_offset = 25;
+							dialog_piechart.setExtraOffsets(
+									right_left_offset,
+									top_bottom_offset,
+									right_left_offset,
+									top_bottom_offset
+							);
 							dialog_piechart.setCenterTextSize(16);
 							dialog_piechart.setCenterTextRadiusPercent(80);
 							dialog_piechart.setCenterTextColor(color);
@@ -654,7 +705,10 @@ public class AStats extends AppCompatActivity {
 
 							final ArrayList<Transaction> tx = type == INCOME ? incomeTransactions : expenseTransactions;
 
-							final HashMap<String, Float> cat_stats_map = new HashMap<>();
+							final HashMap<String, Double> cat_stats_map = new HashMap<>();
+
+							double highest = 0;
+							double lowest = tx.get(0).getAmount();
 
 							for (Transaction t : tx) {
 
@@ -662,30 +716,74 @@ public class AStats extends AppCompatActivity {
 								final double amt = t.getAmount();
 
 								if (cat_stats_map.containsKey(cat_name)) {
-									cat_stats_map.put(cat_name, (float) (cat_stats_map.get(cat_name) + amt));
+									cat_stats_map.put(cat_name, (cat_stats_map.get(cat_name) + amt));
 								} else {
-									cat_stats_map.put(cat_name, (float) amt);
+									cat_stats_map.put(cat_name, amt);
+								}
+								if (amt >= highest) {
+									highest = amt;
+								}
+								if (amt <= lowest) {
+									lowest = amt;
 								}
 
 							}
 
+							final int count = cat_stats_map.size();
+
+							int max_color = type == EXPENSE ? colorRed : colorGreen;
+							int min_color = type == EXPENSE ? colorLightRed : colorLightGreen;
+
+							float[] max_hsv = new float[3];
+							Color.colorToHSV(max_color, max_hsv);
+							float[] min_hsv = new float[3];
+							Color.colorToHSV(min_color, min_hsv);
+
+							final float max_s = max_hsv[1] * 100;
+							final float min_s = min_hsv[1] * 100;
+							final float s_diff = max_s - min_s;
+							final float step = s_diff / count;
+
+
+							ArrayList<Integer> colors = new ArrayList<>();
 							for (Map.Entry e : cat_stats_map.entrySet()) {
 
-								ye.add(new PieEntry((Float) e.getValue(), String.valueOf(e.getKey())));
+								final double value = (Double) e.getValue();
+
+								ye.add(
+										new PieEntry(
+												(float) value,
+												((String) e.getKey()),
+												e.getKey())
+								);
+
+								final float c_sat = (float) (((value * count * step / highest) + min_s) / 100);
+								final float[] c_hsv = new float[3];
+								Color.colorToHSV(max_color, c_hsv);
+								c_hsv[1] = c_sat;
+								final int c = Color.HSVToColor(c_hsv);
+
+								colors.add(c);
 
 							}
 
 							final PieDataSet pds = new PieDataSet(ye, "");
 							pds.setColor(color);
-							pds.setSliceSpace(2);
+							pds.setSliceSpace(0);
 							pds.setValueTextSize(14);
+							pds.setValueLineColor(color);
+							pds.setColors(colors);
+							pds.setValueLinePart1OffsetPercentage(100.f);
+							pds.setValueLinePart1Length(0.5f);
+							pds.setValueLinePart2Length(0f);
+							pds.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
 							dialog_piechart.setData(new PieData(pds));
 							dialog_piechart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
 
 								@Override
 								public void onValueSelected(Entry e, Highlight h) {
 
-									dialog_piechart.setCenterText(((PieEntry) e).getLabel() + " Stats");
+									dialog_piechart.setCenterText(((PieEntry) e).getLabel() + " TransStats");
 
 									// create a transaction list of the selected category
 									ArrayList<Transaction> req_trans = new ArrayList<>();
@@ -723,6 +821,14 @@ public class AStats extends AppCompatActivity {
 
 				}
 			});
+			final int top_bottom_offset = 10;
+			final int right_left_offset = 0;
+			mainPieChart.setExtraOffsets(
+					right_left_offset,
+					top_bottom_offset,
+					right_left_offset,
+					top_bottom_offset
+			);
 
 			ArrayList<PieEntry> yE = new ArrayList<>();
 			ArrayList<Integer> colors = new ArrayList<>();
@@ -737,14 +843,19 @@ public class AStats extends AppCompatActivity {
 			}
 
 
-			PieDataSet pds = new PieDataSet(yE, "this is some label");
-			pds.setSliceSpace(2);
-			pds.setValueTextSize(14);
-			pds.setColors(colors);
-			pds.setValueTextColor(colorPrimaryDark);
+			PieDataSet pieDataSet = new PieDataSet(yE, "this is some label");
+			pieDataSet.setSliceSpace(Common.SLICE_SPACE);
+			pieDataSet.setValueTextSize(14);
+			pieDataSet.setColors(colors);
+			pieDataSet.setValueTextColor(colorPrimaryDark);
+			pieDataSet.setValueLineColor(colorTransparent);
+			pieDataSet.setValueLinePart1OffsetPercentage(100.f);
+			pieDataSet.setValueLinePart1Length(0.5f);
+			pieDataSet.setValueLinePart2Length(0f);
+			pieDataSet.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
 
-			main_piechart.setData(new PieData(pds));
-			main_piechart.invalidate();
+			mainPieChart.setData(new PieData(pieDataSet));
+			mainPieChart.invalidate();
 
 		}
 
@@ -851,11 +962,9 @@ public class AStats extends AppCompatActivity {
 			monthBarChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
 			monthBarChart.getAxisRight().setEnabled(false);
 			monthBarChart.getAxisLeft().setTextColor(colorWhite);
-//			monthBarChart.getAxisLeft().setDrawGridLines(false);
-//			monthBarChart.getXAxis().setDrawGridLines(false);
 			monthBarChart.setDrawBarShadow(false);
 			monthBarChart.groupBars(-0.5f, groupSpace, barSpace);
-			monthBarChart.getDescription().setText(MyCalendar.monthToFullString(myDate) + "'s Stats \n(pinch out horizontally for more precision)");
+			monthBarChart.getDescription().setText(MyCalendar.monthToFullString(myDate) + "'s TransStats \n(pinch out horizontally for more precision)");
 			monthBarChart.getDescription().setTextColor(colorWhite);
 			monthBarChart.setDrawGridBackground(false);
 			monthBarChart.getLegend().setEnabled(false);
@@ -1102,5 +1211,6 @@ public class AStats extends AppCompatActivity {
 
 		}
 	}
+
 
 }

@@ -36,7 +36,9 @@ public class Common {
 	public static final String spFILE_NAME = "mm_sp_file";
 	public static final String spCURRENT_ACCOUNT_ID = "account_id";
 	public static final String spBUDGET_LIMIT = "budget_limit";
-
+	// pie chart contants
+	public static final int HOLE_RADIUS = 50;
+	public static final int SLICE_SPACE = 0;
 	public static int ALL_ACCOUNT_ID = -9837; // Used to get info of all accounts
 	public static int CURRENT_ACCOUNT_ID = ALL_ACCOUNT_ID;
 	public static String CURRENT_ACCOUNT_NAME;

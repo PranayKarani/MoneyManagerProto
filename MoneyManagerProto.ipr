@@ -2,23 +2,10 @@
 <project version="4">
   <component name="CopyrightManager" default="" />
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="Android SQLite" uuid="97ab4b87-3d3f-4b23-85db-969ad1cefdcd">
+    <data-source source="LOCAL" name="Android SQLite" uuid="89d44a6f-5710-4acd-ab8c-162080942b2f">
       <driver-ref>sqlite.xerial</driver-ref>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$USER_HOME$/Library/Caches/IntelliJIdea2016.3/android/databases/SERIAL_NUMBER_57d1ee3e/com.moneymanager/internal/moneymanager.db</jdbc-url>
-    </data-source>
-    <data-source source="LOCAL" name="Android SQLite" uuid="d8bc412f-9a2e-4ade-b174-f78cc0cf0c2c">
-      <driver-ref>sqlite.xerial</driver-ref>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$USER_HOME$/Library/Caches/IntelliJIdea2016.3/android/databases/SERIAL_NUMBER_57d1ee3e/com.moneymanager/internal/moneymanager.db</jdbc-url>
-      <libraries>
-        <library>
-          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.8.11.2/sqlite-jdbc-3.8.11.2.jar</url>
-        </library>
-        <library>
-          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.8.11.2/xerial-sqlite-license.txt</url>
-        </library>
-      </libraries>
+      <jdbc-url>jdbc:sqlite:$USER_HOME$/Library/Caches/IntelliJIdea2016.3/android/databases/SERIAL_NUMBER_192_168_1_100_4455/com.moneymanager/internal/moneymanager.db</jdbc-url>
     </data-source>
   </component>
   <component name="GradleLocalSettings">
@@ -50,6 +37,7 @@
   <component name="InspectionProjectProfileManager">
     <profile version="1.0">
       <option name="myName" value="Project Default" />
+      <inspection_tool class="AndroidLintSetTextI18n" enabled="false" level="WARNING" enabled_by_default="false" />
       <inspection_tool class="Duplicates" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
       <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
         <option name="processCode" value="true" />
@@ -274,11 +262,7 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
   <component name="dataSourceStorageLocal">
-    <data-source name="Android SQLite" uuid="97ab4b87-3d3f-4b23-85db-969ad1cefdcd">
-      <database-info product="SQLite" version="3.8.11" jdbc-version="2.1" driver-name="SQLiteJDBC" driver-version="native" />
-      <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed" />
-    </data-source>
-    <data-source name="Android SQLite" uuid="d8bc412f-9a2e-4ade-b174-f78cc0cf0c2c">
+    <data-source name="Android SQLite" uuid="89d44a6f-5710-4acd-ab8c-162080942b2f">
       <database-info product="SQLite" version="3.8.11" jdbc-version="2.1" driver-name="SQLiteJDBC" driver-version="native" />
       <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed" />
     </data-source>

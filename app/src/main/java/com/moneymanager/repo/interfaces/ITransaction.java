@@ -31,6 +31,10 @@ public interface ITransaction {
 
 	Transaction[] getAccountSpecificTransactionsForMonth(int accID, Date date);
 
+	double[] getPeriodSums(int period, int type, Date date);
+
+	double[] getPeriodSumsForAccount(int period, int type, Date date, int accId);
+
 	/* Custom Period Transactions */
 	Transaction[] getTransactionsForCustomPeriod(Date startDate, Date endDate);
 
@@ -47,4 +51,9 @@ public interface ITransaction {
 	void removeTransactionsForAccount(int id);
 
 	Transaction[] getsSearchedTransactions(String[] queries);
+
+	Transaction[] getTransactionsForYear(Date date);
+
+	Transaction[] getAccountSpecificTransactionsForYear(int selectedAccountID, Date date);
+
 }

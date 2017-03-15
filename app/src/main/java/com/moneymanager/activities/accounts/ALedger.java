@@ -131,7 +131,7 @@ public class ALedger extends MyBaseActivity {
 				selectedType = ALL;
 				new TransactionsLedgerLoader().execute();
 				new DebtLedgerLoader().execute();
-				new TransactionsLedgerLoader().execute();
+				new TransferLedgerLoader().execute();
 				break;
 		}
 
