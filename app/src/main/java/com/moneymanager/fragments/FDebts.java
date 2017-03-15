@@ -28,13 +28,13 @@ import static com.moneymanager.Common.*;
 public class FDebts extends Fragment {
 
 
-	Date previousDebtDate;
-	Debt[] debtArray;
-	boolean debt;
+	private Date previousDebtDate;
+	private Debt[] debtArray;
+	private boolean debt;
 
 	// Views
-	ListView list;
-	TextView noDebtText;
+	private ListView list;
+	private TextView noDebtText;
 
 	public FDebts() {
 		// Required empty public constructor
@@ -79,7 +79,7 @@ public class FDebts extends Fragment {
 		return rootView;
 	}
 
-	void refreshDebtArray() {
+	private void refreshDebtArray() {
 
 		TDebt tDebt = new TDebt(getContext());
 		debtArray = null;
@@ -87,12 +87,25 @@ public class FDebts extends Fragment {
 
 		previousDebtDate = debtArray.length > 0 ? MyCalendar.dateBeforeDays(debtArray[0].getDate(), 2) : null;
 
+		for (final Debt debt : debtArray) {
+
+
+			if (debt.getDate().equals(previousDebtDate)) {
+
+				debt.setDate(null);
+			} else {
+				previousDebtDate = debt.getDate();
+			}
+
+
+		}
+
 	}
 
 	class DebtListAdapter extends ArrayAdapter<Debt> {
 
 
-		public DebtListAdapter(Context context, Debt[] objects) {
+		DebtListAdapter(Context context, Debt[] objects) {
 
 			super(context, -1, objects);
 		}
@@ -145,7 +158,7 @@ public class FDebts extends Fragment {
 			dateLayout.setVisibility(View.INVISIBLE);
 
 
-			if (!debt.getDate().equals(previousDebtDate) || position == 0) {
+			if (debt.getDate() != null) {
 
 				dateLayout.setVisibility(View.VISIBLE);
 
@@ -158,8 +171,6 @@ public class FDebts extends Fragment {
 				monthYearText.setText(monthYear);
 
 			}
-
-			previousDebtDate = debt.getDate();
 
 			TextView userText = (TextView) rowView.findViewById(R.id.x_debt_user);
 			TextView typeText = (TextView) rowView.findViewById(R.id.x_debt_type);
