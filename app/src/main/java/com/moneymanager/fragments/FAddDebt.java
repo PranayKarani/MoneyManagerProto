@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.moneymanager.R;
 import com.moneymanager.activities.AUser;
 import com.moneymanager.activities.transaction.AAddTransaction;
@@ -394,7 +395,14 @@ public class FAddDebt extends Fragment {
 		public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
 			year -= 1900;//
-			selectedDebtDate = new Date(year, month, dayOfMonth);
+			Date newDate = new Date(year, month, dayOfMonth);
+
+			if (newDate.after(MyCalendar.dateToday())) {
+				Toast.makeText(getActivity(), "Date cannot be greater than today's date", Toast.LENGTH_LONG).show();
+				return;
+			}
+
+			selectedDebtDate = newDate;
 
 			((AAddTransaction) getActivity()).updateDebtDate(selectedDebtDate);
 

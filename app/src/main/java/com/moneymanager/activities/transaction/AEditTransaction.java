@@ -372,6 +372,11 @@ public class AEditTransaction extends AppCompatActivity {
 			year -= 1900;//
 			Date newDate = new Date(year, month, dayOfMonth);
 
+			if (newDate.after(MyCalendar.dateToday())) {
+				Toast.makeText(getActivity(), "Date cannot be greater than today's date", Toast.LENGTH_LONG).show();
+				return;
+			}
+
 			((AEditTransaction) getActivity()).selectedDate = newDate;
 
 			final TextView text = (TextView) getActivity().findViewById(R.id.edit_trans_date);

@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 import com.moneymanager.R;
 import com.moneymanager.activities.category.ACategories;
@@ -262,6 +263,10 @@ public class FAddTransaction extends Fragment {
 			year -= 1900;//
 			Date newDate = new Date(year, month, dayOfMonth);
 
+			if (newDate.after(MyCalendar.dateToday())) {
+				Toast.makeText(getActivity(), "Date cannot be greater than today's date", Toast.LENGTH_LONG).show();
+				return;
+			}
 			((OnDateSelectListener) getActivity()).updateTransactionDate(newDate);
 
 			final TextView text = (TextView) getActivity().findViewById(R.id.add_trans_date);
