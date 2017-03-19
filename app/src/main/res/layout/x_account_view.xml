@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8sp"
+    android:padding="8dp"
     app:cardCornerRadius="4dp"
     app:cardElevation="4dp">
     <LinearLayout
@@ -34,12 +34,6 @@
                     android:text="Account_name"
                     android:textSize="18sp"
                     />
-
-                <ImageView
-                    android:id="@+id/account_view_edit_button"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    app:srcCompat="@drawable/ic_close_white_48dp"/>
 
             </LinearLayout>
 
@@ -77,16 +71,22 @@
                 android:textSize="12sp"
                 />
         </LinearLayout>
-        <!--<ImageButton-->
-        <!--android:id="@+id/account_view_edit_button"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_margin="0dp"-->
-        <!--android:background="@color/transparent"-->
-        <!--android:padding="0dp"-->
-        <!--android:scaleX="0.5"-->
-        <!--android:scaleY="0.5"-->
-        <!--app:srcCompat="@drawable/ic_more_vert_white_48dp"/>-->
+
+        <LinearLayout
+            android:id="@+id/x_account_spinner_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="8dp">
+
+            <ImageButton
+                android:id="@+id/x_account_popbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_more_vert_white_24dp">
+            </ImageButton>
+
+        </LinearLayout>
 
 
     </LinearLayout>

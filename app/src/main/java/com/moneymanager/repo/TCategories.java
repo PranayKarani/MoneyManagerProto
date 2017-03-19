@@ -136,12 +136,14 @@ public class TCategories implements ICategory {
 	@Override
 	public void insertNewCategory(Category category) throws CategoryExistsException {
 
-		if (category.getName().toLowerCase().equals(Category.OTHER_EXPENSE.toLowerCase()) ||
-				category.getName().toLowerCase().equals(Category.OTHER_INCOME.toLowerCase())) {
+		final String name = category.getName().toLowerCase().replace("'", "''");
+
+		if (name.equals(Category.OTHER_EXPENSE.toLowerCase()) ||
+				name.equals(Category.OTHER_INCOME.toLowerCase())) {
 			throw new CategoryExistsException();
 		}
 
-		Cursor c = dbHelper.select(q_CHECK_CATEGORY(category.getName().toLowerCase(), category.getType()), null);
+		Cursor c = dbHelper.select(q_CHECK_CATEGORY(name, category.getType()), null);
 
 		if (c.getCount() > 0) {
 			throw new CategoryExistsException();
@@ -159,7 +161,8 @@ public class TCategories implements ICategory {
 	@Override
 	public void updateCategory(Category new_cat) throws CategoryExistsException {
 
-		Cursor c = dbHelper.select(q_CHECK_CATEGORY(new_cat.getName().toLowerCase(), new_cat.getType()), null);
+		final String name = new_cat.getName().toLowerCase().replace("'", "''");
+		Cursor c = dbHelper.select(q_CHECK_CATEGORY(name, new_cat.getType()), null);
 
 		if (c.getCount() > 0) {
 			throw new CategoryExistsException();

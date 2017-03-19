@@ -63,7 +63,7 @@ public class ASearch extends MyBaseActivity {
 
 		final TextView infoText = (TextView) findViewById(R.id.a_search_trans_info);
 		if (infoText.getText().toString().length() > 0) {
-			final String query = TTransactions.INFO + " LIKE '%" + infoText.getText() + "%'";
+			final String query = TTransactions.INFO + " LIKE '%" + infoText.getText().toString().replace("'", "''") + "%'";
 			queries[INFO_QUETY_IDX] = query;
 		} else {
 			queries[INFO_QUETY_IDX] = "";

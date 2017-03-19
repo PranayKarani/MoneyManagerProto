@@ -1,6 +1,7 @@
 package com.moneymanager.activities.accounts;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.*;
@@ -18,6 +20,7 @@ import com.google.android.gms.drive.Drive;
 import com.moneymanager.R;
 import com.moneymanager.activities.MyBaseActivity;
 import com.moneymanager.entities.Account;
+import com.moneymanager.exceptions.AccountNameExistsException;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.TAccounts;
 import com.moneymanager.utilities.BackupManager;
@@ -266,55 +269,109 @@ public class AAccounts extends MyBaseActivity {
 				infotv.setText(infoString);
 			}
 
-			// set click listener to edit button in each row
-			final ImageView button = (ImageView) rowView.findViewById(R.id.account_view_edit_button);
-			button.setOnClickListener(new OnClickListener() {
+			final LinearLayout popLayout = (LinearLayout) rowView.findViewById(R.id.x_account_spinner_layout);
+			final ImageButton popUpButton = (ImageButton) popLayout.findViewById(R.id.x_account_popbutton);
+
+			View.OnClickListener popListener = new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
+					PopupMenu popupMenu = new PopupMenu(getContext(), v);
+					popupMenu.getMenuInflater().inflate(R.menu.x_account_actions_popup, popupMenu.getMenu());
+					popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+						@Override
+						public boolean onMenuItemClick(MenuItem item) {
 
-					final Snackbar sb = Snackbar.make(findViewById(R.id.a_accounts_coordinate_layout),
-							"Delete Account?",
-							Snackbar.LENGTH_SHORT)
-							.setAction("Yes", new OnClickListener() {
-								@Override
-								public void onClick(View v) {
+							switch (item.getItemId()) {
+								case R.id.x_account_popup_edit_name:
 
-									Toast.makeText(myContext, "edit account with ID = " + id, Toast.LENGTH_LONG).show();
-									accTable.removeAccount(id);
-									CURRENT_ACCOUNT_ID = ALL_ACCOUNT_ID;
-									ShrPref.writeData(AAccounts.this, spCURRENT_ACCOUNT_ID, CURRENT_ACCOUNT_ID);
+									// set up insert dialog
+									final View alertView = getLayoutInflater().inflate(R.layout.d_edit_account_name, null);
+									final EditText acc_name_edittext = (EditText) alertView.findViewById(R.id.d_edit_account_name);
 
-									// refresh account list
-									final TAccounts accTable = new TAccounts(myContext);
-									final ListView accListView = (ListView) myContext.findViewById(R.id.account_accounts_list);
-
-									try {
-										final Account[] accounts = accTable.getAllAccounts(TAccounts.ID, null);
-										noAccounts = false;
-
-										accListView.setAdapter(new AccListAdapter(myContext, accounts, accTable));
+									final AlertDialog dialog = new AlertDialog.Builder(AAccounts.this)
+											.setCancelable(true)
+											.setView(alertView)
+											.setPositiveButton("save", new DialogInterface.OnClickListener() {
+												@Override
+												public void onClick(DialogInterface dialog, int which) {
 
 
-									} catch (NoAccountsException e) {
+													final Account newAcc = new Account(
+															acc.getId(),
+															acc_name_edittext.getText().toString(),
+															acc.getBalance(),
+															acc.getStartingBalance(),
+															acc.getCreateDate(),
+															false
+													);
 
-										noAccounts = true;
-										final TextView accTxt = (TextView) myContext.findViewById(R.id.accounts_text);
-										accTxt.setVisibility(View.VISIBLE);
-										accListView.setVisibility(View.GONE);
+													TAccounts tAccount = new TAccounts(AAccounts.this);
+													try {
+														tAccount.updateAccount(newAcc);
+														acc.setName(acc_name_edittext.getText().toString());
+													} catch (AccountNameExistsException e) {
+														showLongToast("Account name already exists.\nPlease choose another name.");
+													}
+
+												}
+											})
+											.create();
+									dialog.show();
+
+									break;
+								case R.id.x_account_popup_delete:
+									final Snackbar sb = Snackbar.make(findViewById(R.id.a_accounts_coordinate_layout),
+											"Delete Account?",
+											Snackbar.LENGTH_SHORT)
+											.setAction("Yes", new OnClickListener() {
+												@Override
+												public void onClick(View v) {
+
+													Toast.makeText(myContext, "Account deleted successfully", Toast.LENGTH_LONG).show();
+													accTable.removeAccount(id);
+													CURRENT_ACCOUNT_ID = ALL_ACCOUNT_ID;
+													ShrPref.writeData(AAccounts.this, spCURRENT_ACCOUNT_ID, CURRENT_ACCOUNT_ID);
+
+													// refresh account list
+													final TAccounts accTable = new TAccounts(myContext);
+													final ListView accListView = (ListView) myContext.findViewById(R.id.account_accounts_list);
+
+													try {
+														final Account[] accounts = accTable.getAllAccounts(TAccounts.ID, null);
+														noAccounts = false;
+
+														accListView.setAdapter(new AccListAdapter(myContext, accounts, accTable));
 
 
-									}
+													} catch (NoAccountsException e) {
+
+														noAccounts = true;
+														final TextView accTxt = (TextView) myContext.findViewById(R.id.accounts_text);
+														accTxt.setVisibility(View.VISIBLE);
+														accListView.setVisibility(View.GONE);
 
 
-								}
-							});
-					View sbv = sb.getView();
-					sbv.setBackgroundColor(getMyColor(AAccounts.this, R.color.colorRed));
-					sb.setActionTextColor(getMyColor(AAccounts.this, R.color.colorPrimaryDark));
-					sb.show();
+													}
 
+
+												}
+											});
+									View sbv = sb.getView();
+									sbv.setBackgroundColor(getMyColor(AAccounts.this, R.color.colorRed));
+									sb.setActionTextColor(getMyColor(AAccounts.this, R.color.colorPrimaryDark));
+									sb.show();
+									break;
+							}
+							return true;
+						}
+					});
+					popupMenu.show();
 				}
-			});
+			};
+
+			popLayout.setOnClickListener(popListener);
+			popUpButton.setOnClickListener(popListener);
+
 
 			rowView.setOnClickListener(new View.OnClickListener() {
 

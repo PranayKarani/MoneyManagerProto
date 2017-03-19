@@ -7,6 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import com.moneymanager.db.DBHelper;
 import com.moneymanager.entities.Account;
+import com.moneymanager.exceptions.AccountNameExistsException;
 import com.moneymanager.exceptions.InsufficientBalanceException;
 import com.moneymanager.exceptions.NoAccountsException;
 import com.moneymanager.repo.interfaces.IAccount;
@@ -93,7 +94,11 @@ public class TAccounts implements IAccount {
 	}
 
 
+	private String q_CHECK_ACCOUNT_NAME(String newAccountName) {
 
+		return "SELECT * FROM " + TABLE_NAME + " WHERE " + NAME + " = '" + newAccountName + "'";
+
+	}
 
 
 
@@ -227,6 +232,22 @@ public class TAccounts implements IAccount {
 		} else {
 			return -1;
 		}
+	}
+
+	@Override
+	public void updateAccount(Account account) throws AccountNameExistsException {
+
+		Cursor c = dbHelper.select(q_CHECK_ACCOUNT_NAME(account.getName().replace("'", "''")), null);
+
+		if (c.getCount() > 0) {
+			throw new AccountNameExistsException();
+		} else {
+
+			final ContentValues cv = new ContentValues();
+			cv.put(NAME, account.getName().toLowerCase());// to be stored in lower case in database
+			dbHelper.update(TABLE_NAME, cv, ID + " = ?", new String[]{String.valueOf(account.getId())});
+		}
+
 	}
 
 	@Override

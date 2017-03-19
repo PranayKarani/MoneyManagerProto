@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,11 +12,13 @@ import android.view.View;
 import android.widget.*;
 import com.moneymanager.R;
 import com.moneymanager.entities.User;
+import com.moneymanager.exceptions.CannotDeleteUserException;
 import com.moneymanager.exceptions.UserExistsException;
 import com.moneymanager.repo.TUser;
 
 import java.util.ArrayList;
 
+import static com.moneymanager.Common.getMyColor;
 import static com.moneymanager.Common.setupToolbar;
 
 public class AUser extends MyBaseActivity {
@@ -34,16 +37,35 @@ public class AUser extends MyBaseActivity {
 
 		// Setup List view
 		listView = (ListView) findViewById(R.id.a_user_listview);
-		listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, user_name_list));
+		listView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, user_name_list));
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-				TUser tUser = new TUser(AUser.this);
+				final TUser tUser = new TUser(AUser.this);
+				final User rmUser = new User(user_name_id.get(position), user_name_list.get(position));
 
-				// Removing User not allowed
-				//tUser.removeUser(new User(user_name_id.get(position), user_name_list.get(position)));
-				refreshUserList();
+				final Snackbar sb = Snackbar.make(findViewById(R.id.a_user_coordinate_layout),
+						"Delete category " + rmUser.getName() + "?",
+						Snackbar.LENGTH_SHORT)
+						.setAction("Sure", new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								try {
+									tUser.removeUser(rmUser);
+								} catch (CannotDeleteUserException e) {
+									showLongToast(e.getMessage());
+								}
+								refreshUserList();
+
+							}
+						});
+				View sbv = sb.getView();
+				sbv.setBackgroundColor(getMyColor(AUser.this, R.color.colorRed));
+				sb.setActionTextColor(getMyColor(AUser.this, R.color.colorPrimaryDark));
+				sb.show();
+
+
 
 			}
 		});

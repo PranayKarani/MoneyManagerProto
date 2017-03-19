@@ -8,11 +8,11 @@ import android.database.Cursor;
 import com.moneymanager.db.DBHelper;
 import com.moneymanager.entities.Debt;
 import com.moneymanager.entities.User;
-import com.moneymanager.exceptions.InsufficientBalanceException;
+import com.moneymanager.exceptions.CannotDeleteUserException;
 import com.moneymanager.exceptions.UserExistsException;
 import com.moneymanager.repo.interfaces.IUser;
 
-import static com.moneymanager.Common.DEBT;
+import static com.moneymanager.Common.LOAN;
 
 public class TUser implements IUser {
 
@@ -86,7 +86,8 @@ public class TUser implements IUser {
 	@Override
 	public long addUser(User user) throws UserExistsException {
 
-		Cursor c = dbHelper.select(q_SELECT_USER(user.getName()), null);
+		final String name = user.getName().replace("'", "''");
+		Cursor c = dbHelper.select(q_SELECT_USER(name), null);
 
 		if (c.getCount() > 0) {
 			throw new UserExistsException();
@@ -175,60 +176,72 @@ public class TUser implements IUser {
 	}
 
 	@Override
-	public void removeUser(User user) {
-
-		dbHelper.delete(TABLE_NAME, ID + " = ?", new String[]{String.valueOf(user.getId())});
+	public void removeUser(User user) throws CannotDeleteUserException {
 
 		TDebt tDebt = new TDebt(context);
 		Debt[] debts = tDebt.getAllDebtsForUser(user.getId());
 
-		// count the noof effect accounts first
-		int effectedAccounts = 0;
-		int temp_pre_acc = 0;
-		for (int i = 0; i < debts.length; i++) {
-			if (debts[i].getAccount().getId() != temp_pre_acc) {
-				effectedAccounts++;
-			}
-			temp_pre_acc = debts[i].getAccount().getId();
-		}
-
-		// get the ids of those accounts
-		int[] effectAccountIds = new int[effectedAccounts];
-		temp_pre_acc = -1;
-		for (int i = 0; i < effectAccountIds.length; i++) {
-			if (debts[i].getAccount().getId() != temp_pre_acc) {
-				effectAccountIds[i] = debts[i].getAccount().getId();
-			}
-			temp_pre_acc = debts[i].getAccount().getId();
-		}
-
-		// calculate the bal diff for each effected account according to debt type
-		// if the debt is of DEBT type, amount will be added, else for LOAN, amt will be deducted
-		double[] effectedAccBal = new double[effectedAccounts];
-		for (int i = 0; i < debts.length; i++) {
-
-			if (debts[i].getAccount().getId() == effectAccountIds[i]) {
-
-				if (debts[i].getType() == DEBT) {
-					effectedAccBal[i] += debts[i].getAmount();
+		if (debts.length > 0) {
+			int d_count = 0, l_count = 0;
+			for (Debt debt : debts) {
+				if (debt.getType() == LOAN) {
+					l_count++;
 				} else {
-					effectedAccBal[i] -= debts[i].getAmount();
+					d_count++;
 				}
 			}
-
+			throw new CannotDeleteUserException(user.getName(), d_count, l_count);
 		}
 
-		// now you have the updated balance for all effectef accounts
-		// update the database
-		TAccounts tAccounts = new TAccounts(context);
-		for (int i = 0; i < effectAccountIds.length; i++) {
-			try {
-				tAccounts.updateAccountBalance(effectAccountIds[i], effectedAccBal[i], true);
-			} catch (InsufficientBalanceException e) {
-				e.printStackTrace();
+		dbHelper.delete(TABLE_NAME, ID + " = ?", new String[]{String.valueOf(user.getId())});
 
-			}
-		}
+//		// count the noof effect accounts first
+//		int effectedAccounts = 0;
+//		int temp_pre_acc = 0;
+//		for (Debt debt : debts) {
+//			if (debt.getAccount().getId() != temp_pre_acc) {
+//				effectedAccounts++;
+//			}
+//			temp_pre_acc = debt.getAccount().getId();
+//		}
+//
+//		// get the ids of those accounts
+//		int[] effectAccountIds = new int[effectedAccounts];
+//		temp_pre_acc = -1;
+//		for (int i = 0; i < effectAccountIds.length; i++) {
+//			if (debts[i].getAccount().getId() != temp_pre_acc) {
+//				effectAccountIds[i] = debts[i].getAccount().getId();
+//			}
+//			temp_pre_acc = debts[i].getAccount().getId();
+//		}
+//
+//		// calculate the bal diff for each effected account according to debt type
+//		// if the debt is of DEBT type, amount will be added, else for LOAN, amt will be deducted
+//		double[] effectedAccBal = new double[effectedAccounts];
+//		for (int i = 0; i < debts.length; i++) {
+//
+//			if (debts[i].getAccount().getId() == effectAccountIds[i]) {
+//
+//				if (debts[i].getType() == DEBT) {
+//					effectedAccBal[i] += debts[i].getAmount();
+//				} else {
+//					effectedAccBal[i] -= debts[i].getAmount();
+//				}
+//			}
+//
+//		}
+//
+//		// now you have the updated balance for all effectef accounts
+//		// update the database
+//		TAccounts tAccounts = new TAccounts(context);
+//		for (int i = 0; i < effectAccountIds.length; i++) {
+//			try {
+//				tAccounts.updateAccountBalance(effectAccountIds[i], effectedAccBal[i], true);
+//			} catch (InsufficientBalanceException e) {
+//				e.printStackTrace();
+//
+//			}
+//		}
 
 	}
 

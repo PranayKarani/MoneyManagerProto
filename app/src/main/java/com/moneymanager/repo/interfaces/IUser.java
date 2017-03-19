@@ -3,6 +3,7 @@
 package com.moneymanager.repo.interfaces;
 
 import com.moneymanager.entities.User;
+import com.moneymanager.exceptions.CannotDeleteUserException;
 import com.moneymanager.exceptions.UserExistsException;
 
 public interface IUser {
@@ -17,7 +18,7 @@ public interface IUser {
 
 	User[] getSpecificUsersFromAllAccounts(int type);
 
-	void removeUser(User user);
+	void removeUser(User user) throws CannotDeleteUserException;
 
 	User[] getSearchedUsers(String searchText);
 }

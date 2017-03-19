@@ -3,6 +3,7 @@ package com.moneymanager.activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -44,7 +45,7 @@ import static com.moneymanager.Common.*;
 public class AMain extends MyBaseActivity {
 
 	private final String[] nav_places = {
-			"Stats", "Accounts", "Budgets", "Debts & Loans", "Users", "Categories"
+			"Stats", "Accounts", "Budgets", "Debts & Loans", "Categories", "Users"
 	};
 	private Account[] accounts;
 	private String[] acc_names;
@@ -87,11 +88,12 @@ public class AMain extends MyBaseActivity {
 						startActivity(new Intent(AMain.this, ADebts.class));
 						break;
 					case 4:
-						startActivity(new Intent(AMain.this, AUser.class));
-						break;
-					case 5:
 						startActivity(new Intent(AMain.this, ACategories.class));
 						break;
+					case 5:
+						startActivity(new Intent(AMain.this, AUser.class));
+						break;
+
 				}
 
 			}
@@ -111,11 +113,54 @@ public class AMain extends MyBaseActivity {
 		});
 
 
-		ImageButton imgBtn = (ImageButton) findViewById(R.id.a_home_nav_settings);
+		final ImageButton imgBtn = (ImageButton) findViewById(R.id.a_home_nav_settings);
 		imgBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(AMain.this, ASettings.class));
+			}
+		});
+
+		final ImageButton aboutBtn = (ImageButton) findViewById(R.id.a_home_nav_about);
+		aboutBtn.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+
+				final AlertDialog dialog = new AlertDialog.Builder(AMain.this)
+						.setCancelable(true)
+						.setTitle("About")
+						.setMessage("Hi! I am Pranay Karani, developer of this app. If you have any issues, suggestions, feedback, please feel free to contact me. Anykind of feedback is really appreciated. " +
+								"\n\nIf you like this app then please review it on the Play Store. Thank You :)")
+						.setNegativeButton("Rate it", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+
+							}
+						})
+						.setPositiveButton("get in touch", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+
+								final String[] TO = {"pranaykarani@outlook.com"};
+								Intent emailIntent = new Intent(Intent.ACTION_SEND);
+
+								emailIntent.setData(Uri.parse("mailto:"));
+								emailIntent.setType("text/plain");
+								emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
+								emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Money Manager feedback");
+
+								try {
+									startActivity(Intent.createChooser(emailIntent, "Send Email"));
+								} catch (android.content.ActivityNotFoundException ex) {
+									Toast.makeText(AMain.this, "There is no email client installed.", Toast.LENGTH_SHORT).show();
+								}
+
+							}
+						})
+						.create();
+				dialog.show();
+
 			}
 		});
 
