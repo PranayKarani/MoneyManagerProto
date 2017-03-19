@@ -194,7 +194,6 @@ public class TAccounts implements IAccount {
 	@Override
 	public void removeAccount(int id) {
 
-		// TODO do something about transactions in this Account
 		TTransactions tTransaction = new TTransactions(context);
 		tTransaction.removeTransactionsForAccount(id);
 

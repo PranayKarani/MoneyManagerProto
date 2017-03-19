@@ -2,8 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
-    <!--TODO change the icon later-->
     <item
         android:id="@+id/account_transfer_menu"
         android:icon="@drawable/ic_done_white_48dp"
